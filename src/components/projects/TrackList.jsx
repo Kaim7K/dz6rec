@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { Plus } from "lucide-react";
 import { apiClient } from "@/api/appClient";
@@ -32,7 +32,7 @@ export default function TrackList({ project, tracks, onChanged }) {
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <h3 className="font-display text-lg font-medium text-white">Faixas</h3>
-          <span className="text-2xs text-white/35">{list.length} {isSingle ? "Â· Single" : ""}</span>
+          <span className="text-2xs text-white/35">{list.length} {isSingle ? "· Single" : ""}</span>
         </div>
         {canAdd ? (
           <button onClick={() => setOpen(true)} className="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm text-white/80 transition-colors hover:bg-white/5"><Plus size={16} />Adicionar faixa</button>

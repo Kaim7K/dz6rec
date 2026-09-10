@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { apiClient } from "@/api/appClient";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -27,7 +27,7 @@ export default function MyTasks() {
       <div>
         <p className="text-2xs font-medium uppercase tracking-[0.18em] text-white/35">Foco</p>
         <h1 className="mt-2 font-display text-3xl font-medium tracking-tight text-white sm:text-4xl">Minhas tarefas</h1>
-        <p className="mt-1.5 text-white/45">Tudo que precisa da sua atenÃ§Ã£o hoje.</p>
+        <p className="mt-1.5 text-white/45">Tudo que precisa da sua atenção hoje.</p>
       </div>
       <section>
         <div className="mb-3 flex items-center gap-2"><h2 className="text-sm font-medium text-white/60">Pendentes</h2><span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-2xs text-white/45">{pending.length}</span></div>
@@ -45,7 +45,7 @@ export default function MyTasks() {
       </section>
       {done.length > 0 && (
         <section>
-          <div className="mb-3 flex items-center gap-2"><h2 className="text-sm font-medium text-white/40">ConcluÃ­das</h2><span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-2xs text-white/35">{done.length}</span></div>
+          <div className="mb-3 flex items-center gap-2"><h2 className="text-sm font-medium text-white/40">Concluídas</h2><span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-2xs text-white/35">{done.length}</span></div>
           <div className="space-y-1.5">{done.map((t) => (
             <div key={t.id} className="flex items-center gap-3 rounded-xl border border-white/[0.04] bg-white/[0.02] p-3.5 opacity-50">
               <Checkbox checked onCheckedChange={() => toggle(t)} className="border-white/20 data-[state=checked]:bg-primary data-[state=checked]:border-primary" />

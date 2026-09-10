@@ -1,16 +1,16 @@
-﻿import { CATEGORIES } from "@/lib/music";
+import { CATEGORIES } from "@/lib/music";
 
-// infere a categoria de uma seÃ§Ã£o pelo campo explÃ­cito ou pelo nome
+// infere a categoria de uma seção pelo campo explícito ou pelo nome
 export function sectionCategory(section) {
   if (section?.category) return section.category;
   const n = (section?.name || "").toLowerCase();
   if (n.includes("visual") || n.includes("identidade")) return "visual";
-  if (n.includes("mÃºsica") || n.includes("musica") || n.includes("produÃ§Ã£o musical")) return "musica";
-  if (n.includes("marketing") || n.includes("estrat") || n.includes("prÃ©") || n.includes("pre") || n.includes("lanÃ§") || n.includes("lanc") || n.includes("pÃ³s") || n.includes("pos")) return "marketing";
+  if (n.includes("música") || n.includes("musica") || n.includes("produção musical")) return "musica";
+  if (n.includes("marketing") || n.includes("estrat") || n.includes("pré") || n.includes("pre") || n.includes("lanç") || n.includes("lanc") || n.includes("pós") || n.includes("pos")) return "marketing";
   return null;
 }
 
-// Calcula progresso por categoria (MÃºsica/Visual/Marketing) e total, exclusivamente por tarefas concluÃ­das
+// Calcula progresso por categoria (Música/Visual/Marketing) e total, exclusivamente por tarefas concluídas
 export function computeProgress(items, sections) {
   const secMap = {};
   (sections || []).forEach((s) => { secMap[s.id] = sectionCategory(s); });
@@ -30,7 +30,7 @@ export function computeProgress(items, sections) {
   };
 }
 
-// versÃ£o leve para cards/listagens: sÃ³ total a partir de itens (seÃ§Ãµes implÃ­citas)
+// versão leve para cards/listagens: só total a partir de itens (seções implícitas)
 export function totalProgress(items) {
   const t = (items || []).length;
   const d = (items || []).filter((i) => i.completed).length;

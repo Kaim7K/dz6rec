@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,9 +39,9 @@ export default function EditArtistDialog({ artist, open, onClose, onSaved }) {
         </DialogHeader>
         <form onSubmit={submit} className="space-y-4">
           <div className="space-y-1.5"><Label>Nome</Label><Input required value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Nome do artista" /></div>
-          <div className="space-y-1.5"><Label>@usuÃ¡rio</Label><Input value={form.handle} onChange={(e) => set("handle", e.target.value)} placeholder="handle" /></div>
+          <div className="space-y-1.5"><Label>@usuário</Label><Input value={form.handle} onChange={(e) => set("handle", e.target.value)} placeholder="handle" /></div>
           <div className="space-y-1.5"><Label>Foto</Label><FileField value={photo} onChange={setPhoto} accept="image/*" hint="Retrato do artista" /></div>
-          <div className="space-y-1.5"><Label>Bio</Label><Textarea value={form.bio} onChange={(e) => set("bio", e.target.value)} rows={3} placeholder="Breve descriÃ§Ã£o" /></div>
+          <div className="space-y-1.5"><Label>Bio</Label><Textarea value={form.bio} onChange={(e) => set("bio", e.target.value)} rows={3} placeholder="Breve descrição" /></div>
           <DialogFooter>
             <Button type="button" variant="ghost" onClick={onClose} className="text-white/55">Cancelar</Button>
             <Button type="submit" disabled={loading} className="bg-primary text-primary-foreground">{loading ? "Salvando..." : "Salvar"}</Button>

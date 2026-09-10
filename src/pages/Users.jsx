@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { apiClient } from "@/api/appClient";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import EditUserDialog from "@/components/users/EditUserDialog";
@@ -31,7 +31,7 @@ export default function Users() {
   const invite = async (e) => {
     e.preventDefault(); setSending(true); setMsg("");
     try { await apiClient.users.inviteUser(email, "user"); setMsg("Convite enviado com sucesso."); setEmail(""); setInviteCargo(""); }
-    catch (err) { setMsg(err.message || "NÃ£o foi possÃ­vel enviar o convite."); }
+    catch (err) { setMsg(err.message || "Não foi possível enviar o convite."); }
     finally { setSending(false); }
   };
 
@@ -49,8 +49,8 @@ export default function Users() {
   if (me?.role !== "admin") return (
     <div className="mx-auto max-w-md rounded-sl border border-stage-border bg-stage-card p-10 text-center">
       <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-stage-accent-soft"><ShieldCheck className="text-stage-accent" /></div>
-      <h1 className="mt-4 font-jakarta text-title font-bold text-stage-ink">Ãrea restrita</h1>
-      <p className="mt-2 text-body text-stage-muted">Somente a administraÃ§Ã£o pode gerenciar usuÃ¡rios.</p>
+      <h1 className="mt-4 font-jakarta text-title font-bold text-stage-ink">Área restrita</h1>
+      <p className="mt-2 text-body text-stage-muted">Somente a administração pode gerenciar usuários.</p>
     </div>
   );
 
@@ -67,8 +67,8 @@ export default function Users() {
   return (
     <div className="space-y-5 rounded-2xl border border-stage-border bg-stage-surface p-4 font-inter sm:p-6 lg:p-8">
       <div>
-        <h1 className="font-jakarta text-title font-bold text-stage-ink">UsuÃ¡rios</h1>
-        <p className="mt-0.5 text-body text-stage-muted">{users.length} usuÃ¡rios Â· {activeCount} ativos</p>
+        <h1 className="font-jakarta text-title font-bold text-stage-ink">Usuários</h1>
+        <p className="mt-0.5 text-body text-stage-muted">{users.length} usuários · {activeCount} ativos</p>
       </div>
 
       <div className="flex flex-col gap-2.5 sm:flex-row">
@@ -99,7 +99,7 @@ export default function Users() {
 
       <div className="overflow-hidden rounded-sl border border-stage-border bg-stage-card">
         <div className={`hidden items-center gap-4 border-b border-stage-border bg-stage-surface px-4 py-2.5 text-micro font-semibold uppercase tracking-wide text-stage-muted sm:grid ${GRID}`}>
-          <span>UsuÃ¡rio</span><span>E-mail</span><span>Cargos</span><span className="text-right">AÃ§Ãµes</span>
+          <span>Usuário</span><span>E-mail</span><span>Cargos</span><span className="text-right">Ações</span>
         </div>
         {filtered.map((u) => (
           <div key={u.id} className={`hidden items-center gap-4 border-b border-stage-border px-4 py-2.5 last:border-0 sm:grid ${GRID}`}>
@@ -107,7 +107,7 @@ export default function Users() {
               <Avatar u={u} size="h-8 w-8" />
               <div className="min-w-0">
                 <p className="flex items-center gap-1.5 truncate text-body font-semibold text-stage-ink">
-                  {u.full_name || "UsuÃ¡rio"}
+                  {u.full_name || "Usuário"}
                   {u.status === "inativo" && <span className="rounded-full bg-stage-warn-soft px-1.5 py-0.5 text-micro font-medium text-stage-warn">Inativo</span>}
                 </p>
                 <p className="text-micro text-stage-muted">{PERMISSAO[u.permissao] || "Membro"}</p>
@@ -120,12 +120,12 @@ export default function Users() {
             <div className="flex flex-wrap gap-1.5">{chipsFor(u, cargoList(u.cargo))}</div>
             <div className="flex items-center justify-end gap-1">
               <button onClick={() => setCargoUser(u)} className="inline-flex h-8 items-center gap-1.5 rounded-md border border-stage-border bg-stage-card px-2.5 text-micro font-semibold text-stage-accent transition-colors hover:border-stage-accent/40 hover:bg-stage-accent-soft">Gerenciar Cargos</button>
-              <button onClick={() => setEditUser(u)} aria-label="Editar usuÃ¡rio" className="rounded-full p-2 text-stage-muted transition-colors hover:bg-stage-surface hover:text-stage-ink"><Pencil size={15} /></button>
+              <button onClick={() => setEditUser(u)} aria-label="Editar usuário" className="rounded-full p-2 text-stage-muted transition-colors hover:bg-stage-surface hover:text-stage-ink"><Pencil size={15} /></button>
               {u.id !== me.id && <DeleteUserButton user={u} onDeleted={load} />}
             </div>
           </div>
         ))}
-        {filtered.length === 0 && <p className="p-6 text-center text-body text-stage-muted">Nenhum usuÃ¡rio encontrado.</p>}
+        {filtered.length === 0 && <p className="p-6 text-center text-body text-stage-muted">Nenhum usuário encontrado.</p>}
       </div>
 
       <div className="space-y-3 sm:hidden">
@@ -136,10 +136,10 @@ export default function Users() {
               <div className="flex items-start gap-3">
                 <Avatar u={u} size="h-10 w-10" />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-body font-semibold text-stage-ink">{u.full_name || "UsuÃ¡rio"}</p>
-                  <p className="truncate text-micro text-stage-muted">{u.email} Â· {PERMISSAO[u.permissao] || "Membro"}</p>
+                  <p className="truncate text-body font-semibold text-stage-ink">{u.full_name || "Usuário"}</p>
+                  <p className="truncate text-micro text-stage-muted">{u.email} · {PERMISSAO[u.permissao] || "Membro"}</p>
                 </div>
-                <button onClick={() => setEditUser(u)} aria-label="Editar usuÃ¡rio" className="rounded-full p-2 text-stage-muted transition-colors hover:bg-stage-surface hover:text-stage-ink"><Pencil size={15} /></button>
+                <button onClick={() => setEditUser(u)} aria-label="Editar usuário" className="rounded-full p-2 text-stage-muted transition-colors hover:bg-stage-surface hover:text-stage-ink"><Pencil size={15} /></button>
                 {u.id !== me.id && <DeleteUserButton user={u} onDeleted={load} />}
               </div>
               <div className="mt-3 flex flex-wrap items-center gap-1.5">
@@ -152,7 +152,7 @@ export default function Users() {
             </div>
           );
         })}
-        {filtered.length === 0 && <p className="rounded-sl border border-stage-border bg-stage-card p-6 text-center text-body text-stage-muted">Nenhum usuÃ¡rio encontrado.</p>}
+        {filtered.length === 0 && <p className="rounded-sl border border-stage-border bg-stage-card p-6 text-center text-body text-stage-muted">Nenhum usuário encontrado.</p>}
       </div>
 
       {cargoUser && <ManageCargosDialog user={cargoUser} catalog={cargos} onClose={() => setCargoUser(null)} onSaved={load} />}

@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
@@ -14,8 +14,8 @@ function UserSummary({ user }) {
         {user.photo_url ? <img src={user.photo_url} alt="" className="h-full w-full object-cover" /> : (user.full_name || user.email || "U")[0].toUpperCase()}
       </span>
       <div className="min-w-0">
-        <p className="truncate font-jakarta text-section font-bold text-stage-ink">{user.full_name || "UsuÃ¡rio"}</p>
-        <p className="truncate text-micro text-stage-muted">{user.email}{user.handle ? ` Â· @${user.handle}` : ""}</p>
+        <p className="truncate font-jakarta text-section font-bold text-stage-ink">{user.full_name || "Usuário"}</p>
+        <p className="truncate text-micro text-stage-muted">{user.email}{user.handle ? ` · @${user.handle}` : ""}</p>
       </div>
     </div>
   );
@@ -38,7 +38,7 @@ export default function ManageCargosDialog({ user, catalog, onClose, onSaved }) 
   const actions = (
     <div className="flex gap-2.5">
       <Button variant="outline" onClick={onClose} className="h-11 flex-1 rounded-sl border-stage-border bg-stage-card text-body font-medium text-stage-muted hover:bg-stage-surface hover:text-stage-ink">Cancelar</Button>
-      <Button onClick={save} disabled={loading} className="h-11 flex-1 rounded-sl bg-stage-accent text-body font-semibold text-white hover:bg-stage-accent/90">{loading ? "Salvando..." : "Salvar AlteraÃ§Ãµes"}</Button>
+      <Button onClick={save} disabled={loading} className="h-11 flex-1 rounded-sl bg-stage-accent text-body font-semibold text-white hover:bg-stage-accent/90">{loading ? "Salvando..." : "Salvar Alterações"}</Button>
     </div>
   );
 
@@ -64,7 +64,7 @@ export default function ManageCargosDialog({ user, catalog, onClose, onSaved }) 
       <DialogContent className="max-w-[600px] border-stage-border bg-stage-card text-stage-ink">
         <DialogHeader>
           <DialogTitle className="font-jakarta text-title font-bold text-stage-ink">Editar Cargos</DialogTitle>
-          <DialogDescription className="text-body text-stage-muted">Adicione ou remova os cargos deste usuÃ¡rio. Cargos descontinuados tambÃ©m podem ser removidos aqui.</DialogDescription>
+          <DialogDescription className="text-body text-stage-muted">Adicione ou remova os cargos deste usuário. Cargos descontinuados também podem ser removidos aqui.</DialogDescription>
         </DialogHeader>
         <div className="max-h-[52vh] overflow-y-auto pr-1">
           <UserSummary user={user} />

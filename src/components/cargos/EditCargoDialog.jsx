@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +19,7 @@ export default function EditCargoDialog({ cargo, onClose, onSaved }) {
     const newName = name.trim();
     await apiClient.entities.Cargo.update(cargo.id, { name: newName, color });
     if (newName !== cargo.name) {
-      // propaga o novo nome para perfis, seÃ§Ãµes e tarefas que usam o cargo
+      // propaga o novo nome para perfis, seções e tarefas que usam o cargo
       const users = await apiClient.entities.User.list().catch(() => []);
       for (const u of users.filter((x) => cargoList(x.cargo).includes(cargo.name))) {
         await apiClient.entities.User.update(u.id, { cargo: cargoList(u.cargo).map((c) => (c === cargo.name ? newName : c)) });
@@ -37,7 +37,7 @@ export default function EditCargoDialog({ cargo, onClose, onSaved }) {
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Editar cargo</DialogTitle>
-          <DialogDescription>Altere o nome ou a cor. A alteraÃ§Ã£o se aplica a todos os perfis e tarefas que usam este cargo.</DialogDescription>
+          <DialogDescription>Altere o nome ou a cor. A alteração se aplica a todos os perfis e tarefas que usam este cargo.</DialogDescription>
         </DialogHeader>
         <div className="space-y-5">
           <div className="space-y-1.5"><Label>Nome</Label><Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nome do cargo" /></div>

@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { apiClient } from "@/api/appClient";
 import { Button } from "@/components/ui/button";
@@ -30,7 +30,7 @@ export default function Login() {
       await apiClient.auth.loginViaEmailPassword(email, password);
       window.location.href = returnTo;
     } catch (err) {
-      setError(err.message || "UsuÃ¡rio ou senha invÃ¡lidos");
+      setError(err.message || "Usuário ou senha inválidos");
     } finally {
       setLoading(false);
     }
@@ -74,7 +74,7 @@ export default function Login() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="email">UsuÃ¡rio</Label>
+          <Label htmlFor="email">Usuário</Label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
             <Input
@@ -100,7 +100,7 @@ export default function Login() {
               id="password"
               type="password"
               autoComplete="current-password"
-              placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="pl-10 h-12"

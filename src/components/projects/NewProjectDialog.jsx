@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,7 +36,7 @@ export default function NewProjectDialog({ open, onClose, onCreated, artists, te
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>Novo projeto</DialogTitle>
-          <DialogDescription>Configure os detalhes essenciais do lanÃ§amento.</DialogDescription>
+          <DialogDescription>Configure os detalhes essenciais do lançamento.</DialogDescription>
         </DialogHeader>
         <form onSubmit={submit} className="space-y-4">
           <Field label="Nome do projeto"><Input required value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Ex. Noite Clara" /></Field>
@@ -46,11 +46,11 @@ export default function NewProjectDialog({ open, onClose, onCreated, artists, te
           </div>
           <Field label="Artista principal"><Select value={form.main_artist_id} onValueChange={(v) => set("main_artist_id", v)}><SelectTrigger><SelectValue placeholder="Selecionar artista" /></SelectTrigger><SelectContent>{artists.map((a) => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}</SelectContent></Select></Field>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="ParticipaÃ§Ãµes"><Input value={form.featuring} onChange={(e) => set("featuring", e.target.value)} placeholder="Artistas convidados" /></Field>
-            <Field label="LanÃ§amento previsto"><DateField value={form.release_date} onChange={(v) => set("release_date", v)} placeholder="Selecionar data" /></Field>
+            <Field label="Participações"><Input value={form.featuring} onChange={(e) => set("featuring", e.target.value)} placeholder="Artistas convidados" /></Field>
+            <Field label="Lançamento previsto"><DateField value={form.release_date} onChange={(v) => set("release_date", v)} placeholder="Selecionar data" /></Field>
           </div>
           <Field label="Capa"><FileField value={cover} onChange={setCover} accept="image/*" hint="PNG ou JPG, preferencialmente 1:1" /></Field>
-          <Field label="DescriÃ§Ã£o (opcional)"><Textarea value={form.description} onChange={(e) => set("description", e.target.value)} rows={2} placeholder="Breve contexto do projeto" /></Field>
+          <Field label="Descrição (opcional)"><Textarea value={form.description} onChange={(e) => set("description", e.target.value)} rows={2} placeholder="Breve contexto do projeto" /></Field>
           {templates.length > 0 && <Field label="Aplicar template"><Select value={templateId} onValueChange={setTemplateId}><SelectTrigger><SelectValue placeholder="Nenhum" /></SelectTrigger><SelectContent>{templates.map((t) => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent></Select></Field>}
           <DialogFooter><Button type="button" variant="ghost" onClick={onClose} className="text-white/55">Cancelar</Button><Button type="submit" disabled={loading} className="bg-primary text-primary-foreground">{loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Criar projeto</Button></DialogFooter>
         </form>

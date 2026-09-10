@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
 import { TYPE, STATUS, STATUS_TONE } from "@/lib/music";
@@ -22,14 +22,14 @@ export default function FeaturedProject({ project, progress }) {
         <div className="flex items-center gap-2">
           <span className={`h-1.5 w-1.5 rounded-full ${tone.dot}`} />
           <span className={`text-2xs font-medium uppercase tracking-[0.2em] ${tone.text}`}>{STATUS[project.status]}</span>
-          <span className="text-2xs uppercase tracking-[0.2em] text-white/25">Â· {TYPE[project.type]}</span>
+          <span className="text-2xs uppercase tracking-[0.2em] text-white/25">· {TYPE[project.type]}</span>
         </div>
         <h2 className="mt-4 font-display text-3xl font-bold leading-[1.05] tracking-tight text-white sm:text-4xl lg:text-5xl">
           {project.name}
         </h2>
         <p className="mt-3 text-sm text-white/45">
-          {project.main_artist_name || "â€”"}
-          {project.featuring ? ` Â· feat. ${project.featuring}` : ""}
+          {project.main_artist_name || "—"}
+          {project.featuring ? ` · feat. ${project.featuring}` : ""}
         </p>
         {project.description && (
           <p className="mt-4 max-w-md text-sm leading-relaxed text-white/55 line-clamp-2">{project.description}</p>

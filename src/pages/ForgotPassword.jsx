@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { apiClient } from "@/api/appClient";
 import { Button } from "@/components/ui/button";
@@ -38,7 +38,7 @@ export default function ForgotPassword() {
     >
       {sent ? (
         <p className="text-sm text-foreground text-center">
-          Se existir uma conta com esse e-mail, vocÃª receberÃ¡ o link em breve.
+          Se existir uma conta com esse e-mail, você receberá o link em breve.
         </p>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">

@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { apiClient } from "@/api/appClient";
 import { Pencil, Plus, ShieldCheck, Trash2 } from "lucide-react";
 import CargoBadge from "@/components/CargoBadge";
@@ -22,8 +22,8 @@ export default function Configuracoes() {
   if (me?.role !== "admin") return (
     <div className="mx-auto max-w-md rounded-2xl border border-white/[0.06] bg-white/[0.03] p-10 text-center">
       <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-white/[0.05]"><ShieldCheck className="text-white/50" /></div>
-      <h1 className="mt-4 font-display text-2xl font-medium text-white">Ãrea restrita</h1>
-      <p className="mt-2 text-sm text-white/50">Somente a administraÃ§Ã£o pode configurar o painel.</p>
+      <h1 className="mt-4 font-display text-2xl font-medium text-white">Área restrita</h1>
+      <p className="mt-2 text-sm text-white/50">Somente a administração pode configurar o painel.</p>
     </div>
   );
 
@@ -32,7 +32,7 @@ export default function Configuracoes() {
 
   return (
     <div className="space-y-7">
-      <div><p className="text-2xs font-medium uppercase tracking-[0.18em] text-white/35">Identidade</p><h1 className="mt-2 font-display text-3xl font-medium tracking-tight text-white sm:text-4xl">ConfiguraÃ§Ãµes</h1><p className="mt-1.5 text-white/45">PreferÃªncias do painel da gravadora.</p></div>
+      <div><p className="text-2xs font-medium uppercase tracking-[0.18em] text-white/35">Identidade</p><h1 className="mt-2 font-display text-3xl font-medium tracking-tight text-white sm:text-4xl">Configurações</h1><p className="mt-1.5 text-white/45">Preferências do painel da gravadora.</p></div>
 
       <section className="rounded-2xl border border-white/[0.06] bg-white/[0.03] p-5">
         <h2 className="font-display text-lg font-medium text-white">Cargos & badges</h2>
@@ -56,7 +56,7 @@ export default function Configuracoes() {
         </div>
       </section>
 
-      <section className="max-w-xl space-y-2.5">{["NotificaÃ§Ãµes", "PreferÃªncias da equipe", "IntegraÃ§Ãµes"].map((s) => (
+      <section className="max-w-xl space-y-2.5">{["Notificações", "Preferências da equipe", "Integrações"].map((s) => (
         <div key={s} className="flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.03] p-4">
           <div><p className="text-sm font-medium text-white">{s}</p><p className="text-2xs text-white/40">Em breve</p></div>
           <span className="rounded-full bg-white/[0.04] px-2.5 py-1 text-2xs text-white/35">em breve</span>

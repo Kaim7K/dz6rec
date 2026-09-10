@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { apiClient } from "@/api/appClient";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -37,8 +37,8 @@ export default function TemplateEditorDialog({ template, cargos, onClose, onSave
   return (
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
-        <DialogHeader><DialogTitle>Editar template â€” {template.name}</DialogTitle></DialogHeader>
-        <p className="text-sm text-white/40">Ajuste seÃ§Ãµes, tarefas e subtarefas. Projetos jÃ¡ criados nÃ£o sÃ£o alterados.</p>
+        <DialogHeader><DialogTitle>Editar template — {template.name}</DialogTitle></DialogHeader>
+        <p className="text-sm text-white/40">Ajuste seções, tarefas e subtarefas. Projetos já criados não são alterados.</p>
         <div className="space-y-4">
           {sections.map((s) => {
             const sItems = sectionItems(s.id);
@@ -50,7 +50,7 @@ export default function TemplateEditorDialog({ template, cargos, onClose, onSave
                   <Select value={s.cargo || undefined} onValueChange={(v) => setSectionCargo(s, v === NONE ? null : v)}>
                     <SelectTrigger className="h-7 w-auto min-w-[5rem] border-white/[0.08] bg-white/[0.04] px-2 text-2xs text-white/45"><SelectValue placeholder="cargo" /></SelectTrigger>
                     <SelectContent>
-                      {s.cargo && <SelectItem value={NONE} className="text-white/45">â€” Limpar â€”</SelectItem>}
+                      {s.cargo && <SelectItem value={NONE} className="text-white/45">— Limpar —</SelectItem>}
                       {cargos.map((c) => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}
                     </SelectContent>
                   </Select>
@@ -69,7 +69,7 @@ export default function TemplateEditorDialog({ template, cargos, onClose, onSave
             );
           })}
           <form onSubmit={addSection} className="flex items-center gap-2">
-            <input value={newSection} onChange={(e) => setNewSection(e.target.value)} placeholder="Nova seÃ§Ã£o..." className="flex-1 rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-2.5 text-sm outline-none transition placeholder:text-white/30 focus:border-white/15" />
+            <input value={newSection} onChange={(e) => setNewSection(e.target.value)} placeholder="Nova seção..." className="flex-1 rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-2.5 text-sm outline-none transition placeholder:text-white/30 focus:border-white/15" />
             <button className="rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">Adicionar</button>
           </form>
         </div>

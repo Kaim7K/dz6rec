@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,20 +36,20 @@ export default function EditUserDialog({ user, cargos, onClose, onSaved }) {
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="max-w-md border-stage-border bg-stage-card text-stage-ink">
         <DialogHeader>
-          <DialogTitle className="font-jakarta text-title font-bold text-stage-ink">Editar usuÃ¡rio</DialogTitle>
-          <DialogDescription className="text-body text-stage-muted">Defina cargos, permissÃ£o e status. Um usuÃ¡rio pode ter vÃ¡rios cargos.</DialogDescription>
+          <DialogTitle className="font-jakarta text-title font-bold text-stage-ink">Editar usuário</DialogTitle>
+          <DialogDescription className="text-body text-stage-muted">Defina cargos, permissão e status. Um usuário pode ter vários cargos.</DialogDescription>
         </DialogHeader>
         <div className="space-y-5">
           <Field label="Cargos">
             <UserCargosEditor value={cargosArr} onChange={setCargosArr} catalog={cargos} />
           </Field>
-          <Field label="PermissÃ£o">
+          <Field label="Permissão">
             <Select value={permissao} onValueChange={setPermissao}><SelectTrigger className={selectCls}><SelectValue /></SelectTrigger><SelectContent className={contentCls}>{Object.entries(PERMISSAO).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}</SelectContent></Select>
           </Field>
           <Field label="Status">
             <Select value={status} onValueChange={setStatus}><SelectTrigger className={selectCls}><SelectValue /></SelectTrigger><SelectContent className={contentCls}><SelectItem value="ativo">Ativo</SelectItem><SelectItem value="inativo">Inativo</SelectItem></SelectContent></Select>
           </Field>
-          <Field label="@usuÃ¡rio"><Input value={handle} onChange={(e) => setHandle(e.target.value)} placeholder="handle" className={selectCls + " placeholder:text-stage-muted"} /></Field>
+          <Field label="@usuário"><Input value={handle} onChange={(e) => setHandle(e.target.value)} placeholder="handle" className={selectCls + " placeholder:text-stage-muted"} /></Field>
           <Field label="Foto de perfil">
             {user.photo_url && !removePhoto ? (
               <div className="mb-2 flex items-center gap-3 rounded-sl border border-stage-border bg-stage-surface px-3 py-2.5">

@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { apiClient } from "@/api/appClient";
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,7 @@ export default function ResetPassword() {
     e.preventDefault();
     setError("");
     if (newPassword !== confirmPassword) {
-      setError("As senhas nÃ£o coincidem.");
+      setError("As senhas não coincidem.");
       return;
     }
     setLoading(true);
@@ -38,8 +38,8 @@ export default function ResetPassword() {
     return (
       <AuthLayout
         icon={AlertTriangle}
-        title="Link invÃ¡lido"
-        subtitle="Este link estÃ¡ incompleto ou expirou"
+        title="Link inválido"
+        subtitle="Este link está incompleto ou expirou"
         footer={
           <Link to="/forgot-password" className="text-primary font-medium hover:underline">
             Solicitar novo link
@@ -47,7 +47,7 @@ export default function ResetPassword() {
         }
       >
         <p className="text-sm text-foreground text-center">
-          Solicite um novo e-mail de redefiniÃ§Ã£o de senha.
+          Solicite um novo e-mail de redefinição de senha.
         </p>
       </AuthLayout>
     );
@@ -74,7 +74,7 @@ export default function ResetPassword() {
               type="password"
               autoComplete="new-password"
               autoFocus
-              placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+              placeholder="••••••••"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               className="pl-10 h-12"
@@ -90,7 +90,7 @@ export default function ResetPassword() {
               id="confirm"
               type="password"
               autoComplete="new-password"
-              placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+              placeholder="••••••••"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               className="pl-10 h-12"

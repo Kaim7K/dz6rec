@@ -1,12 +1,12 @@
-﻿// Shared by the auth pages (Login, Register, and any page that resumes a flow
+// Shared by the auth pages (Login, Register, and any page that resumes a flow
 // after sign-in). Keep the redirect
-// validation in one place â€” it is security-sensitive and easy to drift.
+// validation in one place — it is security-sensitive and easy to drift.
 
 // Resolve ?returnTo= to a safe same-origin path, else "/".
 //
 // The same-origin check alone is not enough: a value like /.//evil.com or
 // /\evil.com parses same-origin but normalizes to a protocol-relative
-// //evil.com when assigned to location.href â€” an open redirect. So require the
+// //evil.com when assigned to location.href — an open redirect. So require the
 // resolved path to be exactly one leading slash (no "//" prefix, no backslash).
 export function sanitizeReturnTo(raw) {
   if (!raw) return "/";

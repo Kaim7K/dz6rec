@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { apiClient } from "@/api/appClient";
 import { Bell, LogOut, Menu, Search } from "lucide-react";
@@ -51,8 +51,8 @@ export default function Topbar({ onMenu }) {
           <button onClick={() => setPanel(panel === "bell" ? null : "bell")} className="relative rounded-xl p-2.5 text-white/55 hover:bg-white/5 hover:text-white"><Bell size={18} />{unread > 0 && <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-primary ring-2 ring-background" />}</button>
           {panel === "bell" && (
             <div className="absolute right-0 mt-2 w-80 overflow-hidden rounded-2xl border border-white/[0.08] bg-popover p-1.5 shadow-pop">
-              <p className="px-3 py-2 text-2xs font-medium uppercase tracking-[0.16em] text-white/35">NotificaÃ§Ãµes</p>
-              {notifs.length === 0 ? <p className="px-3 py-6 text-center text-sm text-white/35">Nenhuma notificaÃ§Ã£o.</p> :
+              <p className="px-3 py-2 text-2xs font-medium uppercase tracking-[0.16em] text-white/35">Notificações</p>
+              {notifs.length === 0 ? <p className="px-3 py-6 text-center text-sm text-white/35">Nenhuma notificação.</p> :
                 <div className="max-h-80 overflow-y-auto">{notifs.map((n) => (
                   <button key={n.id} onClick={() => openNotif(n)} className={cn("block w-full rounded-lg px-3 py-2.5 text-left text-sm hover:bg-white/5", n.read ? "text-white/45" : "text-white/90")}>{n.text}<span className="mt-0.5 block text-2xs text-white/30">{new Date(n.created_date).toLocaleString("pt-BR")}</span></button>
                 ))}</div>}

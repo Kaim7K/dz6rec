@@ -1,17 +1,17 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { apiClient } from "@/api/appClient";
 import { cn } from "@/lib/utils";
 import { FolderKanban, House, LayoutTemplate, ListTodo, Mic2, Settings, Users, X } from "lucide-react";
 
 const items = [
-  { label: "InÃ­cio", to: "/", Icon: House },
+  { label: "Início", to: "/", Icon: House },
   { label: "Projetos", to: "/projetos", Icon: FolderKanban },
   { label: "Artistas", to: "/artistas", Icon: Mic2 },
   { label: "Meus trabalhos", to: "/minhas-tarefas", Icon: ListTodo },
   { label: "Templates", to: "/templates", Icon: LayoutTemplate },
-  { label: "UsuÃ¡rios", to: "/usuarios", Icon: Users, admin: true },
-  { label: "ConfiguraÃ§Ãµes", to: "/configuracoes", Icon: Settings, admin: true },
+  { label: "Usuários", to: "/usuarios", Icon: Users, admin: true },
+  { label: "Configurações", to: "/configuracoes", Icon: Settings, admin: true },
 ];
 
 function NavItem({ label, to, Icon, onClose }) {
@@ -60,7 +60,7 @@ export default function Sidebar({ open, onClose }) {
           <div className="space-y-0.5">{geral.map((i) => <NavItem key={i.to} {...i} onClose={onClose} />)}</div>
           {admin.length > 0 && (
             <>
-              <p className="px-3 pb-2 pt-5 text-2xs font-medium uppercase tracking-[0.18em] text-white/25">AdministraÃ§Ã£o</p>
+              <p className="px-3 pb-2 pt-5 text-2xs font-medium uppercase tracking-[0.18em] text-white/25">Administração</p>
               <div className="space-y-0.5">{admin.map((i) => <NavItem key={i.to} {...i} onClose={onClose} />)}</div>
             </>
           )}
@@ -68,7 +68,7 @@ export default function Sidebar({ open, onClose }) {
         <div className="px-5 py-5">
           <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] px-3.5 py-3">
             <p className="text-2xs font-medium uppercase tracking-[0.16em] text-white/30">Painel interno</p>
-            <p className="mt-1 text-xs text-white/45">DZ6 Â· Gravadora</p>
+            <p className="mt-1 text-xs text-white/45">DZ6 · Gravadora</p>
           </div>
         </div>
       </aside>
