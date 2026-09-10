@@ -11,8 +11,10 @@ import {
   readJson,
   record,
   send,
+  signOAuthState,
   signToken,
   sortRows,
+  verifyOAuthState,
 } from "./_utils.js";
 
 export const config = {
@@ -62,7 +64,130 @@ async function updateUser(sql, userId, data) {
   return publicUser(rows[0]);
 }
 
-async function handleAuth(req, res, action, sql) {
+function appOrigin(req) {
+  const configured = process.env.APP_URL?.replace(/\/$/, "");
+  if (configured) return configured;
+  const protocol = req.headers["x-forwarded-proto"] || "https";
+  const host = req.headers["x-forwarded-host"] || req.headers.host;
+  return `${protocol}://${host}`;
+}
+
+function safeReturnPath(value) {
+  if (!value || !value.startsWith("/") || value.startsWith("//") || value.includes("\\")) return "/";
+  return value;
+}
+
+function redirect(res, location) {
+  res.statusCode = 302;
+  res.setHeader("Location", location);
+  res.end();
+}
+
+function googleCallbackRedirect(req, params) {
+  const hash = new URLSearchParams(params).toString();
+  return `${appOrigin(req)}/auth/google/callback#${hash}`;
+}
+
+async function handleGoogleAuth(req, res, subAction, sql) {
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+  if (!clientId || !clientSecret) {
+    return send(res, 503, { error: "Login com Google ainda nao foi configurado" });
+  }
+
+  const callbackUrl = `${appOrigin(req)}/api/auth/google/callback`;
+
+  if (!subAction) {
+    if (req.method !== "GET") return methodNotAllowed(res);
+    const url = new URL(req.url, appOrigin(req));
+    const returnTo = safeReturnPath(url.searchParams.get("returnTo"));
+    const params = new URLSearchParams({
+      client_id: clientId,
+      redirect_uri: callbackUrl,
+      response_type: "code",
+      scope: "openid email profile",
+      prompt: "select_account",
+      state: signOAuthState(returnTo),
+    });
+    return redirect(res, `https://accounts.google.com/o/oauth2/v2/auth?${params}`);
+  }
+
+  if (subAction !== "callback") return send(res, 404, { error: "Not found" });
+  if (req.method !== "GET") return methodNotAllowed(res);
+
+  const url = new URL(req.url, appOrigin(req));
+  const googleError = url.searchParams.get("error");
+  if (googleError) {
+    return redirect(res, googleCallbackRedirect(req, { error: "Login com Google cancelado" }));
+  }
+
+  const code = url.searchParams.get("code");
+  const state = url.searchParams.get("state");
+  if (!code || !state) {
+    return redirect(res, googleCallbackRedirect(req, { error: "Resposta de login invalida" }));
+  }
+
+  let returnTo = "/";
+  try {
+    returnTo = safeReturnPath(verifyOAuthState(state).returnTo);
+  } catch {
+    return redirect(res, googleCallbackRedirect(req, { error: "Sessao de login expirada. Tente novamente." }));
+  }
+
+  const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      code,
+      client_id: clientId,
+      client_secret: clientSecret,
+      redirect_uri: callbackUrl,
+      grant_type: "authorization_code",
+    }),
+  });
+  const tokens = await tokenResponse.json();
+  if (!tokenResponse.ok || !tokens.access_token) {
+    console.error("Google token exchange failed", tokens.error);
+    return redirect(res, googleCallbackRedirect(req, { error: "Nao foi possivel concluir o login com Google" }));
+  }
+
+  const profileResponse = await fetch("https://openidconnect.googleapis.com/v1/userinfo", {
+    headers: { Authorization: `Bearer ${tokens.access_token}` },
+  });
+  const profile = await profileResponse.json();
+  if (!profileResponse.ok || !profile.email || profile.email_verified !== true) {
+    return redirect(res, googleCallbackRedirect(req, { error: "O Google nao confirmou este endereco de email" }));
+  }
+
+  let rows = await sql`SELECT * FROM app_users WHERE lower(email) = lower(${profile.email}) LIMIT 1`;
+  if (!rows.length) {
+    const countRows = await sql`SELECT count(*)::int AS count FROM app_users`;
+    const firstUser = countRows[0].count === 0;
+    rows = await sql`
+      INSERT INTO app_users (id, email, role, permissao, full_name, cargo, status, photo_url)
+      VALUES (${id("usr")}, ${profile.email}, ${firstUser ? "admin" : "user"}, ${firstUser ? "superadmin" : "membro"}, ${profile.name || null}, '[]'::jsonb, 'ativo', ${profile.picture || null})
+      RETURNING *
+    `;
+  } else {
+    rows = await sql`
+      UPDATE app_users
+      SET full_name = COALESCE(full_name, ${profile.name || null}),
+          photo_url = COALESCE(photo_url, ${profile.picture || null}),
+          updated_date = now()
+      WHERE id = ${rows[0].id}
+      RETURNING *
+    `;
+  }
+
+  return redirect(res, googleCallbackRedirect(req, {
+    access_token: signToken(rows[0]),
+    returnTo,
+  }));
+}
+
+async function handleAuth(req, res, action, subAction, sql) {
+  if (action === "google") return handleGoogleAuth(req, res, subAction, sql);
+
   if (action === "me") {
     if (req.method !== "GET") return methodNotAllowed(res);
     const user = await currentUser(req, sql);
@@ -301,7 +426,7 @@ export default async function handler(req, res) {
     await ensureDatabase();
     const sql = getSql();
     const parts = pathParts(req);
-    if (parts[0] === "auth") return handleAuth(req, res, parts[1], sql);
+    if (parts[0] === "auth") return handleAuth(req, res, parts[1], parts[2], sql);
     const user = await currentUser(req, sql);
     if (!user) return send(res, 401, { error: "Authentication required" });
     if (parts[0] === "users") return handleUsers(req, res, parts[1], sql);

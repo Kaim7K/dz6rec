@@ -75,6 +75,9 @@ export const apiClient = {
       if (result.access_token) localStorage.setItem(TOKEN_KEY, result.access_token);
       return result;
     },
+    loginWithGoogle: (returnTo = "/") => {
+      window.location.href = `/api/auth/google?returnTo=${encodeURIComponent(returnTo)}`;
+    },
     register: async ({ email, password, full_name }) => {
       const result = await request("/api/auth/register", { method: "POST", body: JSON.stringify({ email, password, full_name }) });
       if (result.access_token) localStorage.setItem(TOKEN_KEY, result.access_token);

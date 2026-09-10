@@ -58,6 +58,16 @@ export function signToken(user) {
   return jwt.sign({ sub: user.id, email: user.email }, jwtSecret(), { expiresIn: "30d" });
 }
 
+export function signOAuthState(returnTo = "/") {
+  return jwt.sign({ purpose: "google-oauth", returnTo }, jwtSecret(), { expiresIn: "10m" });
+}
+
+export function verifyOAuthState(state) {
+  const payload = jwt.verify(state, jwtSecret());
+  if (payload.purpose !== "google-oauth") throw new Error("Invalid OAuth state");
+  return payload;
+}
+
 export function getBearerToken(req) {
   const header = req.headers.authorization || "";
   if (header.startsWith("Bearer ")) return header.slice(7);
