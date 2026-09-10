@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { STATUS, STATUS_TONE } from "@/lib/music";
 
 export default function StatusBadge({ status, className = "" }) {

@@ -1,12 +1,11 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { apiClient } from "@/api/appClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LogIn, Mail, Lock, Loader2 } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
-import GoogleIcon from "@/components/GoogleIcon";
 import { safeReturnTo } from "@/lib/authReturnTo";
 
 export default function Login() {
@@ -23,22 +22,11 @@ export default function Login() {
     setError("");
     setLoading(true);
     try {
-      await base44.auth.loginViaEmailPassword(email, password);
+      await apiClient.auth.loginViaEmailPassword(email, password);
       window.location.href = returnTo;
     } catch (err) {
-      setError(err.message || "Usuário ou senha inválidos");
+      setError(err.message || "UsuÃ¡rio ou senha invÃ¡lidos");
     } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogle = async () => {
-    setError("");
-    setLoading(true);
-    try {
-      await base44.auth.loginWithProvider("google", returnTo);
-    } catch (err) {
-      setError(err.message || "Falha ao entrar com o Google");
       setLoading(false);
     }
   };
@@ -65,7 +53,7 @@ export default function Login() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="email">Usuário</Label>
+          <Label htmlFor="email">UsuÃ¡rio</Label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
             <Input
@@ -91,7 +79,7 @@ export default function Login() {
               id="password"
               type="password"
               autoComplete="current-password"
-              placeholder="••••••••"
+              placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="pl-10 h-12"
@@ -111,22 +99,6 @@ export default function Login() {
         </Button>
       </form>
 
-      <div className="my-5 flex items-center gap-3">
-        <span className="h-px flex-1 bg-white/10" />
-        <span className="text-2xs uppercase tracking-[0.16em] text-white/30">ou</span>
-        <span className="h-px flex-1 bg-white/10" />
-      </div>
-
-      <Button
-        type="button"
-        variant="outline"
-        onClick={handleGoogle}
-        disabled={loading}
-        className="h-12 w-full border-white/10 bg-transparent font-medium text-white/85 hover:bg-white/5 hover:text-white"
-      >
-        <GoogleIcon className="h-4 w-4" />
-        Entrar com Google
-      </Button>
     </AuthLayout>
   );
 }

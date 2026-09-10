@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import DateField from "@/components/ui/date-field";
 import FileField from "@/components/ui/file-field";
-import { base44 } from "@/api/base44Client";
+import { apiClient } from "@/api/appClient";
 import { TYPE, STATUS, STATUS_ORDER, uploadFile, logActivity } from "@/lib/music";
 import { Loader2, X } from "lucide-react";
 
@@ -44,8 +44,8 @@ export default function EditProjectDialog({ project, open, onClose, onSaved, art
     const data = { ...form, main_artist_name: artist ? artist.name : form.main_artist_id ? "" : project.main_artist_name };
     if (cover) data.cover_url = await uploadFile(cover);
     else if (removeCover) data.cover_url = "";
-    await base44.entities.Project.update(project.id, data);
-    const me = await base44.auth.me().catch(() => null);
+    await apiClient.entities.Project.update(project.id, data);
+    const me = await apiClient.auth.me().catch(() => null);
     await logActivity(project.id, "Projeto atualizado", me?.full_name);
     setLoading(false);
     onSaved();
@@ -57,7 +57,7 @@ export default function EditProjectDialog({ project, open, onClose, onSaved, art
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>Editar projeto</DialogTitle>
-          <DialogDescription>Ajuste os detalhes do lançamento.</DialogDescription>
+          <DialogDescription>Ajuste os detalhes do lanÃ§amento.</DialogDescription>
         </DialogHeader>
         <form onSubmit={submit} className="space-y-4">
           <Field label="Nome do projeto"><Input required value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Ex. Noite Clara" /></Field>
@@ -67,8 +67,8 @@ export default function EditProjectDialog({ project, open, onClose, onSaved, art
           </div>
           <Field label="Artista principal"><Select value={form.main_artist_id} onValueChange={(v) => set("main_artist_id", v)}><SelectTrigger><SelectValue placeholder="Selecionar artista" /></SelectTrigger><SelectContent>{artists.map((a) => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}</SelectContent></Select></Field>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Participações"><Input value={form.featuring} onChange={(e) => set("featuring", e.target.value)} placeholder="Artistas convidados" /></Field>
-            <Field label="Lançamento previsto"><DateField value={form.release_date} onChange={(v) => set("release_date", v)} /></Field>
+            <Field label="ParticipaÃ§Ãµes"><Input value={form.featuring} onChange={(e) => set("featuring", e.target.value)} placeholder="Artistas convidados" /></Field>
+            <Field label="LanÃ§amento previsto"><DateField value={form.release_date} onChange={(v) => set("release_date", v)} /></Field>
           </div>
           <Field label="Capa">
             {project?.cover_url && !removeCover ? (
@@ -80,8 +80,8 @@ export default function EditProjectDialog({ project, open, onClose, onSaved, art
             ) : null}
             <FileField value={cover} onChange={setCover} accept="image/*" hint="PNG ou JPG, preferencialmente 1:1" />
           </Field>
-          <Field label="Descrição (opcional)"><Textarea value={form.description} onChange={(e) => set("description", e.target.value)} rows={2} placeholder="Breve contexto do projeto" /></Field>
-          <DialogFooter><Button type="button" variant="ghost" onClick={onClose} className="text-white/55">Cancelar</Button><Button type="submit" disabled={loading} className="bg-primary text-primary-foreground">{loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Salvar alterações</Button></DialogFooter>
+          <Field label="DescriÃ§Ã£o (opcional)"><Textarea value={form.description} onChange={(e) => set("description", e.target.value)} rows={2} placeholder="Breve contexto do projeto" /></Field>
+          <DialogFooter><Button type="button" variant="ghost" onClick={onClose} className="text-white/55">Cancelar</Button><Button type="submit" disabled={loading} className="bg-primary text-primary-foreground">{loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Salvar alteraÃ§Ãµes</Button></DialogFooter>
         </form>
       </DialogContent>
     </Dialog>

@@ -1,32 +1,12 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { apiClient } from "@/api/appClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { UserPlus, Mail, Lock, Loader2 } from "lucide-react";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import AuthLayout from "@/components/AuthLayout";
-import { toast } from "@/components/ui/use-toast";
 import { safeReturnTo } from "@/lib/authReturnTo";
-
-// O primeiro cadastro concluído do app reivindica a permissão de superadmin.
-// Cadastros seguintes permanecem como membros comuns.
-async function claimFirstSuperadmin(email) {
-  try {
-    const existing = await base44.entities.SystemFlag.filter({ flag: "superadmin_bootstrap" });
-    if (existing.length > 0) return;
-    const claimed = await base44.entities.SystemFlag.create({
-      flag: "superadmin_bootstrap",
-      value: email,
-    });
-    if (claimed?.id) {
-      await base44.auth.updateMe({ permissao: "superadmin" });
-    }
-  } catch (err) {
-    console.error("Falha ao reivindicar primeiro superadmin:", err);
-  }
-}
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -34,109 +14,24 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showOtp, setShowOtp] = useState(false);
-  const [otpCode, setOtpCode] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     if (password !== confirmPassword) {
-      setError("As senhas não coincidem");
+      setError("As senhas nao coincidem");
       return;
     }
     setLoading(true);
     try {
-      await base44.auth.register({ email, password });
-      setShowOtp(true);
+      await apiClient.auth.register({ email, password });
+      window.location.href = safeReturnTo();
     } catch (err) {
       setError(err.message || "Falha no cadastro");
     } finally {
       setLoading(false);
     }
   };
-
-  const handleVerify = async () => {
-    setError("");
-    setLoading(true);
-    try {
-      const result = await base44.auth.verifyOtp({ email, otpCode });
-      if (result?.access_token) {
-        base44.auth.setToken(result.access_token);
-        await claimFirstSuperadmin(email);
-      }
-      window.location.href = safeReturnTo();
-    } catch (err) {
-      setError(err.message || "Código inválido");
-      setLoading(false);
-    }
-  };
-
-  const handleResend = async () => {
-    setError("");
-    try {
-      await base44.auth.resendOtp(email);
-      toast({
-        title: "Código enviado",
-        description: "Verifique seu e-mail para o novo código.",
-      });
-    } catch (err) {
-      setError(err.message || "Falha ao reenviar o código");
-    }
-  };
-
-  if (showOtp) {
-    return (
-      <AuthLayout
-        icon={Mail}
-        title="Verifique seu e-mail"
-        subtitle={`Enviamos um código para ${email}`}
-      >
-        {error && (
-          <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
-            {error}
-          </div>
-        )}
-        <div className="flex justify-center mb-6">
-          <InputOTP
-            maxLength={6}
-            value={otpCode}
-            onChange={setOtpCode}
-            autoFocus
-            autoComplete="one-time-code"
-          >
-            <InputOTPGroup>
-              <InputOTPSlot index={0} />
-              <InputOTPSlot index={1} />
-              <InputOTPSlot index={2} />
-              <InputOTPSlot index={3} />
-              <InputOTPSlot index={4} />
-              <InputOTPSlot index={5} />
-            </InputOTPGroup>
-          </InputOTP>
-        </div>
-        <Button
-          className="w-full h-12 font-medium"
-          onClick={handleVerify}
-          disabled={loading || otpCode.length < 6}
-        >
-          {loading ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Verificando...
-            </>
-          ) : (
-            "Verificar"
-          )}
-        </Button>
-        <p className="text-center text-sm text-muted-foreground mt-4">
-          Não recebeu o código?{" "}
-          <button onClick={handleResend} className="text-primary font-medium hover:underline">
-            Reenviar
-          </button>
-        </p>
-      </AuthLayout>
-    );
-  }
 
   return (
     <AuthLayout
@@ -145,7 +40,7 @@ export default function Register() {
       subtitle="O primeiro cadastro se torna superadmin"
       footer={
         <>
-          Já tem uma conta?{" "}
+          Ja tem uma conta?{" "}
           <Link
             to={"/login" + (safeReturnTo() !== "/" ? "?returnTo=" + encodeURIComponent(safeReturnTo()) : "")}
             className="text-primary font-medium hover:underline"
@@ -163,7 +58,7 @@ export default function Register() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="email">Usuário</Label>
+          <Label htmlFor="email">Usuario</Label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
             <Input
@@ -187,7 +82,7 @@ export default function Register() {
               id="password"
               type="password"
               autoComplete="new-password"
-              placeholder="••••••••"
+              placeholder="********"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="pl-10 h-12"
@@ -203,7 +98,7 @@ export default function Register() {
               id="confirm"
               type="password"
               autoComplete="new-password"
-              placeholder="••••••••"
+              placeholder="********"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               className="pl-10 h-12"

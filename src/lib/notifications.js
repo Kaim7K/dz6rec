@@ -1,14 +1,14 @@
-import { base44 } from "@/api/base44Client";
+﻿import { apiClient } from "@/api/appClient";
 import { usersForCargo } from "@/lib/music";
 
-// Envia uma notificação para uma lista de ids de usuários (deduplicada, sem o autor)
+// Envia uma notificaÃ§Ã£o para uma lista de ids de usuÃ¡rios (deduplicada, sem o autor)
 export async function notifyUsers(userIds, { text, projectId, link }, excludeId = null) {
   const ids = [...new Set((userIds || []).filter(Boolean).filter((id) => id !== excludeId))];
   if (!ids.length) return;
-  await base44.entities.Notification.bulkCreate(ids.map((user_id) => ({ user_id, text, project_id: projectId, link })));
+  await apiClient.entities.Notification.bulkCreate(ids.map((user_id) => ({ user_id, text, project_id: projectId, link })));
 }
 
-// Extrai menções @Nome de um texto — resolve pessoas (por nome, @handle ou e-mail) e cargos (todos do cargo)
+// Extrai menÃ§Ãµes @Nome de um texto â€” resolve pessoas (por nome, @handle ou e-mail) e cargos (todos do cargo)
 export function parseMentions(text, users = [], cargos = []) {
   const out = { users: [], tokens: [] };
   const lower = (text || "").toLowerCase();
@@ -36,7 +36,7 @@ export function parseMentions(text, users = [], cargos = []) {
     let idx = lower.indexOf(tl);
     while (idx !== -1) {
       const end = idx + token.length;
-      const nextOk = end === lower.length || !/[a-z0-9à-ÿ]/.test(lower[end]);
+      const nextOk = end === lower.length || !/[a-z0-9Ã -Ã¿]/.test(lower[end]);
       const free = !taken.some(([a, b]) => idx < b && end > a);
       if (nextOk && free) {
         taken.push([idx, end]);
@@ -50,7 +50,7 @@ export function parseMentions(text, users = [], cargos = []) {
   return out;
 }
 
-// Quando todos os itens de uma seção ficam concluídos, notifica os responsáveis da próxima seção
+// Quando todos os itens de uma seÃ§Ã£o ficam concluÃ­dos, notifica os responsÃ¡veis da prÃ³xima seÃ§Ã£o
 export async function notifyNextStage({ project, sectionId, toggledItemId, items, sections, users, excludeUserId }) {
   try {
     const sectionItems = items.filter((i) => i.section_id === sectionId && !i.parent_id);
@@ -71,7 +71,7 @@ export async function notifyNextStage({ project, sectionId, toggledItemId, items
     const ids = [...(next.responsible_ids || [])];
     usersForCargo(users, next.cargo).forEach((u) => ids.push(u.id));
     await notifyUsers(ids, {
-      text: `Etapa "${done.name}" concluída em "${project.name}" — "${next.name}" é a próxima.`,
+      text: `Etapa "${done.name}" concluÃ­da em "${project.name}" â€” "${next.name}" Ã© a prÃ³xima.`,
       projectId: project.id,
       link: `/projetos/${project.id}`,
     }, excludeUserId);

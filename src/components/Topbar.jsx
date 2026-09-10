@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { apiClient } from "@/api/appClient";
 import { Bell, LogOut, Menu, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -13,17 +13,17 @@ export default function Topbar({ onMenu }) {
 
   const loadNotifs = (user) => {
     if (!user) return;
-    base44.entities.Notification.list("-created_date", 40)
+    apiClient.entities.Notification.list("-created_date", 40)
       .then((n) => setNotifs(n.filter((x) => x.user_id === user.id)))
       .catch(() => {});
   };
 
   useEffect(() => {
     let unsub = null;
-    base44.auth.me().then((m) => {
+    apiClient.auth.me().then((m) => {
       setMe(m);
       loadNotifs(m);
-      try { unsub = base44.entities.Notification.subscribe(() => loadNotifs(m)); } catch {}
+      try { unsub = apiClient.entities.Notification.subscribe(() => loadNotifs(m)); } catch {}
     }).catch(() => {});
     return () => { if (unsub) unsub(); };
   }, []);
@@ -32,7 +32,7 @@ export default function Topbar({ onMenu }) {
   const results = [{ label: "Projetos", to: "/projetos" }, { label: "Artistas", to: "/artistas" }, { label: "Meus trabalhos", to: "/minhas-tarefas" }, { label: "Templates", to: "/templates" }].filter((i) => query && i.label.toLowerCase().includes(query.toLowerCase()));
 
   const openNotif = async (n) => {
-    if (!n.read) await base44.entities.Notification.update(n.id, { read: true }).catch(() => {});
+    if (!n.read) await apiClient.entities.Notification.update(n.id, { read: true }).catch(() => {});
     setPanel(null);
     if (n.link) navigate(n.link);
   };
@@ -51,8 +51,8 @@ export default function Topbar({ onMenu }) {
           <button onClick={() => setPanel(panel === "bell" ? null : "bell")} className="relative rounded-xl p-2.5 text-white/55 hover:bg-white/5 hover:text-white"><Bell size={18} />{unread > 0 && <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-primary ring-2 ring-background" />}</button>
           {panel === "bell" && (
             <div className="absolute right-0 mt-2 w-80 overflow-hidden rounded-2xl border border-white/[0.08] bg-popover p-1.5 shadow-pop">
-              <p className="px-3 py-2 text-2xs font-medium uppercase tracking-[0.16em] text-white/35">Notificações</p>
-              {notifs.length === 0 ? <p className="px-3 py-6 text-center text-sm text-white/35">Nenhuma notificação.</p> :
+              <p className="px-3 py-2 text-2xs font-medium uppercase tracking-[0.16em] text-white/35">NotificaÃ§Ãµes</p>
+              {notifs.length === 0 ? <p className="px-3 py-6 text-center text-sm text-white/35">Nenhuma notificaÃ§Ã£o.</p> :
                 <div className="max-h-80 overflow-y-auto">{notifs.map((n) => (
                   <button key={n.id} onClick={() => openNotif(n)} className={cn("block w-full rounded-lg px-3 py-2.5 text-left text-sm hover:bg-white/5", n.read ? "text-white/45" : "text-white/90")}>{n.text}<span className="mt-0.5 block text-2xs text-white/30">{new Date(n.created_date).toLocaleString("pt-BR")}</span></button>
                 ))}</div>}
@@ -67,7 +67,7 @@ export default function Topbar({ onMenu }) {
           {panel === "profile" && (
             <div className="absolute right-0 mt-2 w-56 overflow-hidden rounded-2xl border border-white/[0.08] bg-popover p-1.5 shadow-pop">
               <div className="border-b border-white/[0.06] px-3 py-2.5"><p className="text-sm font-medium text-white">{me?.full_name || "Equipe DZ6"}</p><p className="truncate text-2xs text-white/40">{me?.email}</p></div>
-              <button onClick={() => base44.auth.logout("/login")} className="mt-1 flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-white/75 hover:bg-white/5 hover:text-white"><LogOut size={15} />Sair</button>
+              <button onClick={() => apiClient.auth.logout("/login")} className="mt-1 flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-white/75 hover:bg-white/5 hover:text-white"><LogOut size={15} />Sair</button>
             </div>
           )}
         </div>

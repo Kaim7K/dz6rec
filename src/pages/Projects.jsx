@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { base44 } from "@/api/base44Client";
+﻿import React, { useEffect, useState } from "react";
+import { apiClient } from "@/api/appClient";
 import { Plus, Disc3 } from "lucide-react";
 import ProjectCard from "@/components/projects/ProjectCard";
 import NewProjectDialog from "@/components/projects/NewProjectDialog";
@@ -13,7 +13,7 @@ export default function Projects() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const load = () => {
-    Promise.all([base44.entities.Project.list("-created_date"), base44.entities.Artist.list(), base44.entities.ChecklistTemplate.list(), base44.entities.ChecklistItem.list()]).then(([p, a, t, items]) => {
+    Promise.all([apiClient.entities.Project.list("-created_date"), apiClient.entities.Artist.list(), apiClient.entities.ChecklistTemplate.list(), apiClient.entities.ChecklistItem.list()]).then(([p, a, t, items]) => {
       setProjects(p); setArtists(a); setTemplates(t);
       const m = {};
       items.forEach((i) => { if (!i.project_id) return; m[i.project_id] = m[i.project_id] || { d: 0, t: 0 }; m[i.project_id].t++; if (i.completed) m[i.project_id].d++; });
@@ -26,9 +26,9 @@ export default function Projects() {
     <div className="space-y-10 lg:space-y-12">
       <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-2xs font-medium uppercase tracking-[0.2em] text-primary/80">Catálogo</p>
+          <p className="text-2xs font-medium uppercase tracking-[0.2em] text-primary/80">CatÃ¡logo</p>
           <h1 className="mt-3 font-display text-4xl font-bold tracking-tight text-white sm:text-5xl">Projetos</h1>
-          <p className="mt-2 text-white/40">Singles, EPs e álbuns da gravadora.</p>
+          <p className="mt-2 text-white/40">Singles, EPs e Ã¡lbuns da gravadora.</p>
         </div>
         <button
           onClick={() => setOpen(true)}
@@ -45,7 +45,7 @@ export default function Projects() {
           </div>
           <div>
             <p className="font-display text-lg font-semibold text-white/70">Nenhum projeto ainda</p>
-            <p className="mt-1 text-sm text-white/35">Crie o primeiro single, EP ou álbum da gravadora.</p>
+            <p className="mt-1 text-sm text-white/35">Crie o primeiro single, EP ou Ã¡lbum da gravadora.</p>
           </div>
           <button onClick={() => setOpen(true)} className="mt-2 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">
             <Plus size={16} /> Novo projeto

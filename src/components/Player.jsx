@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { usePlayer } from "@/lib/playerContext";
 import { Pause, Play, Repeat, Repeat1, Shuffle, SkipBack, SkipForward, Volume2, Image as ImageIcon } from "lucide-react";
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Trash2 } from "lucide-react";
 import CargoBadge from "@/components/CargoBadge";
@@ -17,7 +17,7 @@ export default function TemplateItemEditor({ item, allItems, depth, cargos, onAd
         <Select value={item.cargo || undefined} onValueChange={(v) => onSetCargo(item, v === NONE ? null : v)}>
           <SelectTrigger className="h-6 w-auto min-w-[4.5rem] border-white/[0.08] bg-white/[0.04] px-2 text-2xs text-white/45"><SelectValue placeholder="cargo" /></SelectTrigger>
           <SelectContent>
-            {item.cargo && <SelectItem value={NONE} className="text-white/45">— Limpar —</SelectItem>}
+            {item.cargo && <SelectItem value={NONE} className="text-white/45">â€” Limpar â€”</SelectItem>}
             {cargos.map((c) => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}
           </SelectContent>
         </Select>

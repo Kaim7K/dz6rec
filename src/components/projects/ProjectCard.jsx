@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { Link } from "react-router-dom";
 import { Pencil } from "lucide-react";
 import { TYPE, STATUS, STATUS_TONE } from "@/lib/music";
@@ -32,7 +32,7 @@ export default function ProjectCard({ project, progress, onEdit }) {
           <span className={`text-2xs font-medium uppercase tracking-[0.16em] ${tone.text}`}>{STATUS[project.status]}</span>
         </div>
         <p className="mt-2 truncate font-display text-base font-semibold tracking-tight text-white">{project.name}</p>
-        <p className="mt-0.5 truncate text-xs text-white/40">{project.main_artist_name || "—"} · {TYPE[project.type]}</p>
+        <p className="mt-0.5 truncate text-xs text-white/40">{project.main_artist_name || "â€”"} Â· {TYPE[project.type]}</p>
         <div className="mt-3 flex items-center gap-2.5">
           <div className="h-px flex-1 overflow-hidden bg-white/[0.08]">
             <div className="h-full bg-primary transition-all duration-500" style={{ width: `${pct}%` }} />

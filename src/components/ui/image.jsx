@@ -1,4 +1,4 @@
-import * as React from "react"
+﻿import * as React from "react"
 import { useSize } from "@/hooks/use-size"
 import { cn } from "@/lib/utils"
 import {
@@ -41,7 +41,7 @@ const ResponsiveImage = React.forwardRef(
 
     const crop = fittingType !== "fit"
     // `size` is null exactly once: the pre-measurement first render, which we
-    // never let reach the network (see below — useSize measures before paint).
+    // never let reach the network (see below â€” useSize measures before paint).
     // A *measured* zero (content-sized wrapper with no CSS dimensions) falls
     // back to a fixed transform width so the image itself can size the box.
     const options = size && {
@@ -53,7 +53,7 @@ const ResponsiveImage = React.forwardRef(
     }
 
     // Both layers render only once the container is measured, so the first
-    // URL the browser ever fetches is already the right size — never a
+    // URL the browser ever fetches is already the right size â€” never a
     // DEFAULT_TRANSFORM_WIDTH guess that gets replaced a frame later (a
     // wasted full-size download per image). useSize measures in
     // useLayoutEffect, so nothing is lost: measurement lands before the
@@ -62,7 +62,7 @@ const ResponsiveImage = React.forwardRef(
       <ImageWrapper ref={wrapperRef} aspectRatio={aspectRatio} className={className} style={style}>
         {/* Tiny blurred placeholder (a few hundred bytes) covering the main
             image's load time. Same crop shape and focal anchor as the main
-            image — fp_ is relative to the crop box, so a square or centered
+            image â€” fp_ is relative to the crop box, so a square or centered
             placeholder would blur-preview a different region. */}
         {options && !loaded && (
           <img
@@ -109,7 +109,7 @@ ResponsiveImage.displayName = "ResponsiveImage"
 
 /**
  * Image with built-in Wix Media Platform support: canonical public images on
- * media.base44.com and static.wixstatic.com/media are resized to the rendered
+ * static.wixstatic.com/media images are resized to the rendered
  * container per device pixel ratio and re-encoded to WebP; `fittingType="fill"`
  * crops server-side, optionally anchored at a focal point. Other URLs render
  * as a plain <img>. Failed transforms retry the original URL; only a broken
@@ -152,7 +152,7 @@ const Image = React.forwardRef(
     }
 
     if (!src) {
-      // Renders as a real <img> (not a <div>) — the visual editor's
+      // Renders as a real <img> (not a <div>) â€” the visual editor's
       // click-to-edit toolbar keys its "Replace Image" action off the DOM
       // tag being `img`, so a placeholder div would be unrecoverable in the
       // editor. FALLBACK_IMAGE_URL doubles as the "no image chosen" graphic.
@@ -175,7 +175,7 @@ const Image = React.forwardRef(
       typeof focalPointX === "number" && typeof focalPointY === "number"
         ? { x: focalPointX, y: focalPointY }
         : undefined
-    // Origin dimensions are optional — when known they stabilize layout via
+    // Origin dimensions are optional â€” when known they stabilize layout via
     // the wrapper's aspect-ratio before the image loads.
     const aspectRatio =
       originWidth && originHeight ? `${originWidth} / ${originHeight}` : undefined

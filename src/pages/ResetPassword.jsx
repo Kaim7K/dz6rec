@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { apiClient } from "@/api/appClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,12 +20,12 @@ export default function ResetPassword() {
     e.preventDefault();
     setError("");
     if (newPassword !== confirmPassword) {
-      setError("As senhas não coincidem.");
+      setError("As senhas nÃ£o coincidem.");
       return;
     }
     setLoading(true);
     try {
-      await base44.auth.resetPassword({ resetToken, newPassword });
+      await apiClient.auth.resetPassword({ resetToken, newPassword });
       window.location.href = "/login";
     } catch (err) {
       setError(err.message || "Failed to reset password");
@@ -38,8 +38,8 @@ export default function ResetPassword() {
     return (
       <AuthLayout
         icon={AlertTriangle}
-        title="Link inválido"
-        subtitle="Este link está incompleto ou expirou"
+        title="Link invÃ¡lido"
+        subtitle="Este link estÃ¡ incompleto ou expirou"
         footer={
           <Link to="/forgot-password" className="text-primary font-medium hover:underline">
             Solicitar novo link
@@ -47,7 +47,7 @@ export default function ResetPassword() {
         }
       >
         <p className="text-sm text-foreground text-center">
-          Solicite um novo e-mail de redefinição de senha.
+          Solicite um novo e-mail de redefiniÃ§Ã£o de senha.
         </p>
       </AuthLayout>
     );
@@ -74,7 +74,7 @@ export default function ResetPassword() {
               type="password"
               autoComplete="new-password"
               autoFocus
-              placeholder="••••••••"
+              placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               className="pl-10 h-12"
@@ -90,7 +90,7 @@ export default function ResetPassword() {
               id="confirm"
               type="password"
               autoComplete="new-password"
-              placeholder="••••••••"
+              placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               className="pl-10 h-12"

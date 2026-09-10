@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 
 const PALETTE = ["#c20000", "#d97706", "#0891b2", "#7c3aed", "#db2777", "#16a34a", "#ca8a04", "#0ea5e9", "#9333ea", "#dc2626"];
 

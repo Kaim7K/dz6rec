@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cargoColor } from "@/components/CargoBadge";
 
@@ -22,7 +22,7 @@ export default function AssignResponsible({ item, users, cargos = [], onAssign, 
         <SelectValue placeholder="atribuir" />
       </SelectTrigger>
       <SelectContent className="max-h-64">
-        {(item.responsible_id || item.cargo) && <SelectItem value={NONE} className="text-white/45">— Remover —</SelectItem>}
+        {(item.responsible_id || item.cargo) && <SelectItem value={NONE} className="text-white/45">â€” Remover â€”</SelectItem>}
         {cargos.map((c) => (
           <SelectItem key={"c" + c.name} value={CARGO + c.name}>
             <span className="flex items-center gap-1.5">

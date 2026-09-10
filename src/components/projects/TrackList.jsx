@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { Plus } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { apiClient } from "@/api/appClient";
 import { logActivity } from "@/lib/music";
 import TrackRow from "@/components/projects/TrackRow";
 import AddTrackDialog from "@/components/projects/AddTrackDialog";
@@ -21,8 +21,8 @@ export default function TrackList({ project, tracks, onChanged }) {
     next.splice(res.destination.index, 0, moved);
     setLocalOrder(next);
     const ordered = next.map((id) => tracks.find((t) => t.id === id)).filter(Boolean);
-    await base44.entities.Track.bulkUpdate(ordered.map((t, i) => ({ id: t.id, track_number: i + 1 })));
-    const me = await base44.auth.me().catch(() => null);
+    await apiClient.entities.Track.bulkUpdate(ordered.map((t, i) => ({ id: t.id, track_number: i + 1 })));
+    const me = await apiClient.auth.me().catch(() => null);
     await logActivity(project.id, "Faixas reordenadas", me?.full_name);
     onChanged();
   };
@@ -32,7 +32,7 @@ export default function TrackList({ project, tracks, onChanged }) {
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <h3 className="font-display text-lg font-medium text-white">Faixas</h3>
-          <span className="text-2xs text-white/35">{list.length} {isSingle ? "· Single" : ""}</span>
+          <span className="text-2xs text-white/35">{list.length} {isSingle ? "Â· Single" : ""}</span>
         </div>
         {canAdd ? (
           <button onClick={() => setOpen(true)} className="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm text-white/80 transition-colors hover:bg-white/5"><Plus size={16} />Adicionar faixa</button>

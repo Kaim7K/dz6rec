@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { base44 } from "@/api/base44Client";
+﻿import React, { useEffect, useState } from "react";
+import { apiClient } from "@/api/appClient";
 import { Plus, StickyNote } from "lucide-react";
 import CargoBadge from "@/components/CargoBadge";
 import ChecklistItemRow from "@/components/projects/ChecklistItemRow";
@@ -14,32 +14,32 @@ export default function ChecklistTab({ project }) {
   const [newSection, setNewSection] = useState("");
   const [users, setUsers] = useState([]);
   const [cargos, setCargos] = useState([]);
-  const load = () => { base44.entities.ChecklistSection.filter({ project_id: project.id }).then((s) => setSections(s.sort((a, b) => a.order - b.order))); base44.entities.ChecklistItem.filter({ project_id: project.id }).then(setItems); };
+  const load = () => { apiClient.entities.ChecklistSection.filter({ project_id: project.id }).then((s) => setSections(s.sort((a, b) => a.order - b.order))); apiClient.entities.ChecklistItem.filter({ project_id: project.id }).then(setItems); };
   useEffect(load, [project.id]);
-  useEffect(() => { Promise.all([base44.entities.User.list().catch(() => []), base44.entities.Cargo.list().catch(() => [])]).then(([us, cs]) => { setUsers(us); setCargos([...new Set([...cs.map((c) => c.name), ...us.flatMap((u) => cargoList(u.cargo))])].map((name) => ({ name }))); }); }, []);
-  const addSection = async (e) => { e.preventDefault(); if (!newSection.trim()) return; await base44.entities.ChecklistSection.create({ project_id: project.id, name: newSection, order: sections.length }); const me = await base44.auth.me().catch(() => null); await logActivity(project.id, `Seção adicionada: ${newSection}`, me?.full_name); setNewSection(""); load(); };
-  const addItem = async (sectionId, text) => { if (!text.trim()) return; await base44.entities.ChecklistItem.create({ section_id: sectionId, project_id: project.id, text, completed: false, order: items.filter((i) => i.section_id === sectionId && !i.parent_id).length }); load(); };
+  useEffect(() => { Promise.all([apiClient.entities.User.list().catch(() => []), apiClient.entities.Cargo.list().catch(() => [])]).then(([us, cs]) => { setUsers(us); setCargos([...new Set([...cs.map((c) => c.name), ...us.flatMap((u) => cargoList(u.cargo))])].map((name) => ({ name }))); }); }, []);
+  const addSection = async (e) => { e.preventDefault(); if (!newSection.trim()) return; await apiClient.entities.ChecklistSection.create({ project_id: project.id, name: newSection, order: sections.length }); const me = await apiClient.auth.me().catch(() => null); await logActivity(project.id, `SeÃ§Ã£o adicionada: ${newSection}`, me?.full_name); setNewSection(""); load(); };
+  const addItem = async (sectionId, text) => { if (!text.trim()) return; await apiClient.entities.ChecklistItem.create({ section_id: sectionId, project_id: project.id, text, completed: false, order: items.filter((i) => i.section_id === sectionId && !i.parent_id).length }); load(); };
   const toggle = async (item) => {
     const newCompleted = !item.completed;
-    await base44.entities.ChecklistItem.update(item.id, { completed: newCompleted });
-    const me = await base44.auth.me().catch(() => null);
-    await logActivity(project.id, `${newCompleted ? "Concluída" : "Reaberta"}: ${item.text}`, me?.full_name);
+    await apiClient.entities.ChecklistItem.update(item.id, { completed: newCompleted });
+    const me = await apiClient.auth.me().catch(() => null);
+    await logActivity(project.id, `${newCompleted ? "ConcluÃ­da" : "Reaberta"}: ${item.text}`, me?.full_name);
     if (newCompleted) await notifyNextStage({ project, sectionId: item.section_id, toggledItemId: item.id, items, sections, users, excludeUserId: me?.id });
     load();
   };
-  const addSub = async (parent, text) => { await base44.entities.ChecklistItem.create({ section_id: parent.section_id, project_id: project.id, text, completed: false, parent_id: parent.id, order: 0 }); load(); };
+  const addSub = async (parent, text) => { await apiClient.entities.ChecklistItem.create({ section_id: parent.section_id, project_id: project.id, text, completed: false, parent_id: parent.id, order: 0 }); load(); };
   const assign = async (item, user) => {
-    await base44.entities.ChecklistItem.update(item.id, { responsible_id: user?.id || null, responsible_name: user?.full_name || user?.email || null });
-    const me = await base44.auth.me().catch(() => null);
-    await logActivity(project.id, `Responsável definido em "${item.text}": ${user?.full_name || "removido"}`, me?.full_name);
-    if (user && user.id !== me?.id) await notifyUsers([user.id], { text: `Você foi atribuído à tarefa "${item.text}" em "${project.name}"`, projectId: project.id, link: `/projetos/${project.id}` });
+    await apiClient.entities.ChecklistItem.update(item.id, { responsible_id: user?.id || null, responsible_name: user?.full_name || user?.email || null });
+    const me = await apiClient.auth.me().catch(() => null);
+    await logActivity(project.id, `ResponsÃ¡vel definido em "${item.text}": ${user?.full_name || "removido"}`, me?.full_name);
+    if (user && user.id !== me?.id) await notifyUsers([user.id], { text: `VocÃª foi atribuÃ­do Ã  tarefa "${item.text}" em "${project.name}"`, projectId: project.id, link: `/projetos/${project.id}` });
     load();
   };
   const assignCargo = async (item, cargoName) => {
-    await base44.entities.ChecklistItem.update(item.id, { cargo: cargoName || null });
-    const me = await base44.auth.me().catch(() => null);
-    await logActivity(project.id, cargoName ? `Cargo "${cargoName}" atribuído à tarefa "${item.text}"` : `Cargo removido da tarefa "${item.text}"`, me?.full_name);
-    if (cargoName) await notifyUsers(usersForCargo(users, cargoName).map((u) => u.id), { text: `Você foi atribuído à tarefa "${item.text}" (${cargoName}) em "${project.name}"`, projectId: project.id, link: `/projetos/${project.id}` }, me?.id);
+    await apiClient.entities.ChecklistItem.update(item.id, { cargo: cargoName || null });
+    const me = await apiClient.auth.me().catch(() => null);
+    await logActivity(project.id, cargoName ? `Cargo "${cargoName}" atribuÃ­do Ã  tarefa "${item.text}"` : `Cargo removido da tarefa "${item.text}"`, me?.full_name);
+    if (cargoName) await notifyUsers(usersForCargo(users, cargoName).map((u) => u.id), { text: `VocÃª foi atribuÃ­do Ã  tarefa "${item.text}" (${cargoName}) em "${project.name}"`, projectId: project.id, link: `/projetos/${project.id}` }, me?.id);
     load();
   };
   return (
@@ -56,7 +56,7 @@ export default function ChecklistTab({ project }) {
           <form onSubmit={(e) => { e.preventDefault(); const f = e.target; addItem(s.id, f.text.value); f.reset(); }} className="mt-2 flex items-center gap-2"><Plus size={15} className="text-white/30" /><input name="text" placeholder="Adicionar tarefa..." className="flex-1 bg-transparent text-sm outline-none placeholder:text-white/30" /></form>
         </div>
       ); })}
-      <form onSubmit={addSection} className="flex items-center gap-2"><input value={newSection} onChange={(e) => setNewSection(e.target.value)} placeholder="Nova seção..." className="flex-1 rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-2.5 text-sm outline-none transition placeholder:text-white/30 focus:border-white/15" /><button className="rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">Adicionar</button></form>
+      <form onSubmit={addSection} className="flex items-center gap-2"><input value={newSection} onChange={(e) => setNewSection(e.target.value)} placeholder="Nova seÃ§Ã£o..." className="flex-1 rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-2.5 text-sm outline-none transition placeholder:text-white/30 focus:border-white/15" /><button className="rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">Adicionar</button></form>
       {noteSection && <NotesDialog section={noteSection} onClose={() => setNoteSection(null)} />}
     </div>
   );

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { base44 } from "@/api/base44Client";
+﻿import React, { useEffect, useState } from "react";
+import { apiClient } from "@/api/appClient";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,14 +13,14 @@ export default function Templates() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [name, setName] = useState("");
-  const load = () => { base44.entities.ChecklistTemplate.list().then(setTemplates); base44.entities.Cargo.list().then(setCargos).catch(() => {}); };
+  const load = () => { apiClient.entities.ChecklistTemplate.list().then(setTemplates); apiClient.entities.Cargo.list().then(setCargos).catch(() => {}); };
   useEffect(() => { load(); }, []);
-  const create = async (e) => { e.preventDefault(); if (!name.trim()) return; await base44.entities.ChecklistTemplate.create({ name, project_type: "custom" }); setName(""); setOpen(false); load(); };
+  const create = async (e) => { e.preventDefault(); if (!name.trim()) return; await apiClient.entities.ChecklistTemplate.create({ name, project_type: "custom" }); setName(""); setOpen(false); load(); };
   const remove = async (t) => {
-    const secs = await base44.entities.ChecklistSection.filter({ template_id: t.id });
-    for (const s of secs) await base44.entities.ChecklistItem.deleteMany({ section_id: s.id }).catch(() => {});
-    await base44.entities.ChecklistSection.deleteMany({ template_id: t.id });
-    await base44.entities.ChecklistTemplate.delete(t.id);
+    const secs = await apiClient.entities.ChecklistSection.filter({ template_id: t.id });
+    for (const s of secs) await apiClient.entities.ChecklistItem.deleteMany({ section_id: s.id }).catch(() => {});
+    await apiClient.entities.ChecklistSection.deleteMany({ template_id: t.id });
+    await apiClient.entities.ChecklistTemplate.delete(t.id);
     load();
   };
   return (
@@ -29,7 +29,7 @@ export default function Templates() {
         <div>
           <p className="text-2xs font-medium uppercase tracking-[0.18em] text-white/35">Estrutura</p>
           <h1 className="mt-2 font-display text-3xl font-medium tracking-tight text-white sm:text-4xl">Templates</h1>
-          <p className="mt-1.5 text-white/45">Estruturas de checklist reutilizáveis ao criar projetos.</p>
+          <p className="mt-1.5 text-white/45">Estruturas de checklist reutilizÃ¡veis ao criar projetos.</p>
         </div>
         <button onClick={() => setOpen(true)} className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"><Plus size={16} />Novo template</button>
       </div>
@@ -40,7 +40,7 @@ export default function Templates() {
           <div key={t.id} className="group flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.03] p-4 transition-colors hover:border-white/[0.1]">
             <div className="flex items-center gap-3">
               <div className="grid h-10 w-10 place-items-center rounded-xl bg-white/[0.04] text-white/40"><LayoutTemplate size={18} /></div>
-              <div><p className="font-medium text-white">{t.name}</p><p className="text-2xs text-white/40">Aplicável ao criar um projeto · editável</p></div>
+              <div><p className="font-medium text-white">{t.name}</p><p className="text-2xs text-white/40">AplicÃ¡vel ao criar um projeto Â· editÃ¡vel</p></div>
             </div>
             <div className="flex items-center gap-1">
               <button onClick={() => setEditing(t)} className="rounded-lg p-2 text-white/40 transition-colors hover:bg-white/5 hover:text-white"><Pencil size={15} /></button>
@@ -50,7 +50,7 @@ export default function Templates() {
         ))}</div>
       )}
       <Dialog open={open} onOpenChange={setOpen}><DialogContent className="max-w-md"><DialogHeader><DialogTitle>Novo template</DialogTitle></DialogHeader>
-        <form onSubmit={create}><div className="space-y-1.5"><Label>Nome</Label><Input required value={name} onChange={(e) => setName(e.target.value)} placeholder="Lançamento de Single" /></div><DialogFooter className="mt-5"><Button type="submit" className="bg-primary text-primary-foreground">Criar</Button></DialogFooter></form>
+        <form onSubmit={create}><div className="space-y-1.5"><Label>Nome</Label><Input required value={name} onChange={(e) => setName(e.target.value)} placeholder="LanÃ§amento de Single" /></div><DialogFooter className="mt-5"><Button type="submit" className="bg-primary text-primary-foreground">Criar</Button></DialogFooter></form>
       </DialogContent></Dialog>
       {editing && <TemplateEditorDialog template={editing} cargos={cargos} onClose={() => setEditing(null)} />}
     </div>

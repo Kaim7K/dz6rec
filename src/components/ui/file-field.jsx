@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+﻿import React, { useEffect, useRef, useState } from "react";
 import { Upload, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -8,7 +8,7 @@ const formatSize = (bytes) => {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
 
-// Upload de arquivo com área de arraste; `light` aplica o tema claro do palco de administração
+// Upload de arquivo com Ã¡rea de arraste; `light` aplica o tema claro do palco de administraÃ§Ã£o
 export default function FileField({ value, onChange, accept = "image/*", hint, light = false }) {
   const inputRef = useRef(null);
   const [over, setOver] = useState(false);

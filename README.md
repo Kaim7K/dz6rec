@@ -1,62 +1,53 @@
-# Base44 Project
+# DZ6 Rec
 
-Use this repository to run and edit the app locally, then publish changes back through Base44.
+Aplicacao React/Vite pronta para deploy na Vercel, com API serverless e persistencia em Postgres.
 
-Any change pushed to the repo will also be reflected in the Base44 Builder.
+## Requisitos
 
-## Prerequisites
+- Node.js 20+
+- Uma base Postgres acessivel por `DATABASE_URL` (Neon via Vercel Marketplace e recomendado)
+- Opcional: Vercel Blob com `BLOB_READ_WRITE_TOKEN` para uploads de arquivos
 
-1. Clone the repository using the project's Git URL.
-2. Navigate to the project directory.
-3. Install dependencies: `npm install`.
-4. Install the Base44 CLI: `npm install -g base44@latest`.
-5. Install [Deno](https://docs.deno.com/runtime/getting_started/installation/) — the local Base44 backend runs on it.
+## Variaveis de ambiente
 
-Run `base44 --help` (or see the [CLI reference](https://docs.base44.com/developers/references/cli/commands/introduction)) for the full command surface.
-
-## Run Locally
-
-Three commands, from the project root:
+Copie `.env.example` para `.env.local` e configure:
 
 ```bash
-base44 login   # one-time per machine
-base44 link    # one-time per clone
-base44 dev     # local backend + frontend together
+DATABASE_URL="postgres://user:password@host/database?sslmode=require"
+JWT_SECRET="use-um-segredo-longo-e-aleatorio"
+BLOB_READ_WRITE_TOKEN=""
 ```
 
-Open the frontend URL that `base44 dev` prints (typically `http://localhost:5173`).
+Sem `BLOB_READ_WRITE_TOKEN`, uploads pequenos ainda funcionam como data URL. Para capas e audios reais em producao, configure Vercel Blob.
 
-Notes:
-
-- **Every fresh clone needs `base44 link`.** It writes `base44/.app.jsonc` (the app-id pointer), which is deliberately gitignored. Your app id is in the Builder URL (`app.base44.com/apps/<id>/...`); `base44 link --help` shows the non-interactive flags.
-- **`base44 dev` runs the frontend for you** (via `site.serveCommand` in this repo's `base44/config.jsonc`) — never run `npm run dev` yourself: alone it serves a UI with no backend behind it (`[base44] Proxy not enabled`, every `/api` call fails), and alongside `base44 dev` the second Vite silently takes the next port and you end up looking at the wrong one.
-- **The app must be published at least once for the UI to load under `base44 dev`.** The frontend boots by fetching app settings from the hosted app; before the first publish that fails and every page redirects to login. The local API works regardless.
-- Entities, functions, and auth run locally — entity data is **in-memory only**, wiped when `base44 dev` restarts. Everything else (Core integrations, OAuth login) is forwarded to your deployed app. Full breakdown: [Local development overview](https://docs.base44.com/developers/backend/overview/local-dev/local-development-overview).
-
-## Frontend Only, Hosted Backend
-
-To work on just the frontend against your app's live hosted backend:
+## Rodar localmente
 
 ```bash
-base44 dev --remote
+npm install
+npm run dev
 ```
 
-⚠️ In this mode writes go to your app's **production data** — plain `base44 dev` keeps everything local.
-
-## Publish Your Changes
-
-After pushing your changes to git, open the Base44 dashboard and publish the app:
+Para testar as serverless functions localmente com o mesmo comportamento da Vercel:
 
 ```bash
-base44 dashboard open
+npm install -g vercel
+vercel dev
 ```
 
-This repo syncs to Base44 through git, so publish from the dashboard rather than `base44 deploy` — a CLI deploy ships your local tree directly, bypassing the sync, and the deployed state silently diverges from the repo.
+## Deploy na Vercel
 
-## Docs & Support
+1. Crie ou vincule o projeto na Vercel.
+2. Adicione um banco Neon Postgres pelo Marketplace da Vercel, ou configure `DATABASE_URL` manualmente.
+3. Configure `JWT_SECRET`.
+4. Opcionalmente adicione Vercel Blob e configure `BLOB_READ_WRITE_TOKEN`.
+5. Faça deploy.
 
-GitHub integration: [https://docs.base44.com/developers/app-code/local-development/github](https://docs.base44.com/developers/app-code/local-development/github)
+A API cria as tabelas `app_users` e `app_records` automaticamente no primeiro request. O primeiro cadastro feito no site vira `admin`/`superadmin`.
 
-Local development: [https://docs.base44.com/developers/backend/overview/local-dev/local-development-overview](https://docs.base44.com/developers/backend/overview/local-dev/local-development-overview)
+## Scripts
 
-Support: [https://app.base44.com/support](https://app.base44.com/support)
+- `npm run dev`: servidor Vite
+- `npm run build`: build de producao
+- `npm run preview`: preview do build
+- `npm run lint`: ESLint
+- `npm run typecheck`: checagem via `jsconfig.json`

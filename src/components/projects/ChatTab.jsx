@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { base44 } from "@/api/base44Client";
+﻿import React, { useEffect, useMemo, useRef, useState } from "react";
+import { apiClient } from "@/api/appClient";
 import { AtSign, MessageSquare, Send } from "lucide-react";
 import { format, isToday, isYesterday } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -11,7 +11,7 @@ import { notifyUsers, parseMentions } from "@/lib/notifications";
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 const dayLabel = (d) => (isToday(d) ? "Hoje" : isYesterday(d) ? "Ontem" : cap(format(d, "dd 'de' MMMM", { locale: ptBR })));
 const sameBlock = (a, b) => a && b && a.user_id === b.user_id && new Date(b.created_date) - new Date(a.created_date) < 5 * 60 * 1000;
-const TOKEN_AT_END = /@([a-zà-ÿ0-9 .\-/]*)$/i;
+const TOKEN_AT_END = /@([a-zÃ -Ã¿0-9 .\-/]*)$/i;
 
 const renderText = (text, tokens, mentionClass) => {
   if (!tokens.length) return text;
@@ -60,19 +60,19 @@ export default function ChatTab({ project }) {
   }, [messages, users, cargos]);
 
   const load = () =>
-    base44.entities.ProjectMessage.filter({ project_id: project.id }).then((m) =>
+    apiClient.entities.ProjectMessage.filter({ project_id: project.id }).then((m) =>
       setMessages(m.sort((a, b) => new Date(a.created_date) - new Date(b.created_date)))
     );
 
   useEffect(() => {
-    base44.auth.me().then(setMe).catch(() => {});
-    Promise.all([base44.entities.User.list().catch(() => []), base44.entities.Cargo.list().catch(() => [])]).then(([us, cs]) => {
+    apiClient.auth.me().then(setMe).catch(() => {});
+    Promise.all([apiClient.entities.User.list().catch(() => []), apiClient.entities.Cargo.list().catch(() => [])]).then(([us, cs]) => {
       setUsers(us);
       setCargos([...new Set([...cs.map((c) => c.name), ...us.flatMap((u) => cargoList(u.cargo))])].map((name) => ({ name })));
     });
     load();
     let unsub = null;
-    try { unsub = base44.entities.ProjectMessage.subscribe(() => load()); } catch {}
+    try { unsub = apiClient.entities.ProjectMessage.subscribe(() => load()); } catch {}
     return () => { if (unsub) unsub(); };
   }, [project.id]);
 
@@ -81,17 +81,17 @@ export default function ChatTab({ project }) {
   const send = async (e) => {
     e.preventDefault();
     if (!text.trim()) return;
-    const user = me || (await base44.auth.me().catch(() => null));
+    const user = me || (await apiClient.auth.me().catch(() => null));
     const name = user?.full_name || user?.email || "Equipe";
     const content = text.trim();
-    await base44.entities.ProjectMessage.create({ project_id: project.id, text: content, user_id: user?.id, user_name: name });
+    await apiClient.entities.ProjectMessage.create({ project_id: project.id, text: content, user_id: user?.id, user_name: name });
     try {
       const { users: mentioned } = parseMentions(content, users, cargos);
       const mentionedIds = mentioned.map((u) => u.id);
       if (mentionedIds.length > 0) {
-        await notifyUsers(mentionedIds, { text: `Você foi mencionado no chat de "${project.name}"`, projectId: project.id, link: `/projetos/${project.id}` }, user?.id);
+        await notifyUsers(mentionedIds, { text: `VocÃª foi mencionado no chat de "${project.name}"`, projectId: project.id, link: `/projetos/${project.id}` }, user?.id);
       } else {
-        const items = await base44.entities.ChecklistItem.filter({ project_id: project.id });
+        const items = await apiClient.entities.ChecklistItem.filter({ project_id: project.id });
         const ids = items.map((i) => i.responsible_id).filter(Boolean);
         await notifyUsers(ids, { text: `Nova mensagem no projeto "${project.name}"`, projectId: project.id, link: `/projetos/${project.id}` }, user?.id);
       }
@@ -140,14 +140,14 @@ export default function ChatTab({ project }) {
         )}
         <div className="min-w-0">
           <p className="text-sm font-medium text-white">Conversa do projeto</p>
-          <p className="text-2xs text-white/40">Mencione com @ — pessoas e cargos recebem notificação</p>
+          <p className="text-2xs text-white/40">Mencione com @ â€” pessoas e cargos recebem notificaÃ§Ã£o</p>
         </div>
       </div>
       <div className="flex-1 space-y-1 overflow-y-auto px-4 py-4">
         {messages.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
             <span className="grid h-12 w-12 place-items-center rounded-full bg-white/[0.05]"><MessageSquare className="text-white/35" size={20} /></span>
-            <p className="max-w-xs text-sm text-white/35">Converse com a equipe do projeto. Use @ para mencionar pessoas ou cargos — responsáveis pelas tarefas recebem notificações.</p>
+            <p className="max-w-xs text-sm text-white/35">Converse com a equipe do projeto. Use @ para mencionar pessoas ou cargos â€” responsÃ¡veis pelas tarefas recebem notificaÃ§Ãµes.</p>
           </div>
         ) : rows.map((r) => {
           if (r.type === "day") return <div key={r.key} className="flex justify-center py-3"><span className="rounded-full border border-white/[0.06] bg-white/[0.04] px-3 py-1 text-2xs font-medium text-white/45">{r.label}</span></div>;
@@ -157,17 +157,17 @@ export default function ChatTab({ project }) {
           if (mine) return (
             <div key={r.key} className={`flex items-end justify-end gap-2.5 ${first ? "pt-2" : ""}`}>
               <div className="flex max-w-[75%] flex-col items-end">
-                {first && <p className="px-1 text-2xs font-medium text-white/45">Você · {format(d, "HH:mm")}</p>}
+                {first && <p className="px-1 text-2xs font-medium text-white/45">VocÃª Â· {format(d, "HH:mm")}</p>}
                 <div className={`${first ? "mt-1" : ""} rounded-2xl bg-primary px-3.5 py-2 text-sm text-primary-foreground ${last ? "" : "rounded-br-md"}`}>{renderText(m.text, tokens, "font-semibold text-white")}</div>
               </div>
-              {last ? <ChatAvatar name={me?.full_name || "Você"} photoUrl={me?.photo_url} size={28} /> : <span className="w-7" />}
+              {last ? <ChatAvatar name={me?.full_name || "VocÃª"} photoUrl={me?.photo_url} size={28} /> : <span className="w-7" />}
             </div>
           );
           return (
             <div key={r.key} className={`flex items-end gap-2.5 ${first ? "pt-2" : ""}`}>
               {first ? <ChatAvatar name={name} photoUrl={sender.photo_url} size={28} /> : <span className="w-7" />}
               <div className="flex min-w-0 max-w-[75%] flex-col items-start">
-                {first && <p className="px-1 text-2xs"><span className="font-medium text-white/85">{name}</span><span className="text-white/35"> · {format(d, "HH:mm")}</span></p>}
+                {first && <p className="px-1 text-2xs"><span className="font-medium text-white/85">{name}</span><span className="text-white/35"> Â· {format(d, "HH:mm")}</span></p>}
                 <div className={`${first ? "mt-1" : ""} rounded-2xl border border-white/[0.06] bg-white/[0.04] px-3.5 py-2 text-sm text-white/85 ${last ? "" : "rounded-bl-md"}`}>{renderText(m.text, tokens, "font-semibold text-primary")}</div>
               </div>
             </div>

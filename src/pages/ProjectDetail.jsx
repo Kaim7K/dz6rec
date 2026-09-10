@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { apiClient } from "@/api/appClient";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Play, Shuffle, Pencil } from "lucide-react";
@@ -23,7 +23,7 @@ export default function ProjectDetail() {
   const [editOpen, setEditOpen] = useState(false);
   const player = usePlayer();
   const load = () => {
-    Promise.all([base44.entities.Project.get(id), base44.entities.Track.filter({ project_id: id }), base44.entities.ChecklistItem.filter({ project_id: id }), base44.entities.ChecklistSection.filter({ project_id: id }), base44.entities.Artist.list()]).then(([p, t, i, s, a]) => {
+    Promise.all([apiClient.entities.Project.get(id), apiClient.entities.Track.filter({ project_id: id }), apiClient.entities.ChecklistItem.filter({ project_id: id }), apiClient.entities.ChecklistSection.filter({ project_id: id }), apiClient.entities.Artist.list()]).then(([p, t, i, s, a]) => {
       setProject(p);
       setTracks(t.sort((a, b) => a.track_number - b.track_number));
       setItems(i);
@@ -36,14 +36,14 @@ export default function ProjectDetail() {
 
   const patch = async (field, value, text) => {
     setProject((p) => ({ ...p, [field]: value }));
-    await base44.entities.Project.update(id, { [field]: value });
-    const me = await base44.auth.me().catch(() => null);
+    await apiClient.entities.Project.update(id, { [field]: value });
+    const me = await apiClient.auth.me().catch(() => null);
     await logActivity(id, text, me?.full_name);
   };
   const changeType = (v) => patch("type", v, `Tipo alterado para ${TYPE[v]}`);
   const changeStatus = (v) => patch("status", v, `Status alterado para ${STATUS[v]}`);
 
-  const tabs = [["faixas", "Faixas"], ["checklist", "Checklist"], ["visao", "Visão geral"], ["historico", "Histórico"], ["chat", "Conversa"]];
+  const tabs = [["faixas", "Faixas"], ["checklist", "Checklist"], ["visao", "VisÃ£o geral"], ["historico", "HistÃ³rico"], ["chat", "Conversa"]];
   return (
     <div className="space-y-8">
       <div className="flex flex-col gap-6 sm:flex-row sm:items-end">
@@ -70,7 +70,7 @@ export default function ProjectDetail() {
           <p className="mt-1.5 text-white/50">{project.main_artist_name}{project.featuring ? ` feat. ${project.featuring}` : ""}</p>
           <div className="mt-5 flex flex-wrap items-center gap-3">
             <button onClick={() => tracks.length && player.play(tracks[0], project, tracks)} className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"><Play size={16} fill="currentColor" />Reproduzir</button>
-            <button onClick={() => tracks.length && player.play(tracks[Math.floor(Math.random() * tracks.length)], project, tracks)} className="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2.5 text-sm text-white/80 transition-colors hover:bg-white/5"><Shuffle size={15} />Aleatório</button>
+            <button onClick={() => tracks.length && player.play(tracks[Math.floor(Math.random() * tracks.length)], project, tracks)} className="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2.5 text-sm text-white/80 transition-colors hover:bg-white/5"><Shuffle size={15} />AleatÃ³rio</button>
           </div>
         </div>
       </div>
@@ -83,7 +83,7 @@ export default function ProjectDetail() {
         </TabsList>
         <TabsContent value="faixas" className="mt-6"><TrackList project={project} tracks={tracks} onChanged={load} /></TabsContent>
         <TabsContent value="checklist" className="mt-6"><ChecklistTab project={project} /></TabsContent>
-        <TabsContent value="visao" className="mt-6"><div className="rounded-2xl border border-white/[0.06] bg-white/[0.03] p-6"><p className="text-sm leading-relaxed text-white/65">{project.description || "Sem descrição."}</p>{project.release_date && <p className="mt-4 text-xs text-white/40">Lançamento previsto · {new Date(project.release_date).toLocaleDateString("pt-BR")}</p>}</div></TabsContent>
+        <TabsContent value="visao" className="mt-6"><div className="rounded-2xl border border-white/[0.06] bg-white/[0.03] p-6"><p className="text-sm leading-relaxed text-white/65">{project.description || "Sem descriÃ§Ã£o."}</p>{project.release_date && <p className="mt-4 text-xs text-white/40">LanÃ§amento previsto Â· {new Date(project.release_date).toLocaleDateString("pt-BR")}</p>}</div></TabsContent>
         <TabsContent value="historico" className="mt-6"><HistoryTab project={project} /></TabsContent>
         <TabsContent value="chat" className="mt-6"><ChatTab project={project} /></TabsContent>
       </Tabs>
