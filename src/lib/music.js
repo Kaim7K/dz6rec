@@ -17,13 +17,23 @@ export const STATUS = {
 };
 export const STATUS_ORDER = ["rascunho", "planejamento", "producao", "revisao", "pre_lancamento", "agendado", "lancado", "pausado", "cancelado", "arquivado"];
 
+export const PRIORITY = {
+  baixa: { label: "Baixa", tone: "text-white/40", dot: "bg-white/30" },
+  normal: { label: "Normal", tone: "text-white/55", dot: "bg-white/45" },
+  alta: { label: "Alta", tone: "text-amber-300", dot: "bg-amber-400" },
+  urgente: { label: "Urgente", tone: "text-primary", dot: "bg-primary" },
+};
+
+export const PRIORITY_ORDER = ["baixa", "normal", "alta", "urgente"];
+export const PRIORITY_WEIGHT = { urgente: 4, alta: 3, normal: 2, baixa: 1 };
+
 export const STATUS_TONE = {
   rascunho:        { dot: "bg-white/40",    text: "text-white/55",   bg: "bg-white/[0.05]",   border: "border-white/[0.07]" },
-  planejamento:    { dot: "bg-violet-400",  text: "text-violet-300", bg: "bg-violet-500/10",  border: "border-violet-500/20" },
+  planejamento:    { dot: "bg-white/45",    text: "text-white/60",   bg: "bg-white/[0.055]",  border: "border-white/[0.08]" },
   producao:        { dot: "bg-emerald-400", text: "text-emerald-300", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
-  revisao:         { dot: "bg-sky-400",     text: "text-sky-300",     bg: "bg-sky-500/10",     border: "border-sky-500/20" },
-  pre_lancamento:  { dot: "bg-amber-400",   text: "text-amber-300",   bg: "bg-amber-500/10",   border: "border-amber-500/20" },
-  agendado:        { dot: "bg-indigo-400",  text: "text-indigo-300", bg: "bg-indigo-500/10",  border: "border-indigo-500/20" },
+  revisao:         { dot: "bg-amber-400",   text: "text-amber-300",   bg: "bg-amber-500/10",   border: "border-amber-500/20" },
+  pre_lancamento:  { dot: "bg-primary",     text: "text-primary",     bg: "bg-primary/10",     border: "border-primary/25" },
+  agendado:        { dot: "bg-white/55",    text: "text-white/70",    bg: "bg-white/[0.055]",  border: "border-white/[0.08]" },
   lancado:         { dot: "bg-primary",     text: "text-primary",     bg: "bg-primary/10",     border: "border-primary/25" },
   pausado:         { dot: "bg-white/30",    text: "text-white/45",    bg: "bg-white/[0.04]",   border: "border-white/[0.06]" },
   cancelado:       { dot: "bg-red-400",     text: "text-red-300",     bg: "bg-red-500/10",     border: "border-red-500/20" },
@@ -35,6 +45,113 @@ export const statusBadge = (status) => {
   return `${t.bg} ${t.text} ${t.border}`;
 };
 
+export function isOverdue(date, done = false) {
+  if (!date || done) return false;
+  const due = new Date(date);
+  due.setHours(23, 59, 59, 999);
+  return due < new Date();
+}
+
+export function isDueSoon(date, done = false, days = 3) {
+  if (!date || done || isOverdue(date, done)) return false;
+  const due = new Date(date);
+  const limit = new Date();
+  limit.setDate(limit.getDate() + days);
+  return due <= limit;
+}
+
+export function dueLabel(date) {
+  if (!date) return "";
+  const today = new Date();
+  const due = new Date(date);
+  today.setHours(0, 0, 0, 0);
+  due.setHours(0, 0, 0, 0);
+  const diff = Math.round((due - today) / 86400000);
+  if (diff === 0) return "Hoje";
+  if (diff === 1) return "Amanhã";
+  if (diff === -1) return "Ontem";
+  if (diff < 0) return `${Math.abs(diff)} dias atrás`;
+  if (diff <= 7) return `${diff} dias`;
+  return due.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
+}
+
+export function taskScore(task) {
+  const priority = PRIORITY_WEIGHT[task.priority || "normal"] || 2;
+  const due = task.due_date ? new Date(task.due_date).getTime() : Number.MAX_SAFE_INTEGER;
+  return (5 - priority) * 10000000000000 + due;
+}
+
+export function nextProjectAction(project, items = [], files = []) {
+  const open = items.filter((item) => !item.completed);
+  const overdue = open.filter((item) => isOverdue(item.due_date)).sort((a, b) => taskScore(a) - taskScore(b));
+  if (overdue.length) {
+    return {
+      tone: "danger",
+      title: "Resolver atraso",
+      text: overdue[0].text,
+      detail: overdue[0].due_date ? `Venceu ${dueLabel(overdue[0].due_date).toLowerCase()}` : "Prazo vencido",
+      href: `/projetos/${project.id}`,
+      action: "Abrir tarefa",
+    };
+  }
+
+  const unassigned = open.find((item) => !item.responsible_id && !item.responsible_name);
+  if (unassigned) {
+    return {
+      tone: "warn",
+      title: "Definir responsável",
+      text: unassigned.text,
+      detail: "Sem dono claro",
+      href: `/projetos/${project.id}`,
+      action: "Atribuir",
+    };
+  }
+
+  const approval = open.find((item) => /aprovar|aprovação|revisar|validar|confirmar|capa|master|mix/i.test(item.text || ""));
+  if (approval) {
+    return {
+      tone: "warn",
+      title: "Aguardando aprovação",
+      text: approval.text,
+      detail: approval.responsible_name || approval.cargo || "Pendente",
+      href: `/projetos/${project.id}`,
+      action: "Revisar",
+    };
+  }
+
+  if (!files.length) {
+    return {
+      tone: "neutral",
+      title: "Adicionar materiais",
+      text: "Envie capa, áudio ou referência para centralizar o projeto.",
+      detail: "Nenhum arquivo anexado",
+      href: `/projetos/${project.id}`,
+      action: "Adicionar arquivo",
+    };
+  }
+
+  const nextTask = open.sort((a, b) => taskScore(a) - taskScore(b))[0];
+  if (nextTask) {
+    return {
+      tone: "neutral",
+      title: "Continuar tarefa",
+      text: nextTask.text,
+      detail: nextTask.due_date ? dueLabel(nextTask.due_date) : nextTask.responsible_name || "Sem prazo",
+      href: `/projetos/${project.id}`,
+      action: "Continuar",
+    };
+  }
+
+  return {
+    tone: "good",
+    title: "Projeto em dia",
+    text: "Nenhuma pendência aberta neste projeto.",
+    detail: STATUS[project.status] || project.status,
+    href: `/projetos/${project.id}`,
+    action: "Ver projeto",
+  };
+}
+
 // Cargos padrão (semeados dinamicamente; novos cargos podem ser adicionados em Configurações)
 export const CARGOS = [
   "Artista/Intérprete", "Produtor Musical", "Beatmaker", "Engenheiro de Áudio", "Designer",
@@ -42,9 +159,9 @@ export const CARGOS = [
 ];
 
 export const CATEGORIES = [
-  { key: "musica",    label: "Música",    color: "#10b981" },
-  { key: "visual",    label: "Visual",    color: "#7c3aed" },
-  { key: "marketing", label: "Marketing", color: "#f59e0b" },
+  { key: "musica",    label: "Música",    color: "#dc0000" },
+  { key: "visual",    label: "Visual",    color: "#f5f5f5" },
+  { key: "marketing", label: "Marketing", color: "#8f0d12" },
 ];
 
 // Template padrão — 3 seções (Música, Visual, Marketing) com cargo padrão e tarefas genéricas

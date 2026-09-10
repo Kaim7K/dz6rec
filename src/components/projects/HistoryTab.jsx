@@ -4,7 +4,7 @@ import { apiClient } from "@/api/appClient";
 export default function HistoryTab({ project }) {
   const [logs, setLogs] = useState([]);
   useEffect(() => { apiClient.entities.ActivityLog.filter({ project_id: project.id }).then((l) => setLogs(l.sort((a, b) => new Date(b.created_date) - new Date(a.created_date)))); }, [project.id]);
-  if (!logs.length) return <div className="rounded-2xl border border-white/[0.06] bg-white/[0.03] p-8 text-center text-sm text-white/35">Sem histórico ainda.</div>;
+  if (!logs.length) return <div className="rounded-2xl border border-white/[0.06] bg-white/[0.03] p-6 text-center text-sm text-white/35">Sem histórico ainda.</div>;
   return (
     <div className="space-y-2">{logs.map((l) => (
       <div key={l.id} className="flex items-start gap-3 rounded-xl border border-white/[0.06] bg-white/[0.03] p-3.5 text-sm">

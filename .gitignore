@@ -28,5 +28,8 @@ dist-ssr
 *.sw?
 
 .env
+.env.local
 .vite
 base44/.app.jsonc
+
+.vercel

@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { apiClient } from "@/api/appClient";
 import { cargoList } from "@/lib/music";
 
-export const COLORS = ["#c20000", "#d97706", "#0891b2", "#7c3aed", "#db2777", "#16a34a", "#ca8a04", "#0ea5e9", "#9333ea", "#dc2626"];
+export const COLORS = ["#dc0000", "#b91c1c", "#991b1b", "#7f1d1d", "#ef4444", "#d97706", "#a3a3a3", "#737373", "#525252", "#f5f5f5"];
 
 export default function EditCargoDialog({ cargo, onClose, onSaved }) {
   const [name, setName] = useState(cargo.name);

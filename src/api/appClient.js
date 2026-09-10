@@ -1,10 +1,23 @@
-﻿const TOKEN_KEY = "dz6_access_token";
+﻿import {
+  getMockProfileId,
+  getMockProfiles,
+  isLocalMockEnabled,
+  mockRequest,
+  resetMockStore,
+  setMockProfileId,
+} from "@/api/mockData";
+
+const TOKEN_KEY = "dz6_access_token";
 
 function getToken() {
   return localStorage.getItem(TOKEN_KEY);
 }
 
 async function request(path, options = {}) {
+  if (isLocalMockEnabled() && path.startsWith("/api/")) {
+    return mockRequest(path, options);
+  }
+
   const headers = new Headers(options.headers || {});
   if (!(options.body instanceof FormData)) {
     headers.set("Content-Type", "application/json");
@@ -59,6 +72,7 @@ const entityNames = [
   "ChecklistTemplate",
   "Notification",
   "Project",
+  "ProjectFile",
   "ProjectMessage",
   "SystemFlag",
   "Track",
@@ -67,6 +81,13 @@ const entityNames = [
 ];
 
 export const apiClient = {
+  localMock: {
+    enabled: isLocalMockEnabled,
+    profiles: getMockProfiles,
+    currentProfileId: getMockProfileId,
+    setProfileId: setMockProfileId,
+    reset: resetMockStore,
+  },
   entities: Object.fromEntries(entityNames.map((name) => [name, entityClient(name)])),
   auth: {
     me: () => request("/api/auth/me"),
@@ -76,6 +97,10 @@ export const apiClient = {
       return result;
     },
     loginWithGoogle: (returnTo = "/") => {
+      if (isLocalMockEnabled()) {
+        window.location.href = returnTo;
+        return;
+      }
       window.location.href = `/api/auth/google?returnTo=${encodeURIComponent(returnTo)}`;
     },
     register: async ({ email, password, full_name }) => {
@@ -89,6 +114,10 @@ export const apiClient = {
     resetPassword: ({ resetToken, newPassword }) => request("/api/auth/reset", { method: "POST", body: JSON.stringify({ resetToken, newPassword }) }),
     logout: (redirectTo) => {
       localStorage.removeItem(TOKEN_KEY);
+      if (isLocalMockEnabled()) {
+        window.location.reload();
+        return;
+      }
       if (redirectTo) window.location.href = typeof redirectTo === "string" ? redirectTo : "/login";
     },
     redirectToLogin: (returnTo = window.location.pathname) => {

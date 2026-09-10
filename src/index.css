@@ -32,7 +32,7 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.85rem;
+    --radius: 0.55rem;
     --font-heading: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
     --font-body: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
     --font-display: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
@@ -60,6 +60,10 @@
   }
   body {
     @apply bg-background text-foreground font-body antialiased;
+    background:
+      radial-gradient(circle at 82% -12%, rgba(130, 0, 0, 0.08), transparent 32rem),
+      linear-gradient(180deg, rgba(255,255,255,0.012), transparent 20rem),
+      hsl(var(--background));
   }
   h1, h2, h3, h4 {
     @apply font-display tracking-tight;
@@ -82,5 +86,53 @@
   }
   button, a, input, textarea, select {
     @apply transition-colors duration-200;
+  }
+}
+
+@layer components {
+  .dz-card {
+    @apply rounded-xl border border-white/[0.055] bg-white/[0.025] backdrop-blur;
+    background-image: linear-gradient(135deg, rgba(255,255,255,0.035), rgba(255,255,255,0.012));
+  }
+
+  .dz-card-soft {
+    @apply rounded-lg border border-white/[0.05] bg-white/[0.022];
+  }
+
+  .dz-panel-title {
+    @apply font-display text-lg font-bold tracking-tight text-white;
+  }
+
+  .dz-kicker {
+    @apply text-2xs font-semibold uppercase tracking-[0.18em] text-white/35;
+  }
+
+  .dz-page {
+    @apply space-y-7 lg:space-y-8;
+  }
+
+  .dz-page-head {
+    @apply flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between;
+  }
+
+  .dz-page-title {
+    @apply mt-1.5 font-display text-2xl font-bold tracking-tight text-white sm:text-3xl;
+  }
+
+  .dz-page-subtitle {
+    @apply mt-1.5 max-w-2xl text-sm text-white/45;
+  }
+
+  .dz-primary-button {
+    @apply inline-flex h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-60;
+  }
+
+  .dz-ghost-button {
+    @apply inline-flex h-9 items-center justify-center gap-2 rounded-md border border-white/[0.06] bg-white/[0.02] px-3.5 text-sm font-medium text-white/72 transition-colors hover:bg-white/[0.05] hover:text-white;
+  }
+
+  .dz-empty {
+    @apply flex min-h-44 flex-col items-center justify-center gap-3 rounded-xl border border-white/[0.055] bg-white/[0.025] p-7 text-center text-sm text-white/40 backdrop-blur;
+    background-image: linear-gradient(135deg, rgba(255,255,255,0.035), rgba(255,255,255,0.012));
   }
 }

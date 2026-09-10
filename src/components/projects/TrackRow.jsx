@@ -1,18 +1,43 @@
 import React, { useEffect, useRef, useState } from "react";
 import { apiClient } from "@/api/appClient";
 import { usePlayer } from "@/lib/playerContext";
-import { uploadFile, logActivity } from "@/lib/music";
+import { uploadFile, logActivity, STATUS, STATUS_TONE } from "@/lib/music";
 import { Pause, Play, Plus, MoreHorizontal, GripVertical, Download } from "lucide-react";
+import dz6ProfileLogo from "@/assets/dz6-profile.png";
 
-export default function TrackRow({ track, project, queue, index, provided }) {
+function Waveform({ pct = 0 }) {
+  const bars = [18, 26, 34, 22, 38, 30, 16, 28, 42, 24, 35, 20, 30, 18, 40, 26, 32, 22, 36, 19, 28, 24, 34, 16, 30, 22, 38, 20, 32, 24];
+  const active = Math.max(1, Math.round((pct / 100) * bars.length));
+
+  return (
+    <div className="flex h-8 items-center gap-0.5">
+      {bars.map((height, index) => (
+        <span
+          key={`${height}-${index}`}
+          className={`w-0.5 rounded-full ${index < active ? "bg-primary" : "bg-white/20"}`}
+          style={{ height }}
+        />
+      ))}
+    </div>
+  );
+}
+
+export default function TrackRow({ track, project, queue, index, provided, progressPct = 0 }) {
   const player = usePlayer();
   const isCurrent = player.current?.track?.id === track.id;
   const [versions, setVersions] = useState([]);
   const [menu, setMenu] = useState(false);
   const fileRef = useRef(null);
+  const tone = STATUS_TONE[project?.status] || STATUS_TONE.rascunho;
+
   useEffect(() => { apiClient.entities.TrackVersion.filter({ track_id: track.id }).then(setVersions); }, [track.id]);
+
   const play = () => { if (isCurrent) player.togglePlay(); else player.play(track, project, queue); };
-  const switchVersion = async (v) => { await apiClient.entities.Track.update(track.id, { audio_url: v.audio_url, version_label: v.name }); setMenu(false); if (isCurrent) player.play({ ...track, audio_url: v.audio_url, version_label: v.name }, project, queue); };
+  const switchVersion = async (v) => {
+    await apiClient.entities.Track.update(track.id, { audio_url: v.audio_url, version_label: v.name });
+    setMenu(false);
+    if (isCurrent) player.play({ ...track, audio_url: v.audio_url, version_label: v.name }, project, queue);
+  };
   const downloadTrack = async () => {
     setMenu(false);
     if (!track.audio_url) return;
@@ -29,18 +54,50 @@ export default function TrackRow({ track, project, queue, index, provided }) {
       window.open(track.audio_url, "_blank");
     }
   };
-  const addVersion = async (e) => { const f = e.target.files?.[0]; if (!f) return; const url = await uploadFile(f); const name = `Mix ${versions.length + 1}`; await apiClient.entities.TrackVersion.create({ track_id: track.id, name, audio_url: url }); await apiClient.entities.Track.update(track.id, { audio_url: url, version_label: name }); const me = await apiClient.auth.me().catch(() => null); await logActivity(project.id, `Versão adicionada em ${track.name}`, me?.full_name); setMenu(false); };
+  const addVersion = async (e) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    const url = await uploadFile(f);
+    const name = `Mix ${versions.length + 1}`;
+    await apiClient.entities.TrackVersion.create({ track_id: track.id, name, audio_url: url });
+    await apiClient.entities.Track.update(track.id, { audio_url: url, version_label: name });
+    const me = await apiClient.auth.me().catch(() => null);
+    await logActivity(project.id, `Versão adicionada em ${track.name}`, me?.full_name);
+    setMenu(false);
+  };
+
   return (
-    <div ref={provided?.innerRef} {...(provided?.draggableProps || {})} className="group flex items-center gap-2.5 rounded-xl px-2.5 py-2.5 transition-colors hover:bg-white/[0.04]">
-      <button {...(provided?.dragHandleProps || {})} className="shrink-0 cursor-grab touch-none text-white/25 opacity-0 transition group-hover:opacity-100 hover:text-white/60 active:cursor-grabbing" aria-label="Mover faixa">
-        <GripVertical size={15} />
-      </button>
-      <button onClick={play} className="grid h-7 w-7 shrink-0 place-items-center text-sm text-white/40 group-hover:text-white">
-        {isCurrent && player.isPlaying ? <Pause size={15} fill="currentColor" /> : <><span className="group-hover:hidden tabular-nums">{String(index + 1).padStart(2, "0")}</span><Play size={15} fill="currentColor" className="hidden group-hover:block" /></>}
-      </button>
-      <div className="min-w-0 flex-1"><p className={`truncate text-sm ${isCurrent ? "text-white" : "text-white/85"}`}>{track.name}</p><p className="truncate text-2xs text-white/40">{[track.main_artist_name, track.featuring && `feat. ${track.featuring}`].filter(Boolean).join(" · ")}</p></div>
-      <span className="rounded-full border border-white/[0.06] bg-white/[0.04] px-2 py-0.5 text-2xs text-white/55">{track.version_label || "Demo"}</span>
-      <div className="relative">
+    <div ref={provided?.innerRef} {...(provided?.draggableProps || {})} className="group grid gap-3 border-b border-white/[0.045] py-4 last:border-b-0 lg:grid-cols-[3rem_1fr_6rem_9rem_18rem_2rem] lg:items-center">
+      <div className="flex items-center gap-2 text-sm text-white/45">
+        <button {...(provided?.dragHandleProps || {})} className="hidden shrink-0 cursor-grab touch-none text-white/18 opacity-0 transition group-hover:opacity-100 hover:text-white/55 active:cursor-grabbing lg:block" aria-label="Mover faixa">
+          <GripVertical size={14} />
+        </button>
+        <button onClick={play} className="grid h-8 w-8 shrink-0 place-items-center rounded-md text-sm text-white/55 group-hover:bg-white/[0.04] group-hover:text-white">
+          {isCurrent && player.isPlaying ? <Pause size={15} fill="currentColor" /> : <><span className="group-hover:hidden tabular-nums">{String(index + 1).padStart(2, "0")}</span><Play size={15} fill="currentColor" className="hidden group-hover:block" /></>}
+        </button>
+      </div>
+
+      <div className="flex min-w-0 items-center gap-3">
+        <div className="h-12 w-12 shrink-0 overflow-hidden rounded-md bg-black">
+          {project?.cover_url ? <img src={project.cover_url} alt="" className="h-full w-full object-cover" /> : <img src={dz6ProfileLogo} alt="" className="h-full w-full object-cover opacity-90" />}
+        </div>
+        <div className="min-w-0">
+          <p className={`truncate text-sm font-bold ${isCurrent ? "text-white" : "text-white/88"}`}>{track.name}</p>
+          <p className="truncate text-xs text-white/42">{[track.main_artist_name || project?.main_artist_name, track.featuring && `feat. ${track.featuring}`].filter(Boolean).join(" · ")}</p>
+        </div>
+      </div>
+
+      <span className="hidden text-sm text-white/48 lg:block">{track.duration || track.duration_label || "03:24"}</span>
+      <span className={`inline-flex w-fit items-center gap-2 rounded-md px-2.5 py-1 text-xs ${tone.bg} ${tone.text}`}>
+        <span className={`h-1.5 w-1.5 rounded-full ${tone.dot}`} />
+        {STATUS[project?.status] || "Status"}
+      </span>
+      <div className="hidden items-center gap-3 lg:flex">
+        <Waveform pct={progressPct} />
+        <span className="text-sm font-bold tabular-nums text-white/78">{progressPct}%</span>
+      </div>
+
+      <div className="relative justify-self-end">
         <button onClick={() => setMenu(!menu)} className="rounded-lg p-1 text-white/40 hover:bg-white/5 hover:text-white"><MoreHorizontal size={16} /></button>
         {menu && <div className="absolute right-0 z-20 mt-1 w-44 rounded-xl border border-white/[0.08] bg-popover p-1.5 shadow-elev">
           {versions.map((v) => <button key={v.id} onClick={() => switchVersion(v)} className="block w-full rounded-lg px-3 py-2 text-left text-xs text-white/70 hover:bg-white/5">{v.name}</button>)}

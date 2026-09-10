@@ -1,24 +1,20 @@
-﻿import React from "react";
-import { cn } from "@/lib/utils";
+import React from "react";
 
 export default function MetricStrip({ metrics }) {
   return (
-    <div className="grid grid-cols-2 gap-y-8 sm:grid-cols-4 sm:gap-y-0">
-      {metrics.map((m, i) => (
-        <div
-          key={i}
-          className={cn(
-            "flex flex-col gap-3",
-            i > 0 && "sm:border-l sm:border-white/[0.06] sm:pl-8",
-            i < metrics.length - 1 && "sm:pr-8"
-          )}
-        >
-          <div className="flex items-center gap-2">
-            {m.icon && <m.icon size={13} className="text-primary/70" />}
-            <span className="text-2xs font-medium uppercase tracking-[0.18em] text-white/40">{m.label}</span>
+    <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+      {metrics.map((metric) => (
+        <article key={metric.label} className="rounded-lg border border-white/[0.05] bg-white/[0.025] p-5">
+          <div className="flex items-center gap-5">
+            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-primary/14 text-primary">
+              {metric.icon && <metric.icon size={23} />}
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-white/48">{metric.label}</p>
+              <p className="mt-1 font-display text-3xl font-bold leading-none tracking-tight text-white">{metric.value}</p>
+            </div>
           </div>
-          <p className="font-display text-4xl font-bold tracking-tight tabular-nums text-white lg:text-5xl">{m.value}</p>
-        </div>
+        </article>
       ))}
     </div>
   );

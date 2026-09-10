@@ -20,7 +20,7 @@ export default function Configuracoes() {
 
   if (loading) return <p className="text-white/40">Carregando...</p>;
   if (me?.role !== "admin") return (
-    <div className="mx-auto max-w-md rounded-2xl border border-white/[0.06] bg-white/[0.03] p-10 text-center">
+    <div className="dz-card mx-auto max-w-md p-7 text-center">
       <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-white/[0.05]"><ShieldCheck className="text-white/50" /></div>
       <h1 className="mt-4 font-display text-2xl font-medium text-white">Área restrita</h1>
       <p className="mt-2 text-sm text-white/50">Somente a administração pode configurar o painel.</p>
@@ -31,18 +31,18 @@ export default function Configuracoes() {
   const remove = async (c) => { await apiClient.entities.Cargo.delete(c.id); load(); };
 
   return (
-    <div className="space-y-7">
-      <div><p className="text-2xs font-medium uppercase tracking-[0.18em] text-white/35">Identidade</p><h1 className="mt-2 font-display text-3xl font-medium tracking-tight text-white sm:text-4xl">Configurações</h1><p className="mt-1.5 text-white/45">Preferências do painel da gravadora.</p></div>
+    <div className="dz-page">
+      <div><p className="dz-kicker">Identidade</p><h1 className="dz-page-title">Configurações</h1><p className="dz-page-subtitle">Preferências do painel da gravadora.</p></div>
 
-      <section className="rounded-2xl border border-white/[0.06] bg-white/[0.03] p-5">
-        <h2 className="font-display text-lg font-medium text-white">Cargos & badges</h2>
+      <section className="dz-card p-5">
+        <h2 className="font-display text-lg font-bold text-white">Cargos & badges</h2>
         <p className="mt-1 text-sm text-white/45">Defina os cargos da equipe. Eles aparecem como badges ao atribuir tarefas e nos perfis.</p>
         <form onSubmit={add} className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
           <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Novo cargo (ex. Produtor Musical)" className="h-11 flex-1 rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 text-sm outline-none transition focus:border-white/15" />
           <div className="flex items-center gap-2">{COLORS.map((c) => (
             <button type="button" key={c} onClick={() => setColor(c)} className={`h-7 w-7 rounded-full transition-transform ${color === c ? "ring-2 ring-white ring-offset-2 ring-offset-[#0b0808]" : "ring-1 ring-white/10 hover:scale-110"}`} style={{ backgroundColor: c }} aria-label={c} />
           ))}</div>
-          <button className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-primary px-6 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"><Plus size={16} />Adicionar</button>
+          <button className="dz-primary-button"><Plus size={16} />Adicionar</button>
         </form>
         <div className="mt-5 flex flex-wrap gap-2">
           {cargos.length === 0 && <p className="text-sm text-white/35">Nenhum cargo criado ainda.</p>}
@@ -57,7 +57,7 @@ export default function Configuracoes() {
       </section>
 
       <section className="max-w-xl space-y-2.5">{["Notificações", "Preferências da equipe", "Integrações"].map((s) => (
-        <div key={s} className="flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.03] p-4">
+        <div key={s} className="flex items-center justify-between rounded-2xl border border-white/[0.07] bg-white/[0.025] p-4 shadow-soft">
           <div><p className="text-sm font-medium text-white">{s}</p><p className="text-2xs text-white/40">Em breve</p></div>
           <span className="rounded-full bg-white/[0.04] px-2.5 py-1 text-2xs text-white/35">em breve</span>
         </div>

@@ -5,7 +5,7 @@ import { cargoColor } from "@/components/CargoBadge";
 const NONE = "__none__";
 const CARGO = "cargo:";
 
-export default function AssignResponsible({ item, users, cargos = [], onAssign, onAssignCargo }) {
+export default function AssignResponsible({ item, users, cargos = [], onAssign, onAssignCargo, className = "" }) {
   const value = item.responsible_id || (item.cargo ? CARGO + item.cargo : undefined);
   const change = (v) => {
     if (v === NONE) {
@@ -18,7 +18,7 @@ export default function AssignResponsible({ item, users, cargos = [], onAssign, 
   };
   return (
     <Select value={value} onValueChange={change}>
-      <SelectTrigger className="h-6 w-auto min-w-[5.5rem] gap-1 border-white/[0.08] bg-white/[0.04] px-2 text-2xs text-white/60 hover:text-white">
+      <SelectTrigger className={`h-6 w-auto min-w-[5.5rem] gap-1 border-white/[0.08] bg-white/[0.04] px-2 text-2xs text-white/60 hover:text-white ${className}`}>
         <SelectValue placeholder="atribuir" />
       </SelectTrigger>
       <SelectContent className="max-h-64">

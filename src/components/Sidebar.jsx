@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import { apiClient } from "@/api/appClient";
 import { cn } from "@/lib/utils";
 import { FolderKanban, House, LayoutTemplate, ListTodo, Mic2, Settings, Users, X } from "lucide-react";
+import dz6ProfileLogo from "@/assets/dz6-profile.png";
 
 const items = [
   { label: "Início", to: "/", Icon: House },
@@ -23,14 +24,15 @@ function NavItem({ label, to, Icon, onClose }) {
       className={({ isActive }) =>
         cn(
           "group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
-          isActive ? "bg-white/[0.06] text-white" : "text-white/50 hover:bg-white/[0.04] hover:text-white/85"
+          isActive ? "bg-primary/20 text-white shadow-[inset_0_0_0_1px_rgba(220,0,0,0.18)]" : "text-white/48 hover:bg-white/[0.03] hover:text-white/82"
         )
       }
     >
       {({ isActive }) => (
         <>
-          <span className={cn("absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-full bg-primary transition-opacity", isActive ? "opacity-100" : "opacity-0")} />
-          <Icon size={18} className={cn("transition-colors", isActive ? "text-primary" : "text-white/40 group-hover:text-white/70")} />
+          <span className={cn("grid h-7 w-7 shrink-0 place-items-center rounded-md transition-colors", isActive ? "bg-primary text-white" : "text-white/42 group-hover:text-white/70")}>
+            <Icon size={17} />
+          </span>
           {label}
         </>
       )}
@@ -47,28 +49,37 @@ export default function Sidebar({ open, onClose }) {
   return (
     <>
       {open && <button className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm lg:hidden" onClick={onClose} aria-label="Fechar menu" />}
-      <aside className={cn("fixed inset-y-0 left-0 z-50 flex w-60 flex-col border-r border-white/[0.06] bg-[#0b0808] transition-transform duration-300 lg:translate-x-0", open ? "translate-x-0" : "-translate-x-full")}>
+      <aside className={cn("fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-white/[0.045] bg-[#070606]/95 backdrop-blur-xl transition-transform duration-300 lg:translate-x-0", open ? "translate-x-0" : "-translate-x-full")}>
         <div className="flex h-20 items-center justify-between px-5">
-          <div className="flex items-center gap-2.5">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary text-xs font-black text-white ring-1 ring-white/10">DZ6</span>
-            <span className="font-display text-sm font-semibold tracking-[0.24em] text-white">DZ6</span>
+          <div className="flex items-center gap-3">
+            <span className="grid h-12 w-12 place-items-center overflow-hidden rounded-md bg-black">
+              <img src={dz6ProfileLogo} alt="DZ6" className="h-full w-full object-cover" />
+            </span>
+            <span>
+              <span className="block font-display text-lg font-bold tracking-[0.18em] text-white">DZ6</span>
+              <span className="block text-[0.58rem] font-bold uppercase tracking-[0.28em] text-white/35">Gravadora</span>
+            </span>
           </div>
           <button onClick={onClose} className="rounded-lg p-1.5 text-white/40 hover:bg-white/5 hover:text-white lg:hidden"><X size={18} /></button>
         </div>
-        <nav className="flex-1 overflow-y-auto px-3 py-2">
-          <p className="px-3 pb-2 pt-2 text-2xs font-medium uppercase tracking-[0.18em] text-white/25">Geral</p>
-          <div className="space-y-0.5">{geral.map((i) => <NavItem key={i.to} {...i} onClose={onClose} />)}</div>
+        <nav className="flex-1 overflow-y-auto px-4 py-3">
+          <p className="px-3 pb-3 pt-1 text-2xs font-bold uppercase tracking-[0.22em] text-white/28">Geral</p>
+          <div className="space-y-1">{geral.map((i) => <NavItem key={i.to} {...i} onClose={onClose} />)}</div>
           {admin.length > 0 && (
             <>
-              <p className="px-3 pb-2 pt-5 text-2xs font-medium uppercase tracking-[0.18em] text-white/25">Administração</p>
-              <div className="space-y-0.5">{admin.map((i) => <NavItem key={i.to} {...i} onClose={onClose} />)}</div>
+              <div className="my-5 h-px bg-white/[0.055]" />
+              <p className="px-3 pb-3 text-2xs font-bold uppercase tracking-[0.22em] text-white/28">Administração</p>
+              <div className="space-y-1">{admin.map((i) => <NavItem key={i.to} {...i} onClose={onClose} />)}</div>
             </>
           )}
         </nav>
-        <div className="px-5 py-5">
-          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] px-3.5 py-3">
-            <p className="text-2xs font-medium uppercase tracking-[0.16em] text-white/30">Painel interno</p>
-            <p className="mt-1 text-xs text-white/45">DZ6 · Gravadora</p>
+        <div className="px-4 py-5">
+          <div className="relative overflow-hidden rounded-lg border border-primary/20 bg-primary/10 px-4 py-5">
+            <div className="absolute bottom-5 right-0 flex h-10 items-end gap-0.5 opacity-30">
+              {[16, 24, 18, 30, 22, 36, 20, 28, 34, 18, 25, 31].map((height, index) => <span key={index} className="w-0.5 rounded-full bg-primary" style={{ height }} />)}
+            </div>
+            <p className="max-w-28 text-sm font-bold leading-5 text-white">Música conecta pessoas</p>
+            <p className="mt-4 text-2xs font-bold uppercase tracking-[0.18em] text-white/34">DZ6 Gravadora</p>
           </div>
         </div>
       </aside>

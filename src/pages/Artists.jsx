@@ -26,22 +26,22 @@ export default function Artists() {
     setLoading(false); setForm({ name: "", handle: "", bio: "" }); setPhoto(null); setOpen(false); load();
   };
   return (
-    <div className="space-y-7">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div className="dz-page">
+      <div className="dz-page-head">
         <div>
-          <p className="text-2xs font-medium uppercase tracking-[0.18em] text-white/35">Roster</p>
-          <h1 className="mt-2 font-display text-3xl font-medium tracking-tight text-white sm:text-4xl">Artistas</h1>
-          <p className="mt-1.5 text-white/45">Pessoas e usuários da gravadora.</p>
+          <p className="dz-kicker">Roster</p>
+          <h1 className="dz-page-title">Artistas</h1>
+          <p className="dz-page-subtitle">Pessoas, vozes e identidades que movimentam os projetos.</p>
         </div>
-        <button onClick={() => setOpen(true)} className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"><Plus size={16} />Novo artista</button>
+        <button onClick={() => setOpen(true)} className="dz-primary-button"><Plus size={16} />Novo artista</button>
       </div>
       {artists.length === 0 ? (
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.03] p-12 text-center text-sm text-white/35">Nenhum artista cadastrado.</div>
+        <div className="dz-empty">Nenhum artista cadastrado.</div>
       ) : (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{artists.map((a) => (
-          <div key={a.id} className="group overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.03] transition-colors hover:border-white/[0.1]">
-            <div className="aspect-[4/3] w-full overflow-hidden bg-white/[0.04]">{a.photo_url ? <img src={a.photo_url} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" alt="" /> : <div className="grid h-full place-items-center"><Mic2 className="text-white/15" size={28} /></div>}</div>
-            <div className="flex items-center justify-between gap-3 p-4">
+          <div key={a.id} className="group overflow-hidden rounded-2xl border border-white/[0.07] bg-white/[0.025] p-3 shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:border-white/[0.12] hover:bg-white/[0.04]">
+            <div className="aspect-square w-full overflow-hidden bg-black">{a.photo_url ? <img src={a.photo_url} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" alt="" /> : <div className="grid h-full place-items-center"><Mic2 className="text-white/15" size={28} /></div>}</div>
+            <div className="flex items-center justify-between gap-3 px-1 pb-1 pt-4">
               <div><p className="font-medium text-white">{a.name}</p><p className="text-xs text-white/40">{a.handle ? `@${a.handle}` : "—"}</p></div>
               <button onClick={() => setEditing(a)} aria-label={`Editar ${a.name}`} className="rounded-full p-2 text-white/40 transition-colors hover:bg-white/[0.06] hover:text-white"><Pencil size={15} /></button>
             </div>

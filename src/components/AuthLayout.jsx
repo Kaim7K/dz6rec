@@ -1,21 +1,26 @@
 ﻿import React from "react";
+import dz6ProfileLogo from "@/assets/dz6-profile.png";
 
-export default function AuthLayout({ icon: Icon, title, subtitle, footer, children }) {
+export default function AuthLayout({ title, subtitle, footer, children }) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-8">
       <div className="w-full max-w-md">
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary mb-4">
-            <Icon className="w-7 h-7 text-primary-foreground" aria-hidden="true" />
+        <div className="mb-8 text-center">
+          <div className="mx-auto mb-4 grid h-16 w-16 place-items-center overflow-hidden rounded-full border border-white/10 bg-black shadow-glow">
+            <img
+              src={dz6ProfileLogo}
+              alt="DZ6"
+              className="h-full w-full object-cover"
+            />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">{title}</h1>
-          {subtitle && <p className="text-muted-foreground mt-2">{subtitle}</p>}
+          <h1 className="font-display text-2xl font-bold tracking-tight text-white">{title}</h1>
+          {subtitle && <p className="mt-2 text-sm text-white/45">{subtitle}</p>}
         </div>
-        <div className="bg-card rounded-2xl shadow-sm border border-border p-8">
+        <div className="rounded-2xl border border-white/[0.075] bg-white/[0.035] p-6 shadow-pop backdrop-blur">
           {children}
         </div>
         {footer && (
-          <p className="text-center text-sm text-muted-foreground mt-6">{footer}</p>
+          <p className="mt-6 text-center text-sm text-white/45">{footer}</p>
         )}
       </div>
     </div>

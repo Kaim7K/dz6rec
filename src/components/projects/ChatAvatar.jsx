@@ -1,7 +1,7 @@
 ﻿import React from "react";
 import { cn } from "@/lib/utils";
 
-const PALETTE = ["#c2401f", "#a31d3b", "#7c3aed", "#0e7490", "#15803d", "#a16207", "#4338ca", "#be185d", "#334155"];
+const PALETTE = ["#dc0000", "#b91c1c", "#991b1b", "#7f1d1d", "#ef4444", "#f5f5f5", "#a3a3a3", "#737373"];
 
 const initialsOf = (name) =>
   (name || "U").trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase();

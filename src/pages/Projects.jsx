@@ -4,6 +4,7 @@ import { Plus, Disc3 } from "lucide-react";
 import ProjectCard from "@/components/projects/ProjectCard";
 import NewProjectDialog from "@/components/projects/NewProjectDialog";
 import EditProjectDialog from "@/components/projects/EditProjectDialog";
+import { STATUS } from "@/lib/music";
 
 export default function Projects() {
   const [projects, setProjects] = useState([]);
@@ -12,6 +13,7 @@ export default function Projects() {
   const [templates, setTemplates] = useState([]);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("todos");
   const load = () => {
     Promise.all([apiClient.entities.Project.list("-created_date"), apiClient.entities.Artist.list(), apiClient.entities.ChecklistTemplate.list(), apiClient.entities.ChecklistItem.list()]).then(([p, a, t, items]) => {
       setProjects(p); setArtists(a); setTemplates(t);
@@ -22,24 +24,41 @@ export default function Projects() {
   };
   useEffect(() => { load(); }, []);
 
+  const statusOptions = ["todos", ...Array.from(new Set(projects.map((p) => p.status).filter(Boolean)))];
+  const visibleProjects = statusFilter === "todos" ? projects : projects.filter((p) => p.status === statusFilter);
+
   return (
-    <div className="space-y-10 lg:space-y-12">
-      <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+    <div className="dz-page">
+      <header className="dz-page-head">
         <div>
-          <p className="text-2xs font-medium uppercase tracking-[0.2em] text-primary/80">Catálogo</p>
-          <h1 className="mt-3 font-display text-4xl font-bold tracking-tight text-white sm:text-5xl">Projetos</h1>
-          <p className="mt-2 text-white/40">Singles, EPs e álbuns da gravadora.</p>
+          <p className="dz-kicker">Catálogo</p>
+          <h1 className="dz-page-title">Projetos</h1>
+          <p className="dz-page-subtitle">Singles, EPs e álbuns em produção na gravadora.</p>
         </div>
         <button
           onClick={() => setOpen(true)}
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          className="dz-primary-button"
         >
           <Plus size={16} /> Novo projeto
         </button>
       </header>
 
+      {projects.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {statusOptions.map((status) => (
+            <button
+              key={status}
+              onClick={() => setStatusFilter(status)}
+              className={`rounded-md px-3 py-1.5 text-xs transition-colors ${statusFilter === status ? "bg-white/10 text-white" : "bg-white/[0.025] text-white/45 hover:bg-white/[0.05] hover:text-white/75"}`}
+            >
+              {status === "todos" ? "Todos" : STATUS[status] || status}
+            </button>
+          ))}
+        </div>
+      )}
+
       {projects.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
+        <div className="dz-empty">
           <div className="grid h-14 w-14 place-items-center rounded-full bg-white/[0.04] ring-1 ring-white/[0.06]">
             <Disc3 size={22} className="text-white/30" />
           </div>
@@ -47,13 +66,13 @@ export default function Projects() {
             <p className="font-display text-lg font-semibold text-white/70">Nenhum projeto ainda</p>
             <p className="mt-1 text-sm text-white/35">Crie o primeiro single, EP ou álbum da gravadora.</p>
           </div>
-          <button onClick={() => setOpen(true)} className="mt-2 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">
+          <button onClick={() => setOpen(true)} className="dz-primary-button mt-2">
             <Plus size={16} /> Novo projeto
           </button>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-          {projects.map((p) => <ProjectCard key={p.id} project={p} progress={byP[p.id]} onEdit={setEditing} />)}
+          {visibleProjects.map((p) => <ProjectCard key={p.id} project={p} progress={byP[p.id]} onEdit={setEditing} />)}
         </div>
       )}
 

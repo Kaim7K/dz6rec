@@ -48,15 +48,15 @@ module.exports = {
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',
   			stage: {
-  				surface: '#F8FAFC',
-  				card: '#FFFFFF',
-  				border: '#E2E8F0',
-  				ink: '#0F172A',
-  				muted: '#64748B',
-  				accent: '#4F46E5',
-  				'accent-soft': '#EEF2FF',
-  				warn: '#D97706',
-  				'warn-soft': '#FEF3C7'
+				surface: '#0A0707',
+				card: '#100D0D',
+				border: 'rgba(255,255,255,0.08)',
+				ink: '#F7F7F7',
+				muted: '#9CA3AF',
+				accent: '#DC0000',
+				'accent-soft': 'rgba(220,0,0,0.14)',
+				warn: '#F59E0B',
+				'warn-soft': 'rgba(245,158,11,0.12)'
   			},
   			chart: {
   				'1': 'hsl(var(--chart-1))',

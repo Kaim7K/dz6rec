@@ -47,7 +47,7 @@ export default function Users() {
 
   if (loading) return <div className="grid min-h-[50vh] place-items-center"><Loader2 className="animate-spin text-stage-accent" /></div>;
   if (me?.role !== "admin") return (
-    <div className="mx-auto max-w-md rounded-sl border border-stage-border bg-stage-card p-10 text-center">
+    <div className="dz-card mx-auto max-w-md p-7 text-center">
       <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-stage-accent-soft"><ShieldCheck className="text-stage-accent" /></div>
       <h1 className="mt-4 font-jakarta text-title font-bold text-stage-ink">Área restrita</h1>
       <p className="mt-2 text-body text-stage-muted">Somente a administração pode gerenciar usuários.</p>
@@ -65,13 +65,16 @@ export default function Users() {
   );
 
   return (
-    <div className="space-y-5 rounded-2xl border border-stage-border bg-stage-surface p-4 font-inter sm:p-6 lg:p-8">
-      <div>
-        <h1 className="font-jakarta text-title font-bold text-stage-ink">Usuários</h1>
-        <p className="mt-0.5 text-body text-stage-muted">{users.length} usuários · {activeCount} ativos</p>
+    <div className="dz-page font-inter">
+      <div className="dz-page-head">
+        <div>
+          <p className="dz-kicker">Administração</p>
+          <h1 className="dz-page-title">Usuários</h1>
+          <p className="dz-page-subtitle">{users.length} usuários · {activeCount} ativos</p>
+        </div>
       </div>
 
-      <div className="flex flex-col gap-2.5 sm:flex-row">
+      <div className="dz-card flex flex-col gap-2.5 p-3 sm:flex-row">
         <div className="relative flex-1">
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-stage-muted" />
           <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar por nome ou e-mail..." className="h-10 w-full rounded-sl border border-stage-border bg-stage-card pl-9 pr-3 text-body text-stage-ink outline-none transition placeholder:text-stage-muted focus:border-stage-accent/50" />
@@ -85,7 +88,7 @@ export default function Users() {
         </Select>
       </div>
 
-      <form onSubmit={invite} className="flex flex-col gap-2.5 rounded-sl border border-stage-border bg-stage-card p-3 sm:flex-row sm:items-center">
+      <form onSubmit={invite} className="dz-card flex flex-col gap-2.5 p-3 sm:flex-row sm:items-center">
         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@gravadora.com" required className="h-10 flex-1 rounded-sl border border-stage-border bg-stage-surface px-3 text-body text-stage-ink outline-none transition placeholder:text-stage-muted focus:border-stage-accent/50" />
         <Select value={inviteCargo} onValueChange={setInviteCargo}>
           <SelectTrigger className="h-10 w-full rounded-sl border-stage-border bg-stage-surface text-body text-stage-ink sm:w-48"><SelectValue placeholder="Cargo (opcional)" /></SelectTrigger>
@@ -97,7 +100,7 @@ export default function Users() {
       </form>
       {msg && <p className="text-body text-stage-muted">{msg}</p>}
 
-      <div className="overflow-hidden rounded-sl border border-stage-border bg-stage-card">
+      <div className="overflow-hidden rounded-2xl border border-stage-border bg-stage-card shadow-soft">
         <div className={`hidden items-center gap-4 border-b border-stage-border bg-stage-surface px-4 py-2.5 text-micro font-semibold uppercase tracking-wide text-stage-muted sm:grid ${GRID}`}>
           <span>Usuário</span><span>E-mail</span><span>Cargos</span><span className="text-right">Ações</span>
         </div>
