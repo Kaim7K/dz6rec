@@ -1,0 +1,49 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "role": {
+      "type": "string",
+      "description": "Papel t\u00e9cnico do usu\u00e1rio no app (plataforma)",
+      "enum": [
+        "admin",
+        "user"
+      ]
+    },
+    "permissao": {
+      "type": "string",
+      "description": "Permiss\u00e3o de acesso: o que a pessoa pode fazer",
+      "enum": [
+        "superadmin",
+        "admin",
+        "membro"
+      ],
+      "default": "membro"
+    },
+    "cargo": {
+      "type": "array",
+      "description": "Cargos profissionais (badges) \u2014 v\u00e1rios simult\u00e2neos",
+      "items": {
+        "type": "string"
+      }
+    },
+    "handle": {
+      "type": "string",
+      "description": "@usu\u00e1rio"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "ativo",
+        "inativo"
+      ],
+      "default": "ativo"
+    },
+    "photo_url": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "role"
+  ]
+}

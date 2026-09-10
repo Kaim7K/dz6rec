@@ -1,0 +1,45 @@
+{
+  "name": "Track",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "main_artist_name": {
+      "type": "string"
+    },
+    "featuring": {
+      "type": "string"
+    },
+    "audio_url": {
+      "type": "string"
+    },
+    "track_number": {
+      "type": "number",
+      "default": 1
+    },
+    "version_label": {
+      "type": "string",
+      "default": "Demo 01"
+    },
+    "bpm": {
+      "type": "number"
+    },
+    "key": {
+      "type": "string"
+    },
+    "isrc": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "project_id",
+    "name"
+  ]
+}

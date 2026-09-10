@@ -1,0 +1,19 @@
+{
+  "name": "TrackVersion",
+  "type": "object",
+  "properties": {
+    "track_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "audio_url": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "track_id",
+    "name"
+  ]
+}

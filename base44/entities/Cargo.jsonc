@@ -1,0 +1,16 @@
+{
+  "name": "Cargo",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "color": {
+      "type": "string",
+      "description": "Cor (hex) do badge do cargo"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

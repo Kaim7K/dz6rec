@@ -1,0 +1,51 @@
+{
+  "name": "ChecklistSection",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "template_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "musica",
+        "visual",
+        "marketing"
+      ]
+    },
+    "cargo": {
+      "type": "string"
+    },
+    "responsible_id": {
+      "type": "string"
+    },
+    "responsible_name": {
+      "type": "string"
+    },
+    "responsible_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "responsible_names": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "order": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "name"
+  ]
+}
