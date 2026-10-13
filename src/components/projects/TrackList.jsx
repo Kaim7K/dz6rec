@@ -26,10 +26,12 @@ export default function TrackList({ project, tracks, onChanged, progressPct = 0 
   };
 
   return (
-    <section className="min-w-0 rounded-lg border border-white/[0.045] bg-[#090606] p-4 sm:p-5">
+    <section className="dz-card min-w-0 p-4 sm:p-5">
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-center gap-3">
-          <Music2 size={25} className="text-white" />
+          <span className="grid h-10 w-10 place-items-center rounded-md border border-white/[0.08] bg-white/[0.04] text-primary">
+            <Music2 size={20} />
+          </span>
           <div>
             <h3 className="text-base font-bold text-white">Faixas</h3>
             <p className="text-sm text-white/45">{list.length} {list.length === 1 ? "faixa" : "faixas"} neste projeto</p>
@@ -38,13 +40,13 @@ export default function TrackList({ project, tracks, onChanged, progressPct = 0 
         <button onClick={() => setOpen(true)} className="dz-ghost-button h-9"><Plus size={15} />Adicionar faixa</button>
       </div>
       {list.length === 0 ? (
-        <p className="border-y border-white/[0.05] py-8 text-center text-sm text-white/40">Nenhuma faixa ainda. Adicione a primeira.</p>
+        <div className="dz-empty min-h-36">Nenhuma faixa ainda. Adicione a primeira.</div>
       ) : (
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId="tracks">
             {(provided) => (
-              <div ref={provided.innerRef} {...provided.droppableProps} className="min-w-0">
-                <div className="hidden grid-cols-[3rem_1fr_6rem_9rem_18rem_2rem] border-b border-white/[0.055] px-0 pb-3 text-2xs font-bold uppercase tracking-[0.12em] text-white/42 lg:grid">
+              <div ref={provided.innerRef} {...provided.droppableProps} className="min-w-0 overflow-hidden rounded-lg border border-white/[0.07] bg-black/15">
+                <div className="hidden grid-cols-[3rem_1fr_6rem_9rem_18rem_2rem] border-b border-white/[0.065] bg-white/[0.025] px-4 py-3 text-2xs font-bold uppercase tracking-[0.12em] text-white/42 lg:grid">
                   <span>#</span>
                   <span>Título</span>
                   <span>Duração</span>

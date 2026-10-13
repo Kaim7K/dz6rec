@@ -8,9 +8,9 @@
 
 @layer base {
   :root {
-    --background: 0 12% 4%;
+    --background: 0 10% 3.5%;
     --foreground: 0 0% 96%;
-    --card: 0 8% 7%;
+    --card: 0 7% 8%;
     --card-foreground: 0 0% 96%;
     --popover: 0 8% 9%;
     --popover-foreground: 0 0% 96%;
@@ -24,8 +24,8 @@
     --accent-foreground: 0 0% 96%;
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 16%;
-    --input: 0 6% 16%;
+    --border: 0 0% 14%;
+    --input: 0 5% 13%;
     --ring: 0 100% 48%;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
@@ -47,6 +47,11 @@
     --sidebar-accent-foreground: 0 0% 96%;
     --sidebar-border: 0 0% 16%;
     --sidebar-ring: 0 100% 48%;
+    --surface-1: #0b0909;
+    --surface-2: #111010;
+    --surface-3: #171414;
+    --line-soft: rgba(255,255,255,0.075);
+    --line-strong: rgba(255,255,255,0.115);
   }
 }
 
@@ -64,8 +69,9 @@
     min-width: 0;
     overflow-x: clip;
     background:
-      radial-gradient(circle at 82% -12%, rgba(130, 0, 0, 0.08), transparent 32rem),
-      linear-gradient(180deg, rgba(255,255,255,0.012), transparent 20rem),
+      radial-gradient(circle at 78% -18%, rgba(190, 0, 0, 0.12), transparent 34rem),
+      radial-gradient(circle at 4% 8%, rgba(255,255,255,0.035), transparent 26rem),
+      linear-gradient(180deg, rgba(255,255,255,0.018), transparent 22rem),
       hsl(var(--background));
   }
   body::before {
@@ -74,10 +80,10 @@
     inset: 0;
     pointer-events: none;
     background-image:
-      linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.014) 1px, transparent 1px);
-    background-size: 48px 48px;
-    mask-image: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent 70%);
+      linear-gradient(rgba(255,255,255,0.014) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,0.52), transparent 64%);
   }
   h1, h2, h3, h4 {
     @apply font-display tracking-tight;
@@ -102,12 +108,24 @@
   button, a, input, textarea, select {
     @apply transition-colors duration-200;
   }
+  button, input, textarea, select {
+    font: inherit;
+  }
+  :focus-visible {
+    outline: 2px solid rgba(220, 0, 0, 0.55);
+    outline-offset: 2px;
+  }
   button, a {
     -webkit-tap-highlight-color: transparent;
   }
   input, textarea, select {
     letter-spacing: 0;
     min-width: 0;
+    color-scheme: dark;
+  }
+  select option {
+    background: #111010;
+    color: #f7f7f7;
   }
   img, video, canvas, svg {
     max-width: 100%;
@@ -120,16 +138,25 @@
 
 @layer components {
   .dz-card {
-    @apply rounded-lg border border-white/[0.07] bg-white/[0.028] shadow-soft backdrop-blur;
-    background-image: linear-gradient(180deg, rgba(255,255,255,0.028), rgba(255,255,255,0.014));
+    @apply rounded-lg border shadow-soft backdrop-blur;
+    border-color: var(--line-soft);
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.018)),
+      var(--surface-2);
   }
 
   .dz-card-soft {
-    @apply rounded-lg border border-white/[0.06] bg-white/[0.02] shadow-soft;
+    @apply rounded-lg border shadow-soft;
+    border-color: var(--line-soft);
+    background: rgba(255,255,255,0.032);
   }
 
   .dz-card-hover {
-    @apply transition-colors hover:border-white/[0.12] hover:bg-white/[0.04];
+    @apply transition-colors hover:bg-white/[0.045];
+  }
+
+  .dz-card-hover:hover {
+    border-color: var(--line-strong);
   }
 
   .dz-panel-title {
@@ -137,7 +164,7 @@
   }
 
   .dz-kicker {
-    @apply text-2xs font-semibold uppercase tracking-[0.18em] text-white/35;
+    @apply text-2xs font-bold uppercase tracking-[0.2em] text-primary/85;
   }
 
   .dz-page {
@@ -145,43 +172,65 @@
   }
 
   .dz-page-head {
-    @apply min-w-0 flex flex-col gap-3 border-b border-white/[0.055] pb-5 sm:flex-row sm:items-end sm:justify-between;
+    @apply min-w-0 flex flex-col gap-4 border-b border-white/[0.07] pb-5 sm:flex-row sm:items-end sm:justify-between;
   }
 
   .dz-page-title {
-    @apply mt-1 max-w-full break-words font-display text-2xl font-bold tracking-tight text-white sm:text-[1.8rem] sm:leading-9;
+    @apply mt-1 max-w-full break-words font-display text-2xl font-bold tracking-tight text-white sm:text-[1.95rem] sm:leading-9;
   }
 
   .dz-page-subtitle {
-    @apply mt-1 max-w-2xl break-words text-sm leading-6 text-white/48;
+    @apply mt-1 max-w-2xl break-words text-sm leading-6 text-white/54;
   }
 
   .dz-primary-button {
-    @apply inline-flex min-h-10 min-w-0 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-bold leading-5 text-primary-foreground shadow-soft transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-60;
+    @apply inline-flex min-h-10 min-w-0 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-bold leading-5 text-primary-foreground shadow-glow transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-60;
   }
 
   .dz-ghost-button {
-    @apply inline-flex min-h-9 min-w-0 items-center justify-center gap-2 rounded-md border border-white/[0.07] bg-white/[0.025] px-3.5 py-2 text-sm font-medium leading-5 text-white/70 transition-colors hover:border-white/[0.12] hover:bg-white/[0.045] hover:text-white;
+    @apply inline-flex min-h-9 min-w-0 items-center justify-center gap-2 rounded-md border px-3.5 py-2 text-sm font-semibold leading-5 text-white/72 transition-colors hover:bg-white/[0.055] hover:text-white;
+    border-color: var(--line-soft);
+    background: rgba(255,255,255,0.032);
   }
 
   .dz-icon-button {
-    @apply grid h-9 w-9 shrink-0 place-items-center rounded-md border border-transparent text-white/45 transition-colors hover:border-white/[0.08] hover:bg-white/[0.045] hover:text-white;
+    @apply grid h-9 w-9 shrink-0 place-items-center rounded-md border text-white/48 transition-colors hover:bg-white/[0.055] hover:text-white;
+    border-color: transparent;
   }
 
   .dz-input {
-    @apply h-10 min-w-0 rounded-md border border-white/[0.08] bg-white/[0.026] px-3 text-sm text-white outline-none placeholder:text-white/34 focus:border-primary/45 focus:bg-white/[0.04];
+    @apply h-10 min-w-0 rounded-md border px-3 text-sm text-white outline-none placeholder:text-white/34 focus:border-primary/45 focus:bg-white/[0.045];
+    border-color: var(--line-soft);
+    background: rgba(255,255,255,0.032);
   }
 
   .dz-list-row {
-    @apply min-w-0 border-b border-white/[0.055] transition-colors last:border-b-0 hover:bg-white/[0.025];
+    @apply min-w-0 border-b border-white/[0.06] transition-colors last:border-b-0 hover:bg-white/[0.035];
   }
 
   .dz-pill {
-    @apply inline-flex h-7 items-center gap-1.5 rounded-md border border-white/[0.07] bg-white/[0.035] px-2.5 text-xs font-medium text-white/62;
+    @apply inline-flex h-7 items-center gap-1.5 rounded-md border px-2.5 text-xs font-semibold text-white/66;
+    border-color: var(--line-soft);
+    background: rgba(255,255,255,0.04);
   }
 
   .dz-empty {
-    @apply flex min-h-44 flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-white/[0.08] bg-white/[0.02] p-7 text-center text-sm text-white/42 backdrop-blur;
-    background-image: linear-gradient(180deg, rgba(255,255,255,0.026), rgba(255,255,255,0.01));
+    @apply flex min-h-44 flex-col items-center justify-center gap-3 rounded-lg border border-dashed p-7 text-center text-sm text-white/46 backdrop-blur;
+    border-color: rgba(255,255,255,0.1);
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.012)),
+      var(--surface-2);
+  }
+
+  .dz-section {
+    @apply rounded-lg border p-4 shadow-soft sm:p-5;
+    border-color: var(--line-soft);
+    background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.014)), var(--surface-1);
+  }
+
+  .dz-field-surface {
+    @apply rounded-md border text-white;
+    border-color: var(--line-soft);
+    background: rgba(255,255,255,0.032);
   }
 }

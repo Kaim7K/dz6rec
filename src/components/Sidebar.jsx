@@ -23,14 +23,14 @@ function NavItem({ label, to, Icon, onClose }) {
       onClick={onClose}
       className={({ isActive }) =>
         cn(
-          "group relative flex items-center gap-3 rounded-md px-3 py-2.5 text-sm transition-colors",
-          isActive ? "bg-primary/16 text-white shadow-[inset_0_0_0_1px_rgba(220,0,0,0.22)]" : "text-white/50 hover:bg-white/[0.035] hover:text-white/82"
+          "group relative flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-semibold transition-colors",
+          isActive ? "bg-white/[0.065] text-white shadow-[inset_3px_0_0_hsl(var(--primary))]" : "text-white/48 hover:bg-white/[0.04] hover:text-white/84"
         )
       }
     >
       {({ isActive }) => (
         <>
-          <span className={cn("grid h-7 w-7 shrink-0 place-items-center rounded-md transition-colors", isActive ? "bg-primary text-white" : "text-white/42 group-hover:text-white/70")}>
+          <span className={cn("grid h-7 w-7 shrink-0 place-items-center rounded-md transition-colors", isActive ? "bg-primary text-white shadow-glow" : "text-white/42 group-hover:text-white/70")}>
             <Icon size={17} />
           </span>
           {label}
@@ -49,10 +49,10 @@ export default function Sidebar({ open, onClose }) {
   return (
     <>
       {open && <button className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm lg:hidden" onClick={onClose} aria-label="Fechar menu" />}
-      <aside className={cn("fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-white/[0.055] bg-[#070606]/96 backdrop-blur-xl transition-transform duration-300 lg:translate-x-0", open ? "translate-x-0" : "-translate-x-full")}>
-        <div className="flex h-20 items-center justify-between px-5">
+      <aside className={cn("fixed inset-y-0 left-0 z-50 flex w-[17rem] flex-col border-r border-white/[0.075] bg-[#080707]/96 shadow-[16px_0_48px_-28px_rgba(0,0,0,0.9)] backdrop-blur-xl transition-transform duration-300 lg:translate-x-0", open ? "translate-x-0" : "-translate-x-full")}>
+        <div className="flex h-20 items-center justify-between border-b border-white/[0.06] px-5">
           <div className="flex items-center gap-3">
-            <span className="grid h-12 w-12 place-items-center overflow-hidden rounded-md bg-black">
+            <span className="grid h-12 w-12 place-items-center overflow-hidden rounded-lg border border-white/[0.08] bg-black shadow-soft">
               <img src={dz6ProfileLogo} alt="DZ6" className="h-full w-full object-cover" />
             </span>
             <span>
@@ -62,19 +62,19 @@ export default function Sidebar({ open, onClose }) {
           </div>
           <button onClick={onClose} className="rounded-md p-1.5 text-white/40 hover:bg-white/5 hover:text-white lg:hidden"><X size={18} /></button>
         </div>
-        <nav className="flex-1 overflow-y-auto px-4 py-3">
+        <nav className="flex-1 overflow-y-auto px-4 py-4">
           <p className="px-3 pb-3 pt-1 text-2xs font-bold uppercase tracking-[0.22em] text-white/28">Geral</p>
-          <div className="space-y-1">{geral.map((i) => <NavItem key={i.to} {...i} onClose={onClose} />)}</div>
+          <div className="space-y-1.5">{geral.map((i) => <NavItem key={i.to} {...i} onClose={onClose} />)}</div>
           {admin.length > 0 && (
             <>
               <div className="my-5 h-px bg-white/[0.055]" />
               <p className="px-3 pb-3 text-2xs font-bold uppercase tracking-[0.22em] text-white/28">Administração</p>
-              <div className="space-y-1">{admin.map((i) => <NavItem key={i.to} {...i} onClose={onClose} />)}</div>
+              <div className="space-y-1.5">{admin.map((i) => <NavItem key={i.to} {...i} onClose={onClose} />)}</div>
             </>
           )}
         </nav>
         <div className="px-4 py-5">
-          <div className="relative overflow-hidden rounded-md border border-primary/18 bg-primary/[0.08] px-4 py-5">
+          <div className="relative overflow-hidden rounded-lg border border-primary/20 bg-[linear-gradient(145deg,rgba(220,0,0,0.16),rgba(255,255,255,0.035))] px-4 py-5 shadow-soft">
             <div className="absolute bottom-5 right-0 flex h-10 items-end gap-0.5 opacity-30">
               {[16, 24, 18, 30, 22, 36, 20, 28, 34, 18, 25, 31].map((height, index) => <span key={index} className="w-0.5 rounded-full bg-primary" style={{ height }} />)}
             </div>

@@ -39,9 +39,9 @@ export default function AppShell() {
     <PlayerProvider>
       <div className="min-h-screen bg-background text-foreground">
         <Sidebar open={menuOpen} onClose={() => setMenuOpen(false)} />
-        <div className="lg:pl-64">
+        <div className="min-w-0 lg:pl-[17rem]">
           <Topbar onMenu={() => setMenuOpen(true)} />
-          <main className="relative mx-auto max-w-[1540px] overflow-x-hidden px-4 py-5 pb-28 sm:px-5 lg:px-7 lg:py-6 lg:pb-32 xl:px-8">
+          <main className="relative mx-auto min-h-[calc(100vh-4rem)] max-w-[1600px] overflow-x-hidden px-4 py-5 pb-28 sm:px-5 lg:px-7 lg:py-7 lg:pb-32 xl:px-9">
             <Outlet />
           </main>
         </div>

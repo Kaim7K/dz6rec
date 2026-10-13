@@ -26,7 +26,7 @@ export default function AddTrackDialog({ open, onClose, onCreated, project, trac
       let audio_url = "";
       if (audio) {
         setUploading(true);
-        audio_url = await uploadFile(audio, { onProgress: setUploadProgress });
+        audio_url = await uploadFile(audio, { onProgress: (value) => setUploadProgress(Math.max(0, Math.min(100, value || 0))) });
         setUploading(false);
       }
       const data = { ...form, name: trackName, project_id: project.id, audio_url, bpm: form.bpm ? Number(form.bpm) : undefined, track_number: Number(form.track_number) };
@@ -38,7 +38,10 @@ export default function AddTrackDialog({ open, onClose, onCreated, project, trac
       setAudio(null); setUploadProgress(0);
       onCreated(); onClose();
     } catch (err) {
-      setError(err.message || "Nao foi possivel enviar o arquivo");
+      setUploadProgress(0);
+      setError(err.message?.includes("client token") || err.message?.includes("CORS") || err.message?.includes("Failed to fetch")
+        ? "Nao foi possivel conectar ao Vercel Blob. Confira o token BLOB_READ_WRITE_TOKEN no projeto e tente novamente."
+        : err.message || "Nao foi possivel enviar o arquivo");
     } finally {
       setLoading(false);
       setUploading(false);

@@ -431,7 +431,7 @@ async function handleMultipartUpload(req, res, sql) {
   const user = await assertActiveUploadUser(req, res, sql);
   if (!user) return;
   if (req.method !== "POST") return methodNotAllowed(res);
-  const form = formidable({ multiples: false, keepExtensions: true });
+  const form = formidable({ multiples: false, keepExtensions: true, maxFileSize: 1024 * 1024 * 1024 });
   const { files } = await new Promise((resolve, reject) => {
     form.parse(req, (err, fields, parsedFiles) => (err ? reject(err) : resolve({ fields, files: parsedFiles })));
   });
@@ -443,11 +443,16 @@ async function handleMultipartUpload(req, res, sql) {
     const mime = uploaded.mimetype || "application/octet-stream";
     return send(res, 200, { file_url: `data:${mime};base64,${file.toString("base64")}` });
   }
-  const blob = await put(`uploads/${Date.now()}-${uploaded.originalFilename || "file"}`, file, {
-    access: "public",
-    contentType: uploaded.mimetype || undefined,
-  });
-  return send(res, 200, { file_url: blob.url });
+  try {
+    const blob = await put(`uploads/${Date.now()}-${uploaded.originalFilename || "file"}`, file, {
+      access: "public",
+      contentType: uploaded.mimetype || undefined,
+    });
+    return send(res, 200, { file_url: blob.url });
+  } catch (error) {
+    console.error("Server upload to Blob failed", error);
+    return send(res, 502, { error: error.message || "Nao foi possivel salvar o arquivo no Blob" });
+  }
 }
 
 async function handleUpload(req, res, sql) {

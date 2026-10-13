@@ -6,12 +6,9 @@
   resetMockStore,
   setMockProfileId,
 } from "@/api/mockData";
-import { upload as uploadBlobClient } from "@vercel/blob/client";
 
 const TOKEN_KEY = "dz6_access_token";
 const ENTITY_POLL_INTERVAL = 1200;
-const CLIENT_UPLOAD_TIMEOUT = 180000;
-const MAX_SERVER_UPLOAD_BYTES = 4.25 * 1024 * 1024;
 const realtimeChannel = typeof BroadcastChannel !== "undefined" ? new BroadcastChannel("dz6-entity-events") : null;
 
 function emitEntityChange(entity) {
@@ -128,51 +125,10 @@ function uploadRequest(path, form, onProgress) {
   });
 }
 
-function safeUploadName(name = "file") {
-  return name
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^\w.-]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 160) || "file";
-}
-
-async function blobUploadRequest(file, onProgress) {
-  if (isLocalMockEnabled()) {
-    onProgress?.(100);
-    const form = new FormData();
-    form.append("file", file);
-    return mockRequest("/api/upload", { method: "POST", body: form });
-  }
-
-  const token = getToken();
-  const controller = new AbortController();
-  const timeout = window.setTimeout(() => controller.abort(), CLIENT_UPLOAD_TIMEOUT);
-  try {
-    const blob = await uploadBlobClient(`uploads/${Date.now()}-${safeUploadName(file.name)}`, file, {
-      access: "public",
-      contentType: file.type || undefined,
-      handleUploadUrl: "/api/upload",
-      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-      abortSignal: controller.signal,
-      onUploadProgress: ({ percentage }) => onProgress?.(Math.round(percentage)),
-    });
-    onProgress?.(100);
-    return { file_url: blob.url };
-  } finally {
-    window.clearTimeout(timeout);
-  }
-}
-
 async function uploadFileRequest(file, onProgress) {
-  try {
-    return await blobUploadRequest(file, onProgress);
-  } catch (error) {
-    if (file.size > MAX_SERVER_UPLOAD_BYTES) throw error;
-    const form = new FormData();
-    form.append("file", file);
-    return uploadRequest("/api/upload", form, onProgress);
-  }
+  const form = new FormData();
+  form.append("file", file);
+  return uploadRequest("/api/upload", form, onProgress);
 }
 
 function entityClient(entity) {

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChevronDown, MessageSquareText, Plus, Trash2 } from "lucide-react";
+import { MessageSquareText, Plus, Trash2 } from "lucide-react";
 import CargoBadge from "@/components/CargoBadge";
 
 const NONE = "__none__";
@@ -36,12 +36,14 @@ export default function TemplateItemEditor({ item, allItems, depth, cargos, onAd
           </SelectContent>
         </Select>
         {depth < 1 && (
-          <label className="inline-flex h-6 items-center gap-1.5 rounded-md bg-white/[0.04] px-2 text-2xs text-white/45">
-            <select value={detailMode} onChange={(e) => onPatch(item, { detail_mode: e.target.value })} className="bg-transparent outline-none">
-              {Object.entries(DETAIL_MODE).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
-            </select>
-            <ChevronDown size={12} />
-          </label>
+          <Select value={detailMode} onValueChange={(value) => onPatch(item, { detail_mode: value })}>
+            <SelectTrigger className="h-7 w-[7.5rem] border-white/[0.08] bg-white/[0.04] px-2 py-0 text-2xs text-white/55">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(DETAIL_MODE).map(([key, label]) => <SelectItem key={key} value={key}>{label}</SelectItem>)}
+            </SelectContent>
+          </Select>
         )}
         <button onClick={() => onDelete(item)} className="rounded p-1 text-white/25 transition-colors hover:bg-white/5 hover:text-red-400"><Trash2 size={13} /></button>
         {depth < 1 && canUseSubtasks(detailMode) && <button onClick={() => setAdding((a) => !a)} className="rounded p-1 text-white/30 transition-colors hover:bg-white/5 hover:text-white"><Plus size={13} /></button>}

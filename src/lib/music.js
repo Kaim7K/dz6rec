@@ -217,6 +217,24 @@ export function usersForCargo(users, cargoName) {
   return users.filter((u) => cargoList(u.cargo).includes(cargoName));
 }
 
+export function taskResponsibleIds(task = {}) {
+  return [...new Set([...(Array.isArray(task.responsible_ids) ? task.responsible_ids : []), task.responsible_id].filter(Boolean))].slice(0, 2);
+}
+
+export function taskResponsibleNames(task = {}) {
+  return [...new Set([...(Array.isArray(task.responsible_names) ? task.responsible_names : []), task.responsible_name].filter(Boolean))].slice(0, 2);
+}
+
+export function taskHasResponsible(task = {}) {
+  return taskResponsibleIds(task).length > 0 || taskResponsibleNames(task).length > 0;
+}
+
+export function taskResponsibleLabel(task = {}) {
+  const names = taskResponsibleNames(task);
+  if (names.length) return names.join(", ");
+  return task.cargo || "";
+}
+
 export async function uploadFile(file, options = {}) {
   const { file_url } = await apiClient.integrations.Core.UploadFile({ file, onProgress: options.onProgress });
   return file_url;

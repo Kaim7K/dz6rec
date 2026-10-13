@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { CalendarDays, ChevronDown, Circle, GripVertical, MessageSquareText, Trash2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import AssignResponsible from "@/components/projects/AssignResponsible";
-import { dueLabel, isDueSoon, isOverdue, PRIORITY, PRIORITY_ORDER } from "@/lib/music";
+import ChatAvatar from "@/components/projects/ChatAvatar";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { dueLabel, isDueSoon, isOverdue, PRIORITY, PRIORITY_ORDER, taskResponsibleIds } from "@/lib/music";
 
 const DETAIL_MODE = {
   subtasks: "Subtarefas",
@@ -13,7 +15,7 @@ const DETAIL_MODE = {
 const canUseSubtasks = (mode) => mode !== "notes";
 const canUseNotes = (mode) => mode === "notes" || mode === "both";
 
-export default function ChecklistItemRow({ item, allItems, depth, users, cargos, onToggle, onAddSub, onAssign, onAssignCargo, onPatch, onDelete, provided, isDragging = false }) {
+export default function ChecklistItemRow({ item, allItems, depth, users, cargos, onToggle, onAddSub, onAssign, onUnassign, onAssignCargo, onPatch, onDelete, provided, isDragging = false }) {
   const children = allItems.filter((i) => i.parent_id === item.id);
   const [expanded, setExpanded] = useState(false);
   const [adding, setAdding] = useState(false);
@@ -23,6 +25,7 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
   const priority = PRIORITY[item.priority || "normal"] || PRIORITY.normal;
   const overdue = isOverdue(item.due_date, item.completed);
   const soon = isDueSoon(item.due_date, item.completed);
+  const responsibleUsers = taskResponsibleIds(item).map((id) => users.find((user) => user.id === id)).filter(Boolean);
 
   React.useEffect(() => {
     setObservation(item.observation || "");
@@ -44,7 +47,7 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
     <article
       ref={provided?.innerRef}
       {...(provided?.draggableProps || {})}
-      className={`overflow-hidden rounded-md border border-white/[0.055] bg-white/[0.022] shadow-[inset_0_1px_0_rgba(255,255,255,0.02)] ${isDragging ? "border-primary/35 bg-white/[0.045] shadow-2xl" : ""}`}
+      className={`overflow-hidden rounded-md border border-white/[0.075] bg-[#171414] shadow-[inset_0_1px_0_rgba(255,255,255,0.035)] ${isDragging ? "border-primary/35 bg-white/[0.055] shadow-2xl" : ""}`}
     >
       <div className="p-2.5">
         <div className="flex items-center gap-2">
@@ -55,6 +58,15 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
           <div className="min-w-0 flex-1">
             <p className={`text-sm font-medium leading-5 ${item.completed ? "line-through text-white/38" : "text-white/88"}`}>{item.text}</p>
           </div>
+          {responsibleUsers.length > 0 && (
+            <div className="flex shrink-0 -space-x-1.5">
+              {responsibleUsers.map((user) => (
+                <span key={user.id} className="rounded-full ring-2 ring-[#171414]" title={user.full_name || user.email}>
+                  <ChatAvatar name={user.full_name || user.email} photoUrl={user.photo_url} size={22} />
+                </span>
+              ))}
+            </div>
+          )}
 
           <button type="button" onClick={() => onDelete(item)} className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-white/[0.02] text-white/26 transition-colors hover:bg-red-500/10 hover:text-red-300" aria-label={`Excluir ${item.text}`}>
             <Trash2 size={13} />
@@ -68,13 +80,17 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
           <div className="mt-2 border-t border-white/[0.05] pt-2">
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
               <div className="flex min-w-0 flex-wrap items-center gap-2">
-                <label className="inline-flex h-7 items-center gap-1.5 rounded-md bg-white/[0.035] px-2 text-2xs text-white/50">
+                <div className="flex h-7 items-center gap-1.5 rounded-md bg-white/[0.035] pl-2 text-2xs text-white/50">
                   <span className="text-white/30">Tipo</span>
-                  <select value={detailMode} onChange={(e) => onPatch(item, { detail_mode: e.target.value })} className="bg-transparent outline-none">
-                    {Object.entries(DETAIL_MODE).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
-                  </select>
-                  <ChevronDown size={13} />
-                </label>
+                  <Select value={detailMode} onValueChange={(value) => onPatch(item, { detail_mode: value })}>
+                    <SelectTrigger className="h-7 w-[7.75rem] border-0 bg-transparent px-1.5 py-0 text-2xs shadow-none focus:bg-transparent [&>svg]:h-3 [&>svg]:w-3">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(DETAIL_MODE).map(([key, label]) => <SelectItem key={key} value={key}>{label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
                 {canUseSubtasks(detailMode) && (
                   <button
                     onClick={() => setAdding(true)}
@@ -84,18 +100,20 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
                   </button>
                 )}
               </div>
-              <label className={`inline-flex h-7 shrink-0 items-center gap-1.5 rounded-md bg-white/[0.035] px-2 text-2xs ${priority.tone}`}>
-                <select value={item.priority || "normal"} onChange={(e) => onPatch(item, { priority: e.target.value })} className="bg-transparent outline-none">
-                  {PRIORITY_ORDER.map((key) => <option key={key} value={key}>{PRIORITY[key].label}</option>)}
-                </select>
-                <ChevronDown size={13} />
-              </label>
+              <Select value={item.priority || "normal"} onValueChange={(value) => onPatch(item, { priority: value })}>
+                <SelectTrigger className={`h-7 w-[6.5rem] shrink-0 border-0 bg-white/[0.035] px-2 py-0 text-2xs shadow-none focus:bg-white/[0.045] [&>svg]:h-3 [&>svg]:w-3 ${priority.tone}`}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {PRIORITY_ORDER.map((key) => <SelectItem key={key} value={key}>{PRIORITY[key].label}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
 
             {canUseSubtasks(detailMode) && (
               <div className="space-y-0.5">
                 {children.map((child) => (
-                  <ChecklistItemRow key={child.id} item={child} allItems={allItems} depth={depth + 1} users={users} cargos={cargos} onToggle={onToggle} onAddSub={onAddSub} onAssign={onAssign} onAssignCargo={onAssignCargo} onPatch={onPatch} onDelete={onDelete} />
+                  <ChecklistItemRow key={child.id} item={child} allItems={allItems} depth={depth + 1} users={users} cargos={cargos} onToggle={onToggle} onAddSub={onAddSub} onAssign={onAssign} onUnassign={onUnassign} onAssignCargo={onAssignCargo} onPatch={onPatch} onDelete={onDelete} />
                 ))}
                 {adding && (
                   <form
@@ -138,7 +156,7 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
                 <input type="date" value={item.due_date || ""} onChange={(e) => onPatch(item, { due_date: e.target.value || null })} className="w-5 bg-transparent text-transparent outline-none [color-scheme:dark]" aria-label={`Prazo de ${item.text}`} />
               </label>
               <div className="flex min-w-0 items-center sm:border-l sm:border-white/[0.055] sm:pl-3">
-                <AssignResponsible item={item} users={users} cargos={cargos} onAssign={onAssign} onAssignCargo={onAssignCargo} className="w-full justify-between" />
+                <AssignResponsible item={item} users={users} cargos={cargos} onAssign={onAssign} onUnassign={onUnassign} onAssignCargo={onAssignCargo} className="w-full justify-between" />
               </div>
             </div>
           </div>

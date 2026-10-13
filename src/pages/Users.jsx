@@ -93,10 +93,10 @@ export default function Users() {
         </div>
       </div>
 
-      <div className="dz-card flex flex-col gap-2.5 p-3 sm:flex-row">
+      <div className="dz-card flex flex-col gap-2.5 p-3.5 sm:flex-row">
         <div className="relative flex-1">
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-stage-muted" />
-          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar por nome ou e-mail..." className="h-10 w-full rounded-md border border-white/[0.08] bg-white/[0.026] pl-9 pr-3 text-sm text-white outline-none transition placeholder:text-white/34 focus:border-primary/45" />
+          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar por nome ou e-mail..." className="dz-input w-full pl-9" />
         </div>
         <Select value={filterCargo} onValueChange={setFilterCargo}>
           <SelectTrigger className="h-10 w-full rounded-md border-white/[0.08] bg-white/[0.026] text-sm text-white sm:w-56"><SelectValue placeholder="Filtrar por cargo" /></SelectTrigger>
@@ -107,8 +107,8 @@ export default function Users() {
         </Select>
       </div>
 
-      <form onSubmit={invite} className="dz-card flex flex-col gap-2.5 p-3 sm:flex-row sm:items-center">
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@gravadora.com" required className="h-10 flex-1 rounded-md border border-white/[0.08] bg-white/[0.026] px-3 text-sm text-white outline-none transition placeholder:text-white/34 focus:border-primary/45" />
+      <form onSubmit={invite} className="dz-card flex flex-col gap-2.5 p-3.5 sm:flex-row sm:items-center">
+        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@gravadora.com" required className="dz-input flex-1" />
         <Select value={inviteCargo} onValueChange={setInviteCargo}>
           <SelectTrigger className="h-10 w-full rounded-md border-white/[0.08] bg-white/[0.026] text-sm text-white sm:w-48"><SelectValue placeholder="Cargo (opcional)" /></SelectTrigger>
           <SelectContent className="border-stage-border bg-stage-card text-stage-ink">{cargos.map((c) => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}</SelectContent>
@@ -120,11 +120,11 @@ export default function Users() {
       {msg && <p className="text-body text-stage-muted">{msg}</p>}
 
       <div className="dz-card overflow-hidden">
-        <div className={`hidden items-center gap-4 border-b border-stage-border bg-stage-surface px-4 py-2.5 text-micro font-semibold uppercase tracking-wide text-stage-muted lg:grid ${GRID}`}>
+        <div className={`hidden items-center gap-4 border-b border-white/[0.07] bg-white/[0.025] px-4 py-3 text-micro font-semibold uppercase tracking-wide text-stage-muted lg:grid ${GRID}`}>
           <span>Usuário</span><span>E-mail</span><span>Cargos</span><span className="text-right">Ações</span>
         </div>
         {filtered.map((u) => (
-          <div key={u.id} className={`hidden items-center gap-4 border-b border-stage-border px-4 py-2.5 last:border-0 lg:grid ${GRID}`}>
+          <div key={u.id} className={`hidden items-center gap-4 border-b border-white/[0.06] px-4 py-3 transition-colors last:border-0 hover:bg-white/[0.025] lg:grid ${GRID}`}>
             <div className="flex min-w-0 items-center gap-3">
               <Avatar u={u} size="h-8 w-8" />
               <div className="min-w-0">

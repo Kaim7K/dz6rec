@@ -48,8 +48,8 @@ module.exports = {
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',
   			stage: {
-				surface: '#0A0707',
-				card: '#100D0D',
+				surface: '#090808',
+				card: '#111010',
 				border: 'rgba(255,255,255,0.08)',
 				ink: '#F7F7F7',
 				muted: '#9CA3AF',
@@ -100,10 +100,10 @@ module.exports = {
   			'micro': ['0.75rem', { lineHeight: '1.05rem' }]
   		},
   		boxShadow: {
-  			soft: '0 1px 2px rgba(0,0,0,0.4), 0 6px 18px -8px rgba(0,0,0,0.4)',
-  			elev: '0 10px 32px -12px rgba(0,0,0,0.6)',
-  			pop: '0 18px 48px -16px rgba(0,0,0,0.7)',
-  			glow: '0 0 0 1px rgba(194,0,0,0.35), 0 10px 36px -12px rgba(194,0,0,0.4)'
+  			soft: '0 1px 0 rgba(255,255,255,0.035), 0 14px 34px -24px rgba(0,0,0,0.95)',
+  			elev: '0 1px 0 rgba(255,255,255,0.045), 0 22px 54px -28px rgba(0,0,0,0.95)',
+  			pop: '0 1px 0 rgba(255,255,255,0.045), 0 24px 60px -20px rgba(0,0,0,0.85)',
+  			glow: '0 0 0 1px rgba(220,0,0,0.32), 0 18px 42px -24px rgba(220,0,0,0.72)'
   		},
   		letterSpacing: {
   			tightest: '-0.04em'
