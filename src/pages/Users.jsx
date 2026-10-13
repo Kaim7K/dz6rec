@@ -9,7 +9,7 @@ import { PERMISSAO, cargoList } from "@/lib/music";
 import { Check, Loader2, Pencil, Plus, Search, ShieldCheck, Users as UsersIcon } from "lucide-react";
 
 const ALL = "__all__";
-const GRID = "sm:grid-cols-[minmax(0,2fr)_minmax(0,2fr)_minmax(0,3fr)_auto]";
+const GRID = "lg:grid-cols-[minmax(0,2fr)_minmax(0,2fr)_minmax(0,3fr)_auto]";
 
 export default function Users() {
   const [users, setUsers] = useState([]);
@@ -120,11 +120,11 @@ export default function Users() {
       {msg && <p className="text-body text-stage-muted">{msg}</p>}
 
       <div className="dz-card overflow-hidden">
-        <div className={`hidden items-center gap-4 border-b border-stage-border bg-stage-surface px-4 py-2.5 text-micro font-semibold uppercase tracking-wide text-stage-muted sm:grid ${GRID}`}>
+        <div className={`hidden items-center gap-4 border-b border-stage-border bg-stage-surface px-4 py-2.5 text-micro font-semibold uppercase tracking-wide text-stage-muted lg:grid ${GRID}`}>
           <span>Usuário</span><span>E-mail</span><span>Cargos</span><span className="text-right">Ações</span>
         </div>
         {filtered.map((u) => (
-          <div key={u.id} className={`hidden items-center gap-4 border-b border-stage-border px-4 py-2.5 last:border-0 sm:grid ${GRID}`}>
+          <div key={u.id} className={`hidden items-center gap-4 border-b border-stage-border px-4 py-2.5 last:border-0 lg:grid ${GRID}`}>
             <div className="flex min-w-0 items-center gap-3">
               <Avatar u={u} size="h-8 w-8" />
               <div className="min-w-0">
@@ -151,7 +151,7 @@ export default function Users() {
         {filtered.length === 0 && <p className="p-6 text-center text-body text-stage-muted">Nenhum usuário encontrado.</p>}
       </div>
 
-      <div className="space-y-3 sm:hidden">
+      <div className="space-y-3 lg:hidden">
         {filtered.map((u) => {
           const list = cargoList(u.cargo);
           return (

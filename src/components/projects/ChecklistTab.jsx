@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { LayoutTemplate, Loader2, MoreHorizontal, Plus } from "lucide-react";
 import { apiClient } from "@/api/appClient";
 import CargoBadge from "@/components/CargoBadge";
@@ -50,6 +51,33 @@ export default function ChecklistTab({ project }) {
     if (text.includes("visual") || text.includes("design") || text.includes("capa")) return "visual";
     if (text.includes("marketing") || text.includes("social") || text.includes("lançamento")) return "marketing";
     return "musica";
+  };
+
+  const categoryParentItems = (categorySections) => {
+    const sectionOrder = Object.fromEntries(categorySections.map((section) => [section.id, section.order || 0]));
+    return categorySections
+      .flatMap((section) => items.filter((item) => item.section_id === section.id && !item.parent_id))
+      .sort((a, b) => (sectionOrder[a.section_id] - sectionOrder[b.section_id]) || ((a.order || 0) - (b.order || 0)));
+  };
+
+  const onDragEnd = async (result) => {
+    if (!result.destination || result.destination.droppableId !== result.source.droppableId || result.destination.index === result.source.index) return;
+    const category = CATEGORIES.find((entry) => entry.key === result.source.droppableId);
+    if (!category) return;
+    const categorySections = sections.filter((section) => sectionCategory(section) === category.key);
+    const orderedItems = categoryParentItems(categorySections);
+    const next = Array.from(orderedItems);
+    const [moved] = next.splice(result.source.index, 1);
+    next.splice(result.destination.index, 0, moved);
+
+    setItems((current) => current.map((item) => {
+      const index = next.findIndex((ordered) => ordered.id === item.id);
+      return index >= 0 ? { ...item, order: index } : item;
+    }));
+    await apiClient.entities.ChecklistItem.bulkUpdate(next.map((item, index) => ({ id: item.id, order: index })));
+    const me = await apiClient.auth.me().catch(() => null);
+    await logActivity(project.id, "Tarefas reordenadas", me?.full_name);
+    load();
   };
 
   const addSection = async (e) => {
@@ -207,10 +235,11 @@ export default function ChecklistTab({ project }) {
           <LayoutTemplate size={15} />Salvar como template
         </button>
       </div>
-      <div className="grid gap-4 2xl:grid-cols-3">
-        {CATEGORIES.map((category) => {
+      <DragDropContext onDragEnd={onDragEnd}>
+        <div className="grid gap-4 2xl:grid-cols-3">
+          {CATEGORIES.map((category) => {
           const categorySections = sections.filter((section) => sectionCategory(section) === category.key);
-          const categoryItems = categorySections.flatMap((section) => items.filter((item) => item.section_id === section.id && !item.parent_id));
+          const categoryItems = categoryParentItems(categorySections);
           const done = categoryItems.filter((item) => item.completed).length;
           const firstSection = categorySections[0];
 
@@ -229,31 +258,43 @@ export default function ChecklistTab({ project }) {
               </div>
 
               <div className="space-y-1.5">
-                {categorySections.flatMap((section) => {
-                  const sectionItems = items.filter((item) => item.section_id === section.id);
-                  return sectionItems.filter((item) => !item.parent_id).map((item) => (
-                    <ChecklistItemRow key={item.id} item={item} allItems={sectionItems} depth={0} users={users} cargos={cargos} onToggle={toggle} onAddSub={addSub} onAssign={assign} onAssignCargo={assignCargo} onPatch={patchItem} onDelete={deleteItem} />
-                  ));
-                })}
+                <Droppable droppableId={category.key}>
+                  {(provided) => (
+                    <div ref={provided.innerRef} {...provided.droppableProps} className="space-y-1.5">
+                      {categoryItems.map((item, index) => {
+                        const sectionItems = items.filter((entry) => entry.section_id === item.section_id);
+                        return (
+                          <Draggable key={item.id} draggableId={item.id} index={index}>
+                            {(prov, snapshot) => (
+                              <ChecklistItemRow item={item} allItems={sectionItems} depth={0} users={users} cargos={cargos} onToggle={toggle} onAddSub={addSub} onAssign={assign} onAssignCargo={assignCargo} onPatch={patchItem} onDelete={deleteItem} provided={prov} isDragging={snapshot.isDragging} />
+                            )}
+                          </Draggable>
+                        );
+                      })}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
 
                 {categorySections.length === 0 && (
                   <p className="rounded-md border border-dashed border-white/[0.08] px-3 py-3 text-sm text-white/35">Nenhuma seção nesta operação.</p>
                 )}
 
-                <form onSubmit={(e) => { e.preventDefault(); const f = e.currentTarget; addCategoryItems(category, f.text.value); f.reset(); }} className="grid min-h-[4.5rem] grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-2 rounded-md border border-dashed border-white/[0.12] bg-black/10 px-3 py-2.5 transition-colors focus-within:border-primary/45 focus-within:bg-white/[0.025]">
+                <form onSubmit={(e) => { e.preventDefault(); const f = e.currentTarget; addCategoryItems(category, f.text.value); f.reset(); }} className="grid min-h-[4.5rem] grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-md border border-dashed border-white/[0.12] bg-black/10 px-3 py-2.5 transition-colors focus-within:border-primary/45 focus-within:bg-white/[0.025] sm:grid-cols-[2rem_minmax(0,1fr)_auto]">
                   <span className="grid h-8 w-8 place-items-center rounded-md bg-white/[0.045] text-white/60">
                     <Plus size={16} />
                   </span>
                   <textarea name="text" rows={2} placeholder={"Adicionar tarefas...\nUma tarefa por linha"} className="min-h-10 min-w-0 resize-none bg-transparent py-0.5 text-sm leading-5 text-white/82 outline-none placeholder:text-white/40" />
-                  <button type="submit" className="h-8 rounded-md border border-white/[0.08] px-3 text-xs font-bold text-white/62 transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-white">
+                  <button type="submit" className="col-span-2 h-8 rounded-md border border-white/[0.08] px-3 text-xs font-bold text-white/62 transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-white sm:col-span-1">
                     Adicionar
                   </button>
                 </form>
               </div>
             </section>
           );
-        })}
-      </div>
+          })}
+        </div>
+      </DragDropContext>
 
       <form onSubmit={addSection} className="grid gap-3 sm:grid-cols-[1fr_auto] sm:gap-4">
         <div className="flex h-14 items-center gap-4 rounded-md border border-white/[0.075] bg-white/[0.018] px-5">

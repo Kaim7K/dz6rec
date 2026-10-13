@@ -57,9 +57,12 @@
   html {
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    overflow-x: clip;
   }
   body {
     @apply bg-background text-foreground font-body antialiased;
+    min-width: 0;
+    overflow-x: clip;
     background:
       radial-gradient(circle at 82% -12%, rgba(130, 0, 0, 0.08), transparent 32rem),
       linear-gradient(180deg, rgba(255,255,255,0.012), transparent 20rem),
@@ -78,6 +81,7 @@
   }
   h1, h2, h3, h4 {
     @apply font-display tracking-tight;
+    overflow-wrap: anywhere;
   }
   ::selection {
     background: rgba(194, 0, 0, 0.28);
@@ -98,8 +102,19 @@
   button, a, input, textarea, select {
     @apply transition-colors duration-200;
   }
+  button, a {
+    -webkit-tap-highlight-color: transparent;
+  }
   input, textarea, select {
     letter-spacing: 0;
+    min-width: 0;
+  }
+  img, video, canvas, svg {
+    max-width: 100%;
+  }
+  #root {
+    min-width: 0;
+    isolation: isolate;
   }
 }
 
@@ -126,27 +141,27 @@
   }
 
   .dz-page {
-    @apply space-y-5 lg:space-y-6;
+    @apply min-w-0 space-y-5 lg:space-y-6;
   }
 
   .dz-page-head {
-    @apply flex flex-col gap-3 border-b border-white/[0.055] pb-5 sm:flex-row sm:items-end sm:justify-between;
+    @apply min-w-0 flex flex-col gap-3 border-b border-white/[0.055] pb-5 sm:flex-row sm:items-end sm:justify-between;
   }
 
   .dz-page-title {
-    @apply mt-1 font-display text-2xl font-bold tracking-tight text-white sm:text-[1.8rem] sm:leading-9;
+    @apply mt-1 max-w-full break-words font-display text-2xl font-bold tracking-tight text-white sm:text-[1.8rem] sm:leading-9;
   }
 
   .dz-page-subtitle {
-    @apply mt-1 max-w-2xl text-sm leading-6 text-white/48;
+    @apply mt-1 max-w-2xl break-words text-sm leading-6 text-white/48;
   }
 
   .dz-primary-button {
-    @apply inline-flex h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-bold text-primary-foreground shadow-soft transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-60;
+    @apply inline-flex min-h-10 min-w-0 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-bold leading-5 text-primary-foreground shadow-soft transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-60;
   }
 
   .dz-ghost-button {
-    @apply inline-flex h-9 items-center justify-center gap-2 rounded-md border border-white/[0.07] bg-white/[0.025] px-3.5 text-sm font-medium text-white/70 transition-colors hover:border-white/[0.12] hover:bg-white/[0.045] hover:text-white;
+    @apply inline-flex min-h-9 min-w-0 items-center justify-center gap-2 rounded-md border border-white/[0.07] bg-white/[0.025] px-3.5 py-2 text-sm font-medium leading-5 text-white/70 transition-colors hover:border-white/[0.12] hover:bg-white/[0.045] hover:text-white;
   }
 
   .dz-icon-button {
@@ -154,11 +169,11 @@
   }
 
   .dz-input {
-    @apply h-10 rounded-md border border-white/[0.08] bg-white/[0.026] px-3 text-sm text-white outline-none placeholder:text-white/34 focus:border-primary/45 focus:bg-white/[0.04];
+    @apply h-10 min-w-0 rounded-md border border-white/[0.08] bg-white/[0.026] px-3 text-sm text-white outline-none placeholder:text-white/34 focus:border-primary/45 focus:bg-white/[0.04];
   }
 
   .dz-list-row {
-    @apply border-b border-white/[0.055] transition-colors last:border-b-0 hover:bg-white/[0.025];
+    @apply min-w-0 border-b border-white/[0.055] transition-colors last:border-b-0 hover:bg-white/[0.025];
   }
 
   .dz-pill {

@@ -82,20 +82,20 @@ export default function Topbar({ onMenu }) {
   const profileLabel = cargoList(me?.cargo)[0] || PERMISSAO[me?.permissao] || "Equipe DZ6";
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-white/[0.06] bg-[#080606]/88 px-4 backdrop-blur-xl sm:px-5 lg:px-7">
+    <header className="sticky top-0 z-30 flex h-16 min-w-0 items-center gap-2 border-b border-white/[0.06] bg-[#080606]/88 px-3 backdrop-blur-xl sm:gap-3 sm:px-5 lg:px-7">
       <button onClick={onMenu} className="dz-icon-button lg:hidden" aria-label="Abrir menu"><Menu size={20} /></button>
-      <div className="relative max-w-xl flex-1 sm:max-w-2xl">
+      <div className="relative min-w-0 max-w-xl flex-1 sm:max-w-2xl">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/35" size={18} />
-        <input value={query} onChange={(e) => setQuery(e.target.value)} className="h-10 w-full rounded-md border border-white/[0.075] bg-white/[0.028] pl-11 pr-16 text-sm text-white shadow-soft outline-none placeholder:text-white/32 focus:border-primary/40 focus:bg-white/[0.045]" placeholder="Buscar no painel, projetos, artistas..." />
+        <input value={query} onChange={(e) => setQuery(e.target.value)} className="h-10 w-full rounded-md border border-white/[0.075] bg-white/[0.028] pl-11 pr-16 text-sm text-white shadow-soft outline-none placeholder:text-white/32 focus:border-primary/40 focus:bg-white/[0.045]" placeholder="Buscar no painel..." />
         <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded-md border border-white/[0.08] bg-white/[0.04] px-2 py-1 text-2xs font-semibold text-white/42">⌘ K</span>
-        {results.length > 0 && <div className="absolute inset-x-0 top-12 overflow-hidden rounded-lg border border-white/[0.08] bg-popover p-1.5 shadow-elev">{results.map((i) => <Link key={i.to} to={i.to} onClick={() => setQuery("")} className="block rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5 hover:text-white">{i.label}</Link>)}</div>}
+        {results.length > 0 && <div className="absolute inset-x-0 top-12 max-h-[min(22rem,calc(100svh-5rem))] overflow-y-auto rounded-lg border border-white/[0.08] bg-popover p-1.5 shadow-elev">{results.map((i) => <Link key={i.to} to={i.to} onClick={() => setQuery("")} className="block rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5 hover:text-white">{i.label}</Link>)}</div>}
       </div>
-      <div className="ml-auto flex items-center gap-1.5">
+      <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-1.5">
         <LocalMockSwitcher />
         <div className="relative">
           <button onClick={() => setPanel(panel === "bell" ? null : "bell")} className="dz-icon-button relative border-0"><Bell size={18} />{unread > 0 && <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-primary ring-2 ring-background" />}</button>
           {panel === "bell" && (
-            <div className="absolute right-0 mt-2 w-80 overflow-hidden rounded-lg border border-white/[0.08] bg-popover p-1.5 shadow-pop">
+            <div className="absolute right-[-3.25rem] mt-2 w-[min(20rem,calc(100vw-1rem))] overflow-hidden rounded-lg border border-white/[0.08] bg-popover p-1.5 shadow-pop sm:right-0">
               <p className="px-3 py-2 text-2xs font-medium uppercase tracking-[0.16em] text-white/35">Notificações</p>
               {notifs.length === 0 ? <p className="px-3 py-6 text-center text-sm text-white/35">Nenhuma notificação.</p> :
                 <div className="max-h-80 overflow-y-auto">{notifs.map((n) => (
@@ -106,7 +106,7 @@ export default function Topbar({ onMenu }) {
         </div>
         <div className="mx-2 hidden h-8 w-px bg-white/[0.08] sm:block" />
         <div className="relative">
-          <button onClick={() => setPanel(panel === "profile" ? null : "profile")} className="flex items-center gap-3 rounded-md py-1 pl-1 pr-2 hover:bg-white/5">
+          <button onClick={() => setPanel(panel === "profile" ? null : "profile")} className="flex min-w-0 items-center gap-2 rounded-md py-1 pl-1 pr-1 hover:bg-white/5 sm:gap-3 sm:pr-2">
             <span className="grid h-9 w-9 place-items-center overflow-hidden rounded-full bg-primary text-sm font-bold text-primary-foreground shadow-soft">
               {me?.photo_url ? <img src={me.photo_url} alt="" className="h-full w-full object-cover" /> : initials}
             </span>
@@ -117,7 +117,7 @@ export default function Topbar({ onMenu }) {
             <ChevronDown size={15} className="hidden text-white/45 sm:block" />
           </button>
           {panel === "profile" && (
-            <div className="absolute right-0 mt-2 w-56 overflow-hidden rounded-lg border border-white/[0.08] bg-popover p-1.5 shadow-pop">
+            <div className="absolute right-0 mt-2 w-[min(14rem,calc(100vw-1rem))] overflow-hidden rounded-lg border border-white/[0.08] bg-popover p-1.5 shadow-pop">
               <div className="border-b border-white/[0.06] px-3 py-2.5"><p className="text-sm font-medium text-white">{me?.full_name || "Equipe DZ6"}</p><p className="truncate text-2xs text-white/40">{me?.email}</p><p className="mt-1 truncate text-2xs text-white/35">{profileLabel}</p></div>
               <button onClick={() => apiClient.auth.logout("/login")} className="mt-1 flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-sm text-white/75 hover:bg-white/5 hover:text-white"><LogOut size={15} />Sair</button>
             </div>

@@ -4,7 +4,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import AssignResponsible from "@/components/projects/AssignResponsible";
 import { dueLabel, isDueSoon, isOverdue, PRIORITY, PRIORITY_ORDER } from "@/lib/music";
 
-export default function ChecklistItemRow({ item, allItems, depth, users, cargos, onToggle, onAddSub, onAssign, onAssignCargo, onPatch, onDelete }) {
+export default function ChecklistItemRow({ item, allItems, depth, users, cargos, onToggle, onAddSub, onAssign, onAssignCargo, onPatch, onDelete, provided, isDragging = false }) {
   const children = allItems.filter((i) => i.parent_id === item.id);
   const [expanded, setExpanded] = useState(false);
   const [adding, setAdding] = useState(false);
@@ -26,10 +26,16 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
   }
 
   return (
-    <article className="overflow-hidden rounded-md border border-white/[0.055] bg-white/[0.022] shadow-[inset_0_1px_0_rgba(255,255,255,0.02)]">
+    <article
+      ref={provided?.innerRef}
+      {...(provided?.draggableProps || {})}
+      className={`overflow-hidden rounded-md border border-white/[0.055] bg-white/[0.022] shadow-[inset_0_1px_0_rgba(255,255,255,0.02)] ${isDragging ? "border-primary/35 bg-white/[0.045] shadow-2xl" : ""}`}
+    >
       <div className="p-2.5">
         <div className="flex items-center gap-2">
-          <GripVertical size={15} className="shrink-0 text-white/30" />
+          <button type="button" {...(provided?.dragHandleProps || {})} className="shrink-0 cursor-grab touch-none rounded p-0.5 text-white/30 transition-colors hover:bg-white/[0.045] hover:text-white/65 active:cursor-grabbing" aria-label={`Mover ${item.text}`}>
+            <GripVertical size={15} />
+          </button>
           <Checkbox checked={item.completed} onCheckedChange={() => onToggle(item)} className="h-4 w-4 rounded-[4px] border-white/60 data-[state=checked]:border-primary data-[state=checked]:bg-primary" />
           <div className="min-w-0 flex-1">
             <p className={`text-sm font-medium leading-5 ${item.completed ? "line-through text-white/38" : "text-white/88"}`}>{item.text}</p>
