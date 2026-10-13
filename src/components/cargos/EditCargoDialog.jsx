@@ -3,14 +3,40 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiClient } from "@/api/appClient";
 import { cargoList } from "@/lib/music";
 
 export const COLORS = ["#dc0000", "#b91c1c", "#991b1b", "#7f1d1d", "#ef4444", "#d97706", "#a3a3a3", "#737373", "#525252", "#f5f5f5"];
 
+export const randomCargoColor = () => COLORS[Math.floor(Math.random() * COLORS.length)];
+
+export function ColorSelect({ value, onChange, triggerClassName = "" }) {
+  return (
+    <Select value={value} onValueChange={onChange}>
+      <SelectTrigger className={`h-10 min-w-[10.5rem] rounded-md border-white/[0.08] bg-white/[0.026] text-sm text-white ${triggerClassName}`}>
+        <span className="flex min-w-0 items-center gap-2">
+          <span className="h-4 w-4 shrink-0 rounded-full border border-white/20" style={{ backgroundColor: value }} />
+          <SelectValue />
+        </span>
+      </SelectTrigger>
+      <SelectContent>
+        {COLORS.map((hex) => (
+          <SelectItem key={hex} value={hex}>
+            <span className="flex items-center gap-2">
+              <span className="h-4 w-4 rounded-full border border-white/20" style={{ backgroundColor: hex }} />
+              <span className="font-mono text-xs uppercase">{hex}</span>
+            </span>
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
+
 export default function EditCargoDialog({ cargo, onClose, onSaved }) {
   const [name, setName] = useState(cargo.name);
-  const [color, setColor] = useState(cargo.color || COLORS[0]);
+  const [color, setColor] = useState(cargo.color || randomCargoColor());
   const [loading, setLoading] = useState(false);
 
   const save = async () => {
@@ -42,9 +68,7 @@ export default function EditCargoDialog({ cargo, onClose, onSaved }) {
         <div className="space-y-5">
           <div className="space-y-1.5"><Label>Nome</Label><Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nome do cargo" /></div>
           <div className="space-y-1.5"><Label>Cor</Label>
-            <div className="flex flex-wrap items-center gap-2">{COLORS.map((c) => (
-              <button type="button" key={c} onClick={() => setColor(c)} aria-label={c} className={`h-8 w-8 rounded-full transition-transform ${color === c ? "ring-2 ring-white ring-offset-2 ring-offset-[#161616]" : "ring-1 ring-white/10 hover:scale-110"}`} style={{ backgroundColor: c }} />
-            ))}</div>
+            <ColorSelect value={color} onChange={setColor} triggerClassName="w-full" />
           </div>
         </div>
         <DialogFooter>

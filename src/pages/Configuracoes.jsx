@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { apiClient } from "@/api/appClient";
-import { Pencil, Plus, ShieldCheck, Trash2 } from "lucide-react";
+import { Pencil, Plus, ShieldCheck, Shuffle, Trash2 } from "lucide-react";
 import CargoBadge from "@/components/CargoBadge";
-import EditCargoDialog, { COLORS } from "@/components/cargos/EditCargoDialog";
+import EditCargoDialog, { ColorSelect, randomCargoColor } from "@/components/cargos/EditCargoDialog";
 
 export default function Configuracoes() {
   const [me, setMe] = useState(null);
   const [cargos, setCargos] = useState([]);
   const [name, setName] = useState("");
-  const [color, setColor] = useState(COLORS[0]);
+  const [color, setColor] = useState(() => randomCargoColor());
   const [editCargo, setEditCargo] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -27,7 +27,7 @@ export default function Configuracoes() {
     </div>
   );
 
-  const add = async (e) => { e.preventDefault(); if (!name.trim()) return; await apiClient.entities.Cargo.create({ name: name.trim(), color }); setName(""); setColor(COLORS[0]); load(); };
+  const add = async (e) => { e.preventDefault(); if (!name.trim()) return; await apiClient.entities.Cargo.create({ name: name.trim(), color }); setName(""); setColor(randomCargoColor()); load(); };
   const remove = async (c) => { await apiClient.entities.Cargo.delete(c.id); load(); };
 
   return (
@@ -38,10 +38,13 @@ export default function Configuracoes() {
         <h2 className="font-display text-lg font-bold text-white">Cargos & badges</h2>
         <p className="mt-1 text-sm text-white/45">Defina os cargos da equipe. Eles aparecem como badges ao atribuir tarefas e nos perfis.</p>
         <form onSubmit={add} className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Novo cargo (ex. Produtor Musical)" className="h-11 flex-1 rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 text-sm outline-none transition focus:border-white/15" />
-          <div className="flex items-center gap-2">{COLORS.map((c) => (
-            <button type="button" key={c} onClick={() => setColor(c)} className={`h-7 w-7 rounded-full transition-transform ${color === c ? "ring-2 ring-white ring-offset-2 ring-offset-[#0b0808]" : "ring-1 ring-white/10 hover:scale-110"}`} style={{ backgroundColor: c }} aria-label={c} />
-          ))}</div>
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Novo cargo (ex. Produtor Musical)" className="h-11 flex-1 rounded-md border border-white/[0.08] bg-white/[0.04] px-4 text-sm outline-none transition focus:border-primary/45" />
+          <div className="flex items-center gap-2">
+            <ColorSelect value={color} onChange={setColor} />
+            <button type="button" onClick={() => setColor(randomCargoColor())} className="dz-icon-button h-10 w-10" aria-label="Sortear cor">
+              <Shuffle size={15} />
+            </button>
+          </div>
           <button className="dz-primary-button"><Plus size={16} />Adicionar</button>
         </form>
         <div className="mt-5 flex flex-wrap gap-2">
