@@ -30,9 +30,9 @@ function projectHealth(items) {
 
 function ModuleHeader({ title, meta }) {
   return (
-    <div className="mb-3 flex items-center justify-between">
-      <h2 className="text-sm font-bold text-white">{title}</h2>
-      {meta && <span className="text-2xs uppercase tracking-[0.14em] text-white/28">{meta}</span>}
+    <div className="mb-3 flex min-w-0 items-center justify-between gap-3">
+      <h2 className="min-w-0 break-words text-sm font-bold text-white">{title}</h2>
+      {meta && <span className="shrink-0 text-2xs uppercase tracking-[0.14em] text-white/28">{meta}</span>}
     </div>
   );
 }
@@ -78,7 +78,7 @@ function Approvals({ items }) {
           <div key={item.id} className="flex items-center gap-3 border-b border-white/[0.045] py-3 last:border-b-0">
             <span className={`h-2 w-2 rounded-full ${item.completed ? "bg-emerald-400" : isOverdue(item.due_date) ? "bg-primary" : "bg-amber-300"}`} />
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm text-white/82">{item.text}</p>
+              <p className="break-words text-sm text-white/82">{item.text}</p>
               <p className="text-2xs text-white/35">{item.responsible_name || item.cargo || "Sem responsável"}{item.due_date ? ` · ${dueLabel(item.due_date)}` : ""}</p>
             </div>
             <span className="text-2xs text-white/35">{item.completed ? "aprovado" : "pendente"}</span>
@@ -133,9 +133,9 @@ function Files({ project, files, onChanged }) {
         })}
         {files.length === 0 && <p className="py-6 text-center text-sm text-white/35">Nenhum arquivo anexado.</p>}
       </div>
-      <form onSubmit={submit} className="mt-4 grid gap-2 sm:grid-cols-[1fr_auto]">
-        <input value={name} onChange={(event) => setName(event.target.value)} placeholder="Nome do arquivo" className="h-9 rounded-md border border-white/[0.05] bg-white/[0.018] px-3 text-sm outline-none placeholder:text-white/25" />
-        <select value={category} onChange={(event) => setCategory(event.target.value)} className="h-9 rounded-md border border-white/[0.05] bg-background px-3 text-sm text-white/70 outline-none">
+      <form onSubmit={submit} className="mt-4 grid min-w-0 gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
+        <input value={name} onChange={(event) => setName(event.target.value)} placeholder="Nome do arquivo" className="h-9 min-w-0 rounded-md border border-white/[0.05] bg-white/[0.018] px-3 text-sm outline-none placeholder:text-white/25" />
+        <select value={category} onChange={(event) => setCategory(event.target.value)} className="h-9 min-w-0 rounded-md border border-white/[0.05] bg-background px-3 text-sm text-white/70 outline-none">
           {Object.entries(FILE_TYPES).map(([key, type]) => <option key={key} value={key}>{type.label}</option>)}
         </select>
         <div className="sm:col-span-2"><FileField value={file} onChange={setFile} hint="Arquivo, link ou referência do projeto" /></div>
@@ -154,14 +154,14 @@ export default function ProjectWorkspace({ project, sections, items, files, onCh
   const HealthIcon = health.Icon;
 
   return (
-    <div className="grid gap-8 xl:grid-cols-[1.35fr_0.75fr]">
+    <div className="grid min-w-0 gap-8 xl:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.75fr)]">
       <div className="space-y-7">
         <section className="border-b border-white/[0.05] pb-5">
           <p className="text-2xs font-bold uppercase tracking-[0.18em] text-white/28">Próxima ação</p>
           <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <h2 className="text-xl font-bold text-white">{nextAction.title}</h2>
-              <p className="mt-1 text-sm text-white/62">{nextAction.text}</p>
+            <div className="min-w-0">
+              <h2 className="break-words text-xl font-bold text-white">{nextAction.title}</h2>
+              <p className="mt-1 break-words text-sm text-white/62">{nextAction.text}</p>
               <p className={`mt-2 text-xs ${nextAction.tone === "danger" ? "text-primary" : nextAction.tone === "warn" ? "text-amber-300" : "text-white/38"}`}>{nextAction.detail}</p>
             </div>
             <a href={nextAction.href} className="inline-flex h-9 items-center gap-2 rounded-md bg-white/[0.055] px-3 text-sm font-bold text-white/78 hover:bg-white/[0.085]">

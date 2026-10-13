@@ -1,17 +1,32 @@
 import React, { useState } from "react";
-import { CalendarDays, ChevronDown, Circle, GripVertical, Trash2 } from "lucide-react";
+import { CalendarDays, ChevronDown, Circle, GripVertical, MessageSquareText, Trash2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import AssignResponsible from "@/components/projects/AssignResponsible";
 import { dueLabel, isDueSoon, isOverdue, PRIORITY, PRIORITY_ORDER } from "@/lib/music";
+
+const DETAIL_MODE = {
+  subtasks: "Subtarefas",
+  notes: "Observacao",
+  both: "Ambos",
+};
+
+const canUseSubtasks = (mode) => mode !== "notes";
+const canUseNotes = (mode) => mode === "notes" || mode === "both";
 
 export default function ChecklistItemRow({ item, allItems, depth, users, cargos, onToggle, onAddSub, onAssign, onAssignCargo, onPatch, onDelete, provided, isDragging = false }) {
   const children = allItems.filter((i) => i.parent_id === item.id);
   const [expanded, setExpanded] = useState(false);
   const [adding, setAdding] = useState(false);
   const [text, setText] = useState("");
+  const [observation, setObservation] = useState(item.observation || "");
+  const detailMode = item.detail_mode || "subtasks";
   const priority = PRIORITY[item.priority || "normal"] || PRIORITY.normal;
   const overdue = isOverdue(item.due_date, item.completed);
   const soon = isDueSoon(item.due_date, item.completed);
+
+  React.useEffect(() => {
+    setObservation(item.observation || "");
+  }, [item.observation]);
 
   if (depth > 0) {
     return (
@@ -51,13 +66,24 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
 
         {expanded && (
           <div className="mt-2 border-t border-white/[0.05] pt-2">
-            <div className="mb-2 flex items-center justify-between gap-3">
-              <button
-                onClick={() => setAdding(true)}
-                className="text-2xs text-white/30 transition-colors hover:text-white/58"
-              >
-                + Subtarefa
-              </button>
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+              <div className="flex min-w-0 flex-wrap items-center gap-2">
+                <label className="inline-flex h-7 items-center gap-1.5 rounded-md bg-white/[0.035] px-2 text-2xs text-white/50">
+                  <span className="text-white/30">Tipo</span>
+                  <select value={detailMode} onChange={(e) => onPatch(item, { detail_mode: e.target.value })} className="bg-transparent outline-none">
+                    {Object.entries(DETAIL_MODE).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+                  </select>
+                  <ChevronDown size={13} />
+                </label>
+                {canUseSubtasks(detailMode) && (
+                  <button
+                    onClick={() => setAdding(true)}
+                    className="h-7 rounded-md bg-white/[0.025] px-2 text-2xs text-white/35 transition-colors hover:bg-white/[0.05] hover:text-white/65"
+                  >
+                    + Subtarefa
+                  </button>
+                )}
+              </div>
               <label className={`inline-flex h-7 shrink-0 items-center gap-1.5 rounded-md bg-white/[0.035] px-2 text-2xs ${priority.tone}`}>
                 <select value={item.priority || "normal"} onChange={(e) => onPatch(item, { priority: e.target.value })} className="bg-transparent outline-none">
                   {PRIORITY_ORDER.map((key) => <option key={key} value={key}>{PRIORITY[key].label}</option>)}
@@ -66,26 +92,44 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
               </label>
             </div>
 
-            <div className="space-y-0.5">
-              {children.map((child) => (
-                <ChecklistItemRow key={child.id} item={child} allItems={allItems} depth={depth + 1} users={users} cargos={cargos} onToggle={onToggle} onAddSub={onAddSub} onAssign={onAssign} onAssignCargo={onAssignCargo} onPatch={onPatch} onDelete={onDelete} />
-              ))}
-              {adding && (
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    if (!text.trim()) return;
-                    onAddSub(item, text);
-                    setText("");
-                    setAdding(false);
-                  }}
-                  className="ml-8 flex items-center gap-2 py-0.5"
-                >
-                  <Circle size={13} className="text-white/35" />
-                  <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Subtarefa..." className="min-w-0 flex-1 bg-transparent text-xs text-white/70 outline-none placeholder:text-white/25" autoFocus />
-                </form>
-              )}
-            </div>
+            {canUseSubtasks(detailMode) && (
+              <div className="space-y-0.5">
+                {children.map((child) => (
+                  <ChecklistItemRow key={child.id} item={child} allItems={allItems} depth={depth + 1} users={users} cargos={cargos} onToggle={onToggle} onAddSub={onAddSub} onAssign={onAssign} onAssignCargo={onAssignCargo} onPatch={onPatch} onDelete={onDelete} />
+                ))}
+                {adding && (
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      if (!text.trim()) return;
+                      onAddSub(item, text);
+                      setText("");
+                      setAdding(false);
+                    }}
+                    className="ml-8 flex items-center gap-2 py-0.5"
+                  >
+                    <Circle size={13} className="text-white/35" />
+                    <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Subtarefa..." className="min-w-0 flex-1 bg-transparent text-xs text-white/70 outline-none placeholder:text-white/25" autoFocus />
+                  </form>
+                )}
+              </div>
+            )}
+
+            {canUseNotes(detailMode) && (
+              <label className="mt-2 block rounded-md border border-white/[0.055] bg-black/10 p-2 focus-within:border-primary/35">
+                <span className="mb-1.5 flex items-center gap-1.5 text-2xs font-medium uppercase tracking-[0.14em] text-white/32">
+                  <MessageSquareText size={13} /> Observacao
+                </span>
+                <textarea
+                  value={observation}
+                  onChange={(e) => setObservation(e.target.value)}
+                  onBlur={() => onPatch(item, { observation: observation.trim() })}
+                  rows={3}
+                  placeholder="Adicione um contexto, link, criterio de aprovacao ou briefing desta tarefa..."
+                  className="min-h-16 w-full resize-y bg-transparent text-sm leading-5 text-white/72 outline-none placeholder:text-white/25"
+                />
+              </label>
+            )}
 
             <div className="mt-2 grid gap-1.5 border-t border-white/[0.05] pt-2 sm:grid-cols-[minmax(0,0.85fr)_minmax(0,1.6fr)] sm:gap-0">
               <label className={`flex h-8 items-center gap-2 text-2xs ${overdue ? "text-primary" : soon ? "text-amber-300" : "text-white/58"}`}>

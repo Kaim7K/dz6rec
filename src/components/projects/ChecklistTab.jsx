@@ -100,6 +100,8 @@ export default function ChecklistTab({ project }) {
       text: line,
       completed: false,
       priority: "normal",
+      detail_mode: "subtasks",
+      observation: "",
       order: orderStart + index,
     })));
     const me = await apiClient.auth.me().catch(() => null);
@@ -128,7 +130,7 @@ export default function ChecklistTab({ project }) {
 
   const addSub = async (parent, text) => {
     if (!text.trim()) return;
-    await apiClient.entities.ChecklistItem.create({ section_id: parent.section_id, project_id: project.id, text: text.trim(), completed: false, priority: "normal", parent_id: parent.id, order: 0 });
+    await apiClient.entities.ChecklistItem.create({ section_id: parent.section_id, project_id: project.id, text: text.trim(), completed: false, priority: "normal", detail_mode: "subtasks", observation: "", parent_id: parent.id, order: 0 });
     load();
   };
 
@@ -143,7 +145,13 @@ export default function ChecklistTab({ project }) {
   const patchItem = async (item, patch) => {
     await apiClient.entities.ChecklistItem.update(item.id, patch);
     const me = await apiClient.auth.me().catch(() => null);
-    const changed = patch.priority ? `Prioridade definida em "${item.text}"` : `Prazo definido em "${item.text}"`;
+    const changed = patch.priority
+      ? `Prioridade definida em "${item.text}"`
+      : patch.detail_mode
+        ? `Formato definido em "${item.text}"`
+        : Object.prototype.hasOwnProperty.call(patch, "observation")
+          ? `Observacao atualizada em "${item.text}"`
+          : `Prazo definido em "${item.text}"`;
     await logActivity(project.id, changed, me?.full_name);
     load();
   };
@@ -203,6 +211,8 @@ export default function ChecklistTab({ project }) {
             order: item.order || 0,
             cargo: item.cargo || null,
             priority: item.priority || "normal",
+            detail_mode: item.detail_mode || "subtasks",
+            observation: item.observation || "",
           });
           idMap[item.id] = copied.id;
         }
@@ -215,6 +225,8 @@ export default function ChecklistTab({ project }) {
             order: item.order || 0,
             cargo: item.cargo || null,
             priority: item.priority || "normal",
+            detail_mode: item.detail_mode || "subtasks",
+            observation: item.observation || "",
           });
         }
       }

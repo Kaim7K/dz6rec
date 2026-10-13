@@ -67,7 +67,7 @@ export default function TrackRow({ track, project, queue, index, provided, progr
   };
 
   return (
-    <div ref={provided?.innerRef} {...(provided?.draggableProps || {})} className="group grid gap-3 border-b border-white/[0.045] py-4 last:border-b-0 lg:grid-cols-[3rem_1fr_6rem_9rem_18rem_2rem] lg:items-center">
+    <div ref={provided?.innerRef} {...(provided?.draggableProps || {})} className="group grid min-w-0 gap-3 border-b border-white/[0.045] py-4 last:border-b-0 lg:grid-cols-[3rem_minmax(0,1fr)_6rem_9rem_minmax(12rem,18rem)_2rem] lg:items-center">
       <div className="flex items-center gap-2 text-sm text-white/45">
         <button {...(provided?.dragHandleProps || {})} className="hidden shrink-0 cursor-grab touch-none text-white/18 opacity-0 transition group-hover:opacity-100 hover:text-white/55 active:cursor-grabbing lg:block" aria-label="Mover faixa">
           <GripVertical size={14} />

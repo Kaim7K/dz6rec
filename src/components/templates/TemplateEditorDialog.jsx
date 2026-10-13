@@ -29,9 +29,10 @@ export default function TemplateEditorDialog({ template, cargos, onClose, onSave
   const renameSection = async (s, name) => { if (!name.trim()) return; await apiClient.entities.ChecklistSection.update(s.id, { name }); load(); };
   const setSectionCargo = async (s, cargo) => { await apiClient.entities.ChecklistSection.update(s.id, { cargo: cargo || null }); load(); };
   const delSection = async (s) => { await apiClient.entities.ChecklistItem.deleteMany({ section_id: s.id }); await apiClient.entities.ChecklistSection.delete(s.id); load(); };
-  const addItem = async (sid, text) => { if (!text.trim()) return; await apiClient.entities.ChecklistItem.create({ section_id: sid, text, completed: false, order: sectionItems(sid).filter((i) => !i.parent_id).length }); load(); };
-  const addSub = async (parent, text) => { await apiClient.entities.ChecklistItem.create({ section_id: parent.section_id, text, completed: false, parent_id: parent.id, order: 0 }); load(); };
+  const addItem = async (sid, text) => { if (!text.trim()) return; await apiClient.entities.ChecklistItem.create({ section_id: sid, text, completed: false, detail_mode: "subtasks", observation: "", order: sectionItems(sid).filter((i) => !i.parent_id).length }); load(); };
+  const addSub = async (parent, text) => { await apiClient.entities.ChecklistItem.create({ section_id: parent.section_id, text, completed: false, detail_mode: "subtasks", observation: "", parent_id: parent.id, order: 0 }); load(); };
   const setItemCargo = async (item, cargo) => { await apiClient.entities.ChecklistItem.update(item.id, { cargo: cargo || null }); load(); };
+  const patchItem = async (item, patch) => { await apiClient.entities.ChecklistItem.update(item.id, patch); load(); };
   const delItem = async (item) => { if (items.some((i) => i.parent_id === item.id)) await apiClient.entities.ChecklistItem.deleteMany({ parent_id: item.id }); await apiClient.entities.ChecklistItem.delete(item.id); load(); };
 
   return (
@@ -58,7 +59,7 @@ export default function TemplateEditorDialog({ template, cargos, onClose, onSave
                 </div>
                 <div className="space-y-1">
                   {sItems.filter((i) => !i.parent_id).map((item) => (
-                    <TemplateItemEditor key={item.id} item={item} allItems={sItems} depth={0} cargos={cargos} onAddSub={addSub} onSetCargo={setItemCargo} onDelete={delItem} />
+                    <TemplateItemEditor key={item.id} item={item} allItems={sItems} depth={0} cargos={cargos} onAddSub={addSub} onSetCargo={setItemCargo} onPatch={patchItem} onDelete={delItem} />
                   ))}
                 </div>
                 <form onSubmit={(e) => { e.preventDefault(); const f = e.target; addItem(s.id, f.text.value); f.reset(); }} className="mt-2 flex items-center gap-2">

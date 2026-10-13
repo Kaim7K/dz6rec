@@ -1,36 +1,65 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiClient } from "@/api/appClient";
 import { cargoList } from "@/lib/music";
 
-export const COLORS = ["#dc0000", "#b91c1c", "#991b1b", "#7f1d1d", "#ef4444", "#d97706", "#a3a3a3", "#737373", "#525252", "#f5f5f5"];
+const FALLBACK_COLOR = "#DC0000";
+const HEX_COLOR = /^#[0-9A-F]{6}$/i;
 
-export const randomCargoColor = () => COLORS[Math.floor(Math.random() * COLORS.length)];
+const normalizeHexColor = (value) => {
+  const cleaned = String(value || "")
+    .trim()
+    .replace(/^#/, "")
+    .replace(/[^0-9a-f]/gi, "")
+    .slice(0, 6);
+
+  return `#${cleaned.padEnd(6, "0")}`.toUpperCase();
+};
+
+export const randomCargoColor = () => `#${Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, "0").toUpperCase()}`;
 
 export function ColorSelect({ value, onChange, triggerClassName = "" }) {
+  const normalizedValue = HEX_COLOR.test(value || "") ? value.toUpperCase() : normalizeHexColor(value || FALLBACK_COLOR);
+  const [draft, setDraft] = useState(normalizedValue);
+
+  useEffect(() => {
+    setDraft(normalizedValue);
+  }, [normalizedValue]);
+
+  const commit = (nextValue) => {
+    const normalized = HEX_COLOR.test(nextValue || "") ? nextValue.toUpperCase() : normalizeHexColor(nextValue || FALLBACK_COLOR);
+    setDraft(normalized);
+    onChange(normalized);
+  };
+
+  const handleTextChange = (event) => {
+    const nextValue = event.target.value.toUpperCase();
+    setDraft(nextValue);
+    if (HEX_COLOR.test(nextValue)) onChange(nextValue);
+  };
+
   return (
-    <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className={`h-10 min-w-[10.5rem] rounded-md border-white/[0.08] bg-white/[0.026] text-sm text-white ${triggerClassName}`}>
-        <span className="flex min-w-0 items-center gap-2">
-          <span className="h-4 w-4 shrink-0 rounded-full border border-white/20" style={{ backgroundColor: value }} />
-          <SelectValue />
-        </span>
-      </SelectTrigger>
-      <SelectContent>
-        {COLORS.map((hex) => (
-          <SelectItem key={hex} value={hex}>
-            <span className="flex items-center gap-2">
-              <span className="h-4 w-4 rounded-full border border-white/20" style={{ backgroundColor: hex }} />
-              <span className="font-mono text-xs uppercase">{hex}</span>
-            </span>
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <div className={`flex h-10 min-w-[12rem] items-center gap-2 rounded-md border border-white/[0.08] bg-white/[0.026] px-2 text-white transition-colors focus-within:border-primary/45 ${triggerClassName}`}>
+      <input
+        type="color"
+        value={normalizedValue}
+        onChange={(event) => commit(event.target.value)}
+        className="h-7 w-8 shrink-0 cursor-pointer rounded border-0 bg-transparent p-0"
+        aria-label="Escolher cor do cargo"
+      />
+      <Input
+        value={draft}
+        onChange={handleTextChange}
+        onBlur={() => commit(draft)}
+        placeholder="#DC0000"
+        maxLength={7}
+        className="h-8 min-w-0 flex-1 border-0 bg-transparent px-1 font-mono text-xs uppercase text-white shadow-none focus-visible:ring-0"
+        aria-label="Codigo hexadecimal da cor"
+      />
+    </div>
   );
 }
 
@@ -43,7 +72,7 @@ export default function EditCargoDialog({ cargo, onClose, onSaved }) {
     if (!name.trim() || loading) return;
     setLoading(true);
     const newName = name.trim();
-    await apiClient.entities.Cargo.update(cargo.id, { name: newName, color });
+    await apiClient.entities.Cargo.update(cargo.id, { name: newName, color: normalizeHexColor(color) });
     if (newName !== cargo.name) {
       // propaga o novo nome para perfis, seções e tarefas que usam o cargo
       const users = await apiClient.entities.User.list().catch(() => []);

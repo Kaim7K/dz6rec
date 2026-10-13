@@ -26,16 +26,16 @@ export default function TrackList({ project, tracks, onChanged, progressPct = 0 
   };
 
   return (
-    <section className="rounded-lg border border-white/[0.045] bg-[#090606] p-5">
-      <div className="mb-5 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+    <section className="min-w-0 rounded-lg border border-white/[0.045] bg-[#090606] p-4 sm:p-5">
+      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-center gap-3">
           <Music2 size={25} className="text-white" />
           <div>
             <h3 className="text-base font-bold text-white">Faixas</h3>
             <p className="text-sm text-white/45">{list.length} {list.length === 1 ? "faixa" : "faixas"} neste projeto</p>
           </div>
         </div>
-        <button onClick={() => setOpen(true)} className="inline-flex h-9 items-center gap-2 rounded-md bg-white/[0.05] px-3 text-sm font-bold text-white/78 transition-colors hover:bg-white/[0.08]"><Plus size={15} />Adicionar faixa</button>
+        <button onClick={() => setOpen(true)} className="dz-ghost-button h-9"><Plus size={15} />Adicionar faixa</button>
       </div>
       {list.length === 0 ? (
         <p className="border-y border-white/[0.05] py-8 text-center text-sm text-white/40">Nenhuma faixa ainda. Adicione a primeira.</p>
@@ -43,7 +43,7 @@ export default function TrackList({ project, tracks, onChanged, progressPct = 0 
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId="tracks">
             {(provided) => (
-              <div ref={provided.innerRef} {...provided.droppableProps}>
+              <div ref={provided.innerRef} {...provided.droppableProps} className="min-w-0">
                 <div className="hidden grid-cols-[3rem_1fr_6rem_9rem_18rem_2rem] border-b border-white/[0.055] px-0 pb-3 text-2xs font-bold uppercase tracking-[0.12em] text-white/42 lg:grid">
                   <span>#</span>
                   <span>Título</span>

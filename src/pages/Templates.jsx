@@ -37,12 +37,12 @@ export default function Templates() {
         <div className="dz-empty">Nenhum template ainda.</div>
       ) : (
         <div className="dz-card overflow-hidden">{templates.map((t) => (
-          <div key={t.id} className="dz-list-row group flex items-center justify-between px-4 py-3.5">
-            <div className="flex items-center gap-3">
+          <div key={t.id} className="dz-list-row group flex items-center justify-between gap-3 px-4 py-3.5">
+            <div className="flex min-w-0 items-center gap-3">
               <div className="grid h-10 w-10 place-items-center rounded-md bg-primary/12 text-primary ring-1 ring-primary/18"><LayoutTemplate size={18} /></div>
               <div><p className="font-medium text-white">{t.name}</p><p className="text-2xs text-white/40">Aplicável ao criar um projeto · editável</p></div>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex shrink-0 items-center gap-1">
               <button onClick={() => setEditing(t)} className="dz-icon-button h-8 w-8"><Pencil size={15} /></button>
               <button onClick={() => remove(t)} className="dz-icon-button h-8 w-8 hover:text-red-400"><Trash2 size={15} /></button>
             </div>

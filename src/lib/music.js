@@ -239,11 +239,11 @@ export async function applyTemplate(projectId, templateId, users = []) {
     const items = await apiClient.entities.ChecklistItem.filter({ section_id: s.id });
     const idMap = {};
     for (const it of items.filter((i) => !i.parent_id)) {
-      const ni = await apiClient.entities.ChecklistItem.create({ section_id: ns.id, project_id: projectId, text: it.text, completed: false, parent_id: null, order: it.order, cargo: it.cargo });
+      const ni = await apiClient.entities.ChecklistItem.create({ section_id: ns.id, project_id: projectId, text: it.text, completed: false, parent_id: null, order: it.order, cargo: it.cargo, priority: it.priority || "normal", detail_mode: it.detail_mode || "subtasks", observation: it.observation || "" });
       idMap[it.id] = ni.id;
     }
     for (const it of items.filter((i) => i.parent_id)) {
-      if (idMap[it.parent_id]) await apiClient.entities.ChecklistItem.create({ section_id: ns.id, project_id: projectId, text: it.text, completed: false, parent_id: idMap[it.parent_id], order: it.order, cargo: it.cargo });
+      if (idMap[it.parent_id]) await apiClient.entities.ChecklistItem.create({ section_id: ns.id, project_id: projectId, text: it.text, completed: false, parent_id: idMap[it.parent_id], order: it.order, cargo: it.cargo, priority: it.priority || "normal", detail_mode: it.detail_mode || "subtasks", observation: it.observation || "" });
     }
   }
 }
@@ -259,7 +259,7 @@ export async function applyDefaultTemplate(projectId, users = []) {
       order: si,
     });
     for (let ti = 0; ti < s.tasks.length; ti++) {
-      await apiClient.entities.ChecklistItem.create({ section_id: ns.id, project_id: projectId, text: s.tasks[ti], completed: false, parent_id: null, order: ti });
+      await apiClient.entities.ChecklistItem.create({ section_id: ns.id, project_id: projectId, text: s.tasks[ti], completed: false, parent_id: null, order: ti, detail_mode: "subtasks", observation: "" });
     }
   }
 }
