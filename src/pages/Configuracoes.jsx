@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { apiClient } from "@/api/appClient";
-import { Pencil, Plus, ShieldCheck, Shuffle, Trash2 } from "lucide-react";
+import { Loader2, Pencil, Plus, RefreshCw, ShieldCheck, Shuffle, Trash2 } from "lucide-react";
 import CargoBadge from "@/components/CargoBadge";
 import EditCargoDialog, { ColorSelect, randomCargoColor } from "@/components/cargos/EditCargoDialog";
 
@@ -11,6 +11,8 @@ export default function Configuracoes() {
   const [color, setColor] = useState(() => randomCargoColor());
   const [editCargo, setEditCargo] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [reloadSending, setReloadSending] = useState(false);
+  const [reloadMessage, setReloadMessage] = useState("");
 
   const load = () => {
     apiClient.auth.me().then((m) => { setMe(m); setLoading(false); }).catch(() => setLoading(false));
@@ -29,6 +31,24 @@ export default function Configuracoes() {
 
   const add = async (e) => { e.preventDefault(); if (!name.trim()) return; await apiClient.entities.Cargo.create({ name: name.trim(), color }); setName(""); setColor(randomCargoColor()); load(); };
   const remove = async (c) => { await apiClient.entities.Cargo.delete(c.id); load(); };
+  const requestGlobalReload = async () => {
+    if (reloadSending) return;
+    setReloadSending(true);
+    setReloadMessage("");
+    try {
+      await apiClient.entities.SystemFlag.create({
+        key: "global_reload",
+        nonce: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        requested_by_id: me?.id,
+        requested_by_name: me?.full_name || me?.email || "Superadmin",
+      });
+      setReloadMessage("Reload enviado para todos os usuarios.");
+    } catch (err) {
+      setReloadMessage(err.message || "Nao foi possivel enviar o reload.");
+    } finally {
+      setReloadSending(false);
+    }
+  };
 
   return (
     <div className="dz-page">
@@ -56,6 +76,18 @@ export default function Configuracoes() {
               <button onClick={() => remove(c)} aria-label="Excluir cargo" className="rounded-full p-1 text-white/30 transition-colors hover:bg-white/5 hover:text-red-400"><Trash2 size={13} /></button>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="dz-card max-w-xl p-5">
+        <h2 className="font-display text-lg font-bold text-white">Controle do painel</h2>
+        <p className="mt-1 text-sm text-white/45">Force a atualizacao da sessao de todos os usuarios conectados.</p>
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <button type="button" onClick={requestGlobalReload} disabled={reloadSending} className="dz-primary-button">
+            {reloadSending ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} />}
+            Recarregar todos
+          </button>
+          {reloadMessage && <p className="text-sm text-white/45">{reloadMessage}</p>}
         </div>
       </section>
 

@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { put } from "@vercel/blob";
-import { generateClientTokenFromReadWriteToken } from "@vercel/blob/client";
+import { handleUpload as handleBlobUpload } from "@vercel/blob/client";
 import formidable from "formidable";
 import { ensureDatabase, getSql } from "./_db.js";
 import {
@@ -469,33 +469,24 @@ async function handleUpload(req, res, sql) {
   }
 
   try {
-    if (body.type === "blob.upload-completed") {
-      return send(res, 200, { type: "blob.upload-completed", response: "ok" });
-    }
-
-    if (body.type !== "blob.generate-client-token") {
-      return send(res, 400, { error: "Evento de upload invalido" });
-    }
-
-    const pathname = body.payload?.pathname || "";
-    if (!pathname.startsWith("uploads/")) {
-      return send(res, 400, { error: "Caminho de upload invalido" });
-    }
-
-    const clientToken = await generateClientTokenFromReadWriteToken({
+    const jsonResponse = await handleBlobUpload({
+      body,
+      request: req,
       token: process.env.BLOB_READ_WRITE_TOKEN,
-      pathname,
-      access: "public",
-      allowedContentTypes: ["audio/*", "image/*", "video/*", "application/pdf", "application/octet-stream"],
-      maximumSizeInBytes: 1024 * 1024 * 1024,
-      addRandomSuffix: true,
-      tokenPayload: JSON.stringify({
-        clientPayload: body.payload?.clientPayload || null,
-        multipart: Boolean(body.payload?.multipart),
-      }),
+      onBeforeGenerateToken: async (pathname) => {
+        if (!pathname.startsWith("uploads/")) {
+          throw new Error("Caminho de upload invalido");
+        }
+        return {
+          access: "public",
+          allowedContentTypes: ["audio/*", "image/*", "video/*", "application/pdf", "application/octet-stream"],
+          maximumSizeInBytes: 1024 * 1024 * 1024,
+          addRandomSuffix: true,
+        };
+      },
     });
 
-    return send(res, 200, { type: "blob.generate-client-token", clientToken });
+    return send(res, 200, jsonResponse);
   } catch (error) {
     console.error("Blob client token failed", error);
     return send(res, 400, { error: error.message || "Nao foi possivel preparar o upload" });
