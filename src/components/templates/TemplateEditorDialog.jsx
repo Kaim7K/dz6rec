@@ -44,9 +44,9 @@ export default function TemplateEditorDialog({ template, cargos, onClose, onSave
           {sections.map((s) => {
             const sItems = sectionItems(s.id);
             return (
-              <div key={s.id} className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4">
+              <div key={s.id} className="rounded-lg border border-white/[0.075] bg-white/[0.035] p-4">
                 <div className="mb-3 flex flex-wrap items-center gap-2">
-                  <input defaultValue={s.name} onBlur={(e) => { if (e.target.value !== s.name) renameSection(s, e.target.value); }} className="rounded-lg border border-transparent bg-white/[0.04] px-2.5 py-1 text-sm font-medium outline-none focus:border-white/15" />
+                  <input defaultValue={s.name} onBlur={(e) => { if (e.target.value !== s.name) renameSection(s, e.target.value); }} className="rounded-md border border-transparent bg-white/[0.045] px-2.5 py-1 text-sm font-medium outline-none transition-colors focus:border-primary/45" />
                   <CargoBadge cargo={s.cargo} cargos={cargos} />
                   <Select value={s.cargo || undefined} onValueChange={(v) => setSectionCargo(s, v === NONE ? null : v)}>
                     <SelectTrigger className="h-7 w-auto min-w-[5rem] border-white/[0.08] bg-white/[0.04] px-2 text-2xs text-white/45"><SelectValue placeholder="cargo" /></SelectTrigger>
@@ -70,8 +70,8 @@ export default function TemplateEditorDialog({ template, cargos, onClose, onSave
             );
           })}
           <form onSubmit={addSection} className="flex items-center gap-2">
-            <input value={newSection} onChange={(e) => setNewSection(e.target.value)} placeholder="Nova seção..." className="flex-1 rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 py-2.5 text-sm outline-none transition placeholder:text-white/30 focus:border-white/15" />
-            <button className="rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">Adicionar</button>
+            <input value={newSection} onChange={(e) => setNewSection(e.target.value)} placeholder="Nova seção..." className="dz-input flex-1 px-4 py-2.5" />
+            <button className="dz-primary-button h-10 px-4">Adicionar</button>
           </form>
         </div>
       </DialogContent>

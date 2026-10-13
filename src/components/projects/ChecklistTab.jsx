@@ -24,6 +24,7 @@ export default function ChecklistTab({ project }) {
   const [templateName, setTemplateName] = useState("");
   const [templateSaving, setTemplateSaving] = useState(false);
   const [templateMessage, setTemplateMessage] = useState("");
+  const [categoryResponsibleIds, setCategoryResponsibleIds] = useState({});
 
   const load = () => {
     apiClient.entities.ChecklistSection.filter({ project_id: project.id }).then((s) => setSections(s.sort((a, b) => a.order - b.order)));
@@ -61,6 +62,11 @@ export default function ChecklistTab({ project }) {
       .sort((a, b) => (sectionOrder[a.section_id] - sectionOrder[b.section_id]) || ((a.order || 0) - (b.order || 0)));
   };
 
+  const categoryAllItems = (categorySections) => {
+    const sectionIds = new Set(categorySections.map((section) => section.id));
+    return items.filter((item) => sectionIds.has(item.section_id));
+  };
+
   const onDragEnd = async (result) => {
     if (!result.destination || result.destination.droppableId !== result.source.droppableId || result.destination.index === result.source.index) return;
     const category = CATEGORIES.find((entry) => entry.key === result.source.droppableId);
@@ -91,11 +97,12 @@ export default function ChecklistTab({ project }) {
     load();
   };
 
-  const addItems = async (sectionId, text) => {
+  const addItems = async (sectionId, text, basePatch = {}) => {
     const lines = text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
     if (!lines.length) return;
     const orderStart = items.filter((i) => i.section_id === sectionId && !i.parent_id).length;
     await apiClient.entities.ChecklistItem.bulkCreate(lines.map((line, index) => ({
+      ...basePatch,
       section_id: sectionId,
       project_id: project.id,
       text: line,
@@ -117,7 +124,9 @@ export default function ChecklistTab({ project }) {
     if (!section) {
       section = await apiClient.entities.ChecklistSection.create({ project_id: project.id, name: category.label, category: category.key, order: sections.length });
     }
-    await addItems(section.id, lines.join("\n"));
+    const user = users.find((entry) => entry.id === categoryResponsibleIds[category.key]);
+    const basePatch = user ? responsiblePatch([user.id], [user.full_name || user.email], null) : {};
+    await addItems(section.id, lines.join("\n"), basePatch);
   };
 
   const toggle = async (item) => {
@@ -218,11 +227,12 @@ export default function ChecklistTab({ project }) {
   const assignCategoryResponsible = async (category, userId) => {
     const user = users.find((entry) => entry.id === userId);
     if (!user) return;
+    setCategoryResponsibleIds((current) => ({ ...current, [category.key]: userId }));
     const categorySections = sections.filter((section) => sectionCategory(section) === category.key);
-    const categoryItems = categoryParentItems(categorySections);
+    const categoryItems = categoryAllItems(categorySections);
     const updates = categoryItems.map((item) => {
-      const nextIds = [...new Set([...taskResponsibleIds(item), user.id])].slice(0, 2);
-      const nextNames = [...new Set([...taskResponsibleNames(item), user.full_name || user.email])].slice(0, 2);
+      const nextIds = [user.id, ...taskResponsibleIds(item).filter((id) => id !== user.id)].slice(0, 2);
+      const nextNames = [user.full_name || user.email, ...taskResponsibleNames(item).filter((name) => name !== (user.full_name || user.email))].slice(0, 2);
       return { id: item.id, ...responsiblePatch(nextIds, nextNames, item.cargo || null) };
     });
     if (!updates.length) return;
@@ -331,7 +341,7 @@ export default function ChecklistTab({ project }) {
               </div>
 
               <div className="mb-3">
-                <Select onValueChange={(userId) => assignCategoryResponsible(category, userId)}>
+                <Select value={categoryResponsibleIds[category.key] || undefined} onValueChange={(userId) => assignCategoryResponsible(category, userId)}>
                   <SelectTrigger className="h-8 w-full border-white/[0.075] bg-white/[0.035] text-xs text-white/62">
                     <SelectValue placeholder={`Responsavel para ${category.label}`} />
                   </SelectTrigger>

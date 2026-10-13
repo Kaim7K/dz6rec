@@ -485,7 +485,7 @@ async function handleUpload(req, res, sql) {
         return {
           access: "public",
           allowedContentTypes: ["audio/*", "image/*", "video/*", "application/pdf", "application/octet-stream"],
-          maximumSizeInBytes: 1024 * 1024 * 1024,
+          maximumSizeInBytes: 5 * 1024 * 1024 * 1024 * 1024,
           addRandomSuffix: true,
         };
       },

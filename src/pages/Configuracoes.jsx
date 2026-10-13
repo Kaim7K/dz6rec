@@ -58,7 +58,7 @@ export default function Configuracoes() {
         <h2 className="font-display text-lg font-bold text-white">Cargos & badges</h2>
         <p className="mt-1 text-sm text-white/45">Defina os cargos da equipe. Eles aparecem como badges ao atribuir tarefas e nos perfis.</p>
         <form onSubmit={add} className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Novo cargo (ex. Produtor Musical)" className="h-11 flex-1 rounded-md border border-white/[0.08] bg-white/[0.04] px-4 text-sm outline-none transition focus:border-primary/45" />
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Novo cargo (ex. Produtor Musical)" className="dz-input h-11 flex-1 px-4" />
           <div className="flex items-center gap-2">
             <ColorSelect value={color} onChange={setColor} />
             <button type="button" onClick={() => setColor(randomCargoColor())} className="dz-icon-button h-10 w-10" aria-label="Sortear cor">
@@ -92,7 +92,7 @@ export default function Configuracoes() {
       </section>
 
       <section className="max-w-xl space-y-2.5">{["Notificações", "Preferências da equipe", "Integrações"].map((s) => (
-        <div key={s} className="flex items-center justify-between rounded-2xl border border-white/[0.07] bg-white/[0.025] p-4 shadow-soft">
+        <div key={s} className="dz-card flex items-center justify-between p-4">
           <div><p className="text-sm font-medium text-white">{s}</p><p className="text-2xs text-white/40">Em breve</p></div>
           <span className="rounded-full bg-white/[0.04] px-2.5 py-1 text-2xs text-white/35">em breve</span>
         </div>

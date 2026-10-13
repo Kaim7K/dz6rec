@@ -99,7 +99,7 @@ export default function Users() {
           <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar por nome ou e-mail..." className="dz-input w-full pl-9" />
         </div>
         <Select value={filterCargo} onValueChange={setFilterCargo}>
-          <SelectTrigger className="h-10 w-full rounded-md border-white/[0.08] bg-white/[0.026] text-sm text-white sm:w-56"><SelectValue placeholder="Filtrar por cargo" /></SelectTrigger>
+          <SelectTrigger className="h-10 w-full rounded-md text-sm text-white sm:w-56"><SelectValue placeholder="Filtrar por cargo" /></SelectTrigger>
           <SelectContent className="border-stage-border bg-stage-card text-stage-ink">
             <SelectItem value={ALL}>Todos os cargos</SelectItem>
             {cargos.map((c) => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}
@@ -110,7 +110,7 @@ export default function Users() {
       <form onSubmit={invite} className="dz-card flex flex-col gap-2.5 p-3.5 sm:flex-row sm:items-center">
         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@gravadora.com" required className="dz-input flex-1" />
         <Select value={inviteCargo} onValueChange={setInviteCargo}>
-          <SelectTrigger className="h-10 w-full rounded-md border-white/[0.08] bg-white/[0.026] text-sm text-white sm:w-48"><SelectValue placeholder="Cargo (opcional)" /></SelectTrigger>
+          <SelectTrigger className="h-10 w-full rounded-md text-sm text-white sm:w-48"><SelectValue placeholder="Cargo (opcional)" /></SelectTrigger>
           <SelectContent className="border-stage-border bg-stage-card text-stage-ink">{cargos.map((c) => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}</SelectContent>
         </Select>
         <button disabled={sending} className="dz-primary-button disabled:opacity-60">
@@ -120,7 +120,7 @@ export default function Users() {
       {msg && <p className="text-body text-stage-muted">{msg}</p>}
 
       <div className="dz-card overflow-hidden">
-        <div className={`hidden items-center gap-4 border-b border-white/[0.07] bg-white/[0.025] px-4 py-3 text-micro font-semibold uppercase tracking-wide text-stage-muted lg:grid ${GRID}`}>
+        <div className={`hidden items-center gap-4 border-b border-white/[0.07] bg-white/[0.035] px-4 py-3 text-micro font-semibold uppercase tracking-wide text-stage-muted lg:grid ${GRID}`}>
           <span>Usuário</span><span>E-mail</span><span>Cargos</span><span className="text-right">Ações</span>
         </div>
         {filtered.map((u) => (

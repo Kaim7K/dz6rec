@@ -4,10 +4,10 @@ export default function MetricStrip({ metrics }) {
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
       {metrics.map((metric) => (
-        <article key={metric.label} className="rounded-lg border border-white/[0.05] bg-white/[0.025] p-5">
-          <div className="flex items-center gap-5">
-            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-primary/14 text-primary">
-              {metric.icon && <metric.icon size={23} />}
+        <article key={metric.label} className="dz-card p-4 sm:p-5">
+          <div className="flex items-center gap-4">
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-md border border-primary/18 bg-primary/12 text-primary">
+              {metric.icon && <metric.icon size={21} />}
             </div>
             <div className="min-w-0">
               <p className="text-sm font-medium text-white/48">{metric.label}</p>

@@ -199,9 +199,9 @@
   }
 
   .dz-input {
-    @apply h-10 min-w-0 rounded-md border px-3 text-sm text-white outline-none placeholder:text-white/34 focus:border-primary/45 focus:bg-white/[0.045];
+    @apply h-10 min-w-0 rounded-md border px-3 text-sm text-white outline-none placeholder:text-white/36 focus:border-primary/50 focus:bg-white/[0.055];
     border-color: var(--line-soft);
-    background: rgba(255,255,255,0.032);
+    background: rgba(255,255,255,0.035);
   }
 
   .dz-list-row {

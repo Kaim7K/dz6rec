@@ -5,19 +5,19 @@ import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex min-w-0 items-center justify-center gap-2 rounded-md text-center text-sm font-semibold leading-5 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex min-w-0 items-center justify-center gap-2 rounded-md text-center text-sm font-semibold leading-5 transition-all duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/55 active:scale-[0.99] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground shadow-soft hover:bg-primary/90",
+          "bg-primary text-primary-foreground shadow-glow hover:bg-primary/90",
         destructive:
           "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
         outline:
-          "border border-white/[0.08] bg-white/[0.026] text-white/72 shadow-sm hover:bg-white/[0.05] hover:text-white",
+          "border border-white/[0.095] bg-white/[0.035] text-white/72 shadow-sm hover:border-white/[0.16] hover:bg-white/[0.06] hover:text-white",
         secondary:
           "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
-        ghost: "text-white/62 hover:bg-white/[0.045] hover:text-white",
+        ghost: "text-white/62 hover:bg-white/[0.055] hover:text-white",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {

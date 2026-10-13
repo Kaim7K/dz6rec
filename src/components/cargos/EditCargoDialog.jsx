@@ -42,7 +42,7 @@ export function ColorSelect({ value, onChange, triggerClassName = "" }) {
   };
 
   return (
-    <div className={`flex h-10 min-w-[12rem] items-center gap-2 rounded-md border border-white/[0.08] bg-white/[0.026] px-2 text-white transition-colors focus-within:border-primary/45 ${triggerClassName}`}>
+    <div className={`flex h-10 min-w-[12rem] items-center gap-2 rounded-md border border-white/[0.095] bg-white/[0.035] px-2 text-white shadow-sm transition-colors focus-within:border-primary/50 focus-within:bg-white/[0.055] ${triggerClassName}`}>
       <input
         type="color"
         value={normalizedValue}

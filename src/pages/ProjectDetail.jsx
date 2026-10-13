@@ -99,7 +99,7 @@ export default function ProjectDetail() {
               <DeleteProjectButton
                 project={project}
                 onDeleted={() => navigate("/projetos")}
-                className="h-9 border border-white/[0.07] bg-white/[0.025] px-3 text-sm font-medium text-white/62 hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-200"
+                className="h-9 border border-white/[0.09] bg-white/[0.035] px-3 text-sm font-medium text-white/62 hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-200"
               >
                 <Trash2 size={14} />Excluir projeto
               </DeleteProjectButton>
@@ -113,7 +113,7 @@ export default function ProjectDetail() {
       </section>
 
       <Tabs defaultValue="faixas" className="min-w-0 pt-1">
-        <TabsList className="h-auto w-full justify-start gap-1 overflow-x-auto overscroll-x-contain rounded-lg border border-white/[0.075] bg-white/[0.025] p-1">
+        <TabsList className="h-auto w-full justify-start gap-1 overflow-x-auto overscroll-x-contain rounded-lg border border-white/[0.085] bg-white/[0.035] p-1 shadow-soft">
           {tabs.map(([v, label, Icon]) => <TabsTrigger key={v} value={v} className="shrink-0 gap-2 rounded-md border border-transparent bg-transparent px-3 py-2 text-sm font-semibold text-white/48 transition-colors data-[state=active]:border-white/[0.08] data-[state=active]:bg-white/[0.07] data-[state=active]:text-white"><Icon size={16} />{label}</TabsTrigger>)}
         </TabsList>
         <TabsContent value="operacao" className="mt-5"><ProjectWorkspace project={project} sections={sections} items={items} files={files} onChanged={load} /></TabsContent>

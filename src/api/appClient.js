@@ -6,6 +6,7 @@
   resetMockStore,
   setMockProfileId,
 } from "@/api/mockData";
+import { upload } from "@vercel/blob/client";
 
 const TOKEN_KEY = "dz6_access_token";
 const ENTITY_POLL_INTERVAL = 1200;
@@ -125,7 +126,42 @@ function uploadRequest(path, form, onProgress) {
   });
 }
 
+function safeUploadPath(file) {
+  const rawName = file?.name || "arquivo";
+  const normalized = rawName
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9._-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 120);
+  return `uploads/${Date.now()}-${normalized || "arquivo"}`;
+}
+
+async function uploadDirectToBlob(file, onProgress) {
+  const token = getToken();
+  const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
+  const blob = await upload(safeUploadPath(file), file, {
+    access: "public",
+    handleUploadUrl: "/api/upload",
+    headers,
+    contentType: file.type || "application/octet-stream",
+    multipart: true,
+    onUploadProgress: ({ percentage }) => onProgress?.(Math.round(percentage || 0)),
+  });
+  onProgress?.(100);
+  return { file_url: blob.url };
+}
+
 async function uploadFileRequest(file, onProgress) {
+  if (!isLocalMockEnabled()) {
+    try {
+      return await uploadDirectToBlob(file, onProgress);
+    } catch (error) {
+      if (error?.status !== 503 && !String(error?.message || "").includes("BLOB_READ_WRITE_TOKEN")) {
+        throw error;
+      }
+    }
+  }
   const form = new FormData();
   form.append("file", file);
   return uploadRequest("/api/upload", form, onProgress);
