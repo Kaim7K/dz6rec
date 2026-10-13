@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { apiClient } from "@/api/appClient";
 import { Bell, ChevronDown, LogOut, Menu, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/lib/AuthContext";
+import { PERMISSAO, cargoList } from "@/lib/music";
 
 function LocalMockSwitcher() {
   if (!apiClient.localMock.enabled()) return null;
@@ -43,12 +45,15 @@ function LocalMockSwitcher() {
 export default function Topbar({ onMenu }) {
   const [panel, setPanel] = useState(null);
   const [query, setQuery] = useState("");
-  const [me, setMe] = useState(null);
   const [notifs, setNotifs] = useState([]);
+  const { user: me } = useAuth();
   const navigate = useNavigate();
 
   const loadNotifs = (user) => {
-    if (!user) return;
+    if (!user) {
+      setNotifs([]);
+      return;
+    }
     apiClient.entities.Notification.list("-created_date", 40)
       .then((n) => setNotifs(n.filter((x) => x.user_id === user.id)))
       .catch(() => {});
@@ -56,13 +61,10 @@ export default function Topbar({ onMenu }) {
 
   useEffect(() => {
     let unsub = null;
-    apiClient.auth.me().then((m) => {
-      setMe(m);
-      loadNotifs(m);
-      try { unsub = apiClient.entities.Notification.subscribe(() => loadNotifs(m)); } catch {}
-    }).catch(() => {});
+    loadNotifs(me);
+    try { unsub = apiClient.entities.Notification.subscribe(() => loadNotifs(me)); } catch {}
     return () => { if (unsub) unsub(); };
-  }, []);
+  }, [me]);
 
   const unread = notifs.filter((n) => !n.read).length;
   const results = [{ label: "Projetos", to: "/projetos" }, { label: "Artistas", to: "/artistas" }, { label: "Meus trabalhos", to: "/minhas-tarefas" }, { label: "Templates", to: "/templates" }].filter((i) => query && i.label.toLowerCase().includes(query.toLowerCase()));
@@ -73,6 +75,7 @@ export default function Topbar({ onMenu }) {
     if (n.link) navigate(n.link);
   };
   const initials = (me?.full_name || me?.email || "U")[0].toUpperCase();
+  const profileLabel = cargoList(me?.cargo)[0] || PERMISSAO[me?.permissao] || "Equipe DZ6";
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-white/[0.065] bg-background/82 px-4 backdrop-blur-xl sm:px-5 lg:px-8">
@@ -100,16 +103,18 @@ export default function Topbar({ onMenu }) {
         <div className="mx-2 hidden h-8 w-px bg-white/[0.08] sm:block" />
         <div className="relative">
           <button onClick={() => setPanel(panel === "profile" ? null : "profile")} className="flex items-center gap-3 rounded-xl py-1 pl-1 pr-2 hover:bg-white/5">
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-primary text-sm font-bold text-primary-foreground shadow-glow">{initials}</span>
+            <span className="grid h-9 w-9 place-items-center overflow-hidden rounded-full bg-primary text-sm font-bold text-primary-foreground shadow-glow">
+              {me?.photo_url ? <img src={me.photo_url} alt="" className="h-full w-full object-cover" /> : initials}
+            </span>
             <span className="hidden text-left sm:block">
               <span className="block text-sm font-semibold text-white/88">{me?.full_name?.split(" ")[0] || "Conta"}</span>
-              <span className="block text-xs text-white/38">DZ6 Gravadora</span>
+              <span className="block max-w-36 truncate text-xs text-white/38">{profileLabel}</span>
             </span>
             <ChevronDown size={15} className="hidden text-white/45 sm:block" />
           </button>
           {panel === "profile" && (
             <div className="absolute right-0 mt-2 w-56 overflow-hidden rounded-2xl border border-white/[0.08] bg-popover p-1.5 shadow-pop">
-              <div className="border-b border-white/[0.06] px-3 py-2.5"><p className="text-sm font-medium text-white">{me?.full_name || "Equipe DZ6"}</p><p className="truncate text-2xs text-white/40">{me?.email}</p></div>
+              <div className="border-b border-white/[0.06] px-3 py-2.5"><p className="text-sm font-medium text-white">{me?.full_name || "Equipe DZ6"}</p><p className="truncate text-2xs text-white/40">{me?.email}</p><p className="mt-1 truncate text-2xs text-white/35">{profileLabel}</p></div>
               <button onClick={() => apiClient.auth.logout("/login")} className="mt-1 flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-white/75 hover:bg-white/5 hover:text-white"><LogOut size={15} />Sair</button>
             </div>
           )}

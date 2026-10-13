@@ -40,7 +40,7 @@ export default function FileField({ value, onChange, accept = "image/*", hint, l
       onDragOver={(e) => { e.preventDefault(); setOver(true); }}
       onDragLeave={() => setOver(false)}
       onDrop={(e) => { e.preventDefault(); setOver(false); const f = e.dataTransfer.files?.[0]; if (f) onChange(f); }}
-      className={cn("flex cursor-pointer items-center gap-3 rounded-lg border border-dashed px-3 py-3 transition-colors", box)}
+      className={cn("flex w-full min-w-0 cursor-pointer items-center gap-3 rounded-lg border border-dashed px-3 py-3 transition-colors", box)}
     >
       <input ref={inputRef} type="file" accept={accept} className="hidden" onChange={(e) => onChange(e.target.files?.[0] || null)} />
       {value ? (
@@ -54,12 +54,12 @@ export default function FileField({ value, onChange, accept = "image/*", hint, l
             <p className={cn("truncate text-sm", nameCls)}>{value.name}</p>
             <p className={cn("text-2xs", metaCls)}>{formatSize(value.size)}</p>
           </div>
-          <button type="button" onClick={clear} aria-label="Remover arquivo" className={cn("rounded-full p-1.5 transition-colors", clearCls)}><X size={14} /></button>
+          <button type="button" onClick={clear} aria-label="Remover arquivo" className={cn("shrink-0 rounded-full p-1.5 transition-colors", clearCls)}><X size={14} /></button>
         </>
       ) : (
         <>
           <span className={cn("grid h-10 w-10 shrink-0 place-items-center rounded-md", light ? "bg-stage-accent-soft text-stage-accent" : "bg-white/[0.05] text-white/45")}><Upload size={15} /></span>
-          <div>
+          <div className="min-w-0">
             <p className={cn("text-sm", promptCls)}>Clique para selecionar ou arraste</p>
             {hint && <p className={cn("text-2xs", metaCls)}>{hint}</p>}
           </div>

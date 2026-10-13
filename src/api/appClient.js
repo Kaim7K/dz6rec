@@ -36,6 +36,51 @@ async function request(path, options = {}) {
   return data;
 }
 
+function uploadRequest(path, form, onProgress) {
+  if (isLocalMockEnabled() && path.startsWith("/api/")) {
+    onProgress?.(100);
+    return mockRequest(path, { method: "POST", body: form });
+  }
+
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", path);
+    xhr.timeout = 120000;
+    const token = getToken();
+    if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+
+    xhr.upload.onprogress = (event) => {
+      if (!event.lengthComputable) return;
+      onProgress?.(Math.round((event.loaded / event.total) * 100));
+    };
+    xhr.onload = () => {
+      let data = {};
+      try {
+        data = JSON.parse(xhr.responseText || "{}");
+      } catch {
+        const error = new Error("O servidor de upload retornou uma resposta invalida");
+        error.status = xhr.status;
+        error.data = { raw: xhr.responseText };
+        reject(error);
+        return;
+      }
+      if (xhr.status >= 200 && xhr.status < 300) {
+        onProgress?.(100);
+        resolve(data);
+        return;
+      }
+      const error = new Error(data.error || data.message || "Erro na requisicao");
+      error.status = xhr.status;
+      error.data = data;
+      reject(error);
+    };
+    xhr.onerror = () => reject(new Error("Falha no upload"));
+    xhr.ontimeout = () => reject(new Error("Tempo limite do upload excedido"));
+    xhr.onabort = () => reject(new Error("Upload cancelado"));
+    xhr.send(form);
+  });
+}
+
 function entityClient(entity) {
   return {
     list: (sort, limit) => {
@@ -125,14 +170,14 @@ export const apiClient = {
     },
   },
   users: {
-    inviteUser: (email, role = "user") => request("/api/users/invite", { method: "POST", body: JSON.stringify({ email, role }) }),
+    inviteUser: (email, role = "user", cargo) => request("/api/users/invite", { method: "POST", body: JSON.stringify({ email, role, cargo }) }),
   },
   integrations: {
     Core: {
-      UploadFile: async ({ file }) => {
+      UploadFile: async ({ file, onProgress }) => {
         const form = new FormData();
         form.append("file", file);
-        return request("/api/upload", { method: "POST", body: form });
+        return uploadRequest("/api/upload", form, onProgress);
       },
     },
   },

@@ -25,6 +25,10 @@ export const config = {
 
 const userFields = ["role", "permissao", "full_name", "cargo", "handle", "status", "photo_url"];
 
+function isSuperadmin(user) {
+  return user?.permissao === "superadmin";
+}
+
 function pathParts(req) {
   const url = new URL(req.url, "http://localhost");
   return url.pathname.replace(/^\/api\/?/, "").split("/").filter(Boolean);
@@ -165,7 +169,7 @@ async function handleGoogleAuth(req, res, subAction, sql) {
     const firstUser = countRows[0].count === 0;
     rows = await sql`
       INSERT INTO app_users (id, email, role, permissao, full_name, cargo, status, photo_url)
-      VALUES (${id("usr")}, ${profile.email}, ${firstUser ? "admin" : "user"}, ${firstUser ? "superadmin" : "membro"}, ${profile.name || null}, '[]'::jsonb, 'ativo', ${profile.picture || null})
+      VALUES (${id("usr")}, ${profile.email}, ${firstUser ? "admin" : "user"}, ${firstUser ? "superadmin" : "membro"}, ${profile.name || null}, '[]'::jsonb, ${firstUser ? "ativo" : "pendente"}, ${profile.picture || null})
       RETURNING *
     `;
   } else {
@@ -218,7 +222,7 @@ async function handleAuth(req, res, action, subAction, sql) {
     const hash = await bcrypt.hash(password, 12);
     const rows = await sql`
       INSERT INTO app_users (id, email, password_hash, role, permissao, full_name, cargo, status)
-      VALUES (${userId}, ${email}, ${hash}, ${firstUser ? "admin" : "user"}, ${firstUser ? "superadmin" : "membro"}, ${full_name || null}, '[]'::jsonb, 'ativo')
+      VALUES (${userId}, ${email}, ${hash}, ${firstUser ? "admin" : "user"}, ${firstUser ? "superadmin" : "membro"}, ${full_name || null}, '[]'::jsonb, ${firstUser ? "ativo" : "pendente"})
       RETURNING *
     `;
     return send(res, 201, { access_token: signToken(rows[0]), user: publicUser(rows[0]) });
@@ -264,13 +268,15 @@ async function handleAuth(req, res, action, subAction, sql) {
 
 async function handleUsers(req, res, action, sql) {
   if (action === "invite" && req.method === "POST") {
-    const { email, role = "user" } = await readJson(req);
+    const actor = await currentUser(req, sql);
+    if (!isSuperadmin(actor)) return send(res, 403, { error: "Apenas superadmins podem convidar usuarios" });
+    const { email, role = "user", cargo } = await readJson(req);
     if (!email) return send(res, 400, { error: "Email is required" });
     const existing = await sql`SELECT * FROM app_users WHERE lower(email) = lower(${email}) LIMIT 1`;
     if (existing.length) return send(res, 200, publicUser(existing[0]));
     const rows = await sql`
       INSERT INTO app_users (id, email, role, permissao, cargo, status)
-      VALUES (${id("usr")}, ${email}, ${role}, 'membro', '[]'::jsonb, 'ativo')
+      VALUES (${id("usr")}, ${email}, ${role}, 'membro', ${JSON.stringify(cargo ? [cargo] : [])}::jsonb, 'ativo')
       RETURNING *
     `;
     return send(res, 201, publicUser(rows[0]));
@@ -285,16 +291,23 @@ async function handleEntities(req, res, parts, sql) {
   if (!entity) return send(res, 400, { error: "Entity is required" });
 
   if (entity === "User") {
+    const actor = await currentUser(req, sql);
     if (req.method === "GET" && !entityId) {
       const sort = new URL(req.url, "http://localhost").searchParams.get("sort");
       return send(res, 200, await listUsers(sql, sort));
     }
     if (req.method === "GET" && entityId) return send(res, 200, await getUser(sql, entityId));
+    if (!isSuperadmin(actor)) return send(res, 403, { error: "Apenas superadmins podem gerenciar usuarios" });
     if (req.method === "PATCH" && entityId) return send(res, 200, await updateUser(sql, entityId, await readJson(req)));
     if (req.method === "DELETE" && entityId) {
       await sql`DELETE FROM app_users WHERE id = ${entityId}`;
       return send(res, 200, { ok: true });
     }
+  }
+
+  if (entity === "Cargo" && req.method !== "GET") {
+    const actor = await currentUser(req, sql);
+    if (!isSuperadmin(actor)) return send(res, 403, { error: "Apenas superadmins podem configurar cargos" });
   }
 
   if (req.method === "GET" && entityId) {
@@ -429,6 +442,7 @@ export default async function handler(req, res) {
     if (parts[0] === "auth") return handleAuth(req, res, parts[1], parts[2], sql);
     const user = await currentUser(req, sql);
     if (!user) return send(res, 401, { error: "Authentication required" });
+    if (user.status !== "ativo") return send(res, 403, { error: "Seu acesso ainda nao foi aprovado" });
     if (parts[0] === "users") return handleUsers(req, res, parts[1], sql);
     if (parts[0] === "entities") return handleEntities(req, res, parts, sql);
     if (parts[0] === "upload") return handleUpload(req, res);

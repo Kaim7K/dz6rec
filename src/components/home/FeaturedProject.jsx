@@ -6,7 +6,7 @@ import dz6ProfileLogo from "@/assets/dz6-profile.png";
 
 function Cover({ project }) {
   return (
-    <div className="h-[var(--home-cover)] w-[var(--home-cover)] overflow-hidden rounded-md bg-black">
+    <div className="aspect-square w-full max-w-[var(--home-cover)] overflow-hidden rounded-md bg-black">
       <img src={project.cover_url || dz6ProfileLogo} className="h-full w-full object-cover" alt="" />
     </div>
   );
@@ -23,17 +23,17 @@ export default function FeaturedProject({ project, progress }) {
   return (
     <section className="relative overflow-hidden rounded-lg border border-white/[0.055] bg-white/[0.025] p-5">
       <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(255,255,255,0.035),rgba(255,255,255,0.006)_60%)]" />
-      <div className="relative grid gap-5 [--home-cover:12rem] lg:grid-cols-[var(--home-cover)_minmax(0,1fr)_17.5rem] lg:items-stretch">
+      <div className="relative grid min-w-0 gap-5 [--home-cover:12rem] lg:grid-cols-[minmax(10rem,var(--home-cover))_minmax(0,1fr)_minmax(13rem,17.5rem)] lg:items-start">
         <Cover project={project} />
 
-        <div className="flex min-w-0 flex-col justify-between py-0.5 lg:h-[var(--home-cover)]">
+        <div className="flex min-w-0 flex-col justify-between gap-5 py-0.5">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <span className={`h-1.5 w-1.5 rounded-full ${tone.dot}`} />
               <span className={`text-2xs font-bold uppercase tracking-[0.18em] ${tone.text}`}>{STATUS[project.status]}</span>
               <span className="text-2xs uppercase tracking-[0.18em] text-white/26">· {TYPE[project.type]}</span>
             </div>
-            <h2 className="mt-2 truncate font-display text-[2rem] font-bold leading-[1.05] tracking-tight text-white">{project.name}</h2>
+            <h2 className="mt-2 break-words font-display text-2xl font-bold leading-[1.05] tracking-tight text-white sm:text-[2rem]">{project.name}</h2>
             <p className="mt-1.5 text-sm text-white/52">{project.main_artist_name || "Sem artista"}</p>
           </div>
 
@@ -51,7 +51,7 @@ export default function FeaturedProject({ project, progress }) {
           </div>
         </div>
 
-        <dl className="grid content-center gap-5 border-t border-white/[0.055] pt-5 lg:border-l lg:border-t-0 lg:pl-9 lg:pt-0">
+        <dl className="grid min-w-0 content-center gap-5 border-t border-white/[0.055] pt-5 lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0 xl:pl-9">
           <div className="flex gap-4">
             <UserRound size={19} className="mt-1 text-white/45" />
             <div>

@@ -19,7 +19,7 @@ export default function Configuracoes() {
   useEffect(() => { load(); }, []);
 
   if (loading) return <p className="text-white/40">Carregando...</p>;
-  if (me?.role !== "admin") return (
+  if (me?.permissao !== "superadmin") return (
     <div className="dz-card mx-auto max-w-md p-7 text-center">
       <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-white/[0.05]"><ShieldCheck className="text-white/50" /></div>
       <h1 className="mt-4 font-display text-2xl font-medium text-white">Área restrita</h1>

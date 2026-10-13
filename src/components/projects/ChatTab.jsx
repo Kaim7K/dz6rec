@@ -131,7 +131,7 @@ export default function ChatTab({ project }) {
   });
 
   return (
-    <div className="flex h-[32rem] flex-col overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.03]">
+    <div className="flex h-[min(32rem,calc(100svh-12rem))] min-h-[24rem] flex-col overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.03]">
       <div className="flex items-center gap-3 border-b border-white/[0.06] px-4 py-3">
         {participants.length > 0 && (
           <div className="flex -space-x-2.5">
@@ -156,7 +156,7 @@ export default function ChatTab({ project }) {
           const tokens = tokensByMsg[m.id] || [];
           if (mine) return (
             <div key={r.key} className={`flex items-end justify-end gap-2.5 ${first ? "pt-2" : ""}`}>
-              <div className="flex max-w-[75%] flex-col items-end">
+              <div className="flex max-w-[88%] flex-col items-end sm:max-w-[75%]">
                 {first && <p className="px-1 text-2xs font-medium text-white/45">Você · {format(d, "HH:mm")}</p>}
                 <div className={`${first ? "mt-1" : ""} rounded-2xl bg-primary px-3.5 py-2 text-sm text-primary-foreground ${last ? "" : "rounded-br-md"}`}>{renderText(m.text, tokens, "font-semibold text-white")}</div>
               </div>
@@ -166,7 +166,7 @@ export default function ChatTab({ project }) {
           return (
             <div key={r.key} className={`flex items-end gap-2.5 ${first ? "pt-2" : ""}`}>
               {first ? <ChatAvatar name={name} photoUrl={sender.photo_url} size={28} /> : <span className="w-7" />}
-              <div className="flex min-w-0 max-w-[75%] flex-col items-start">
+              <div className="flex min-w-0 max-w-[88%] flex-col items-start sm:max-w-[75%]">
                 {first && <p className="px-1 text-2xs"><span className="font-medium text-white/85">{name}</span><span className="text-white/35"> · {format(d, "HH:mm")}</span></p>}
                 <div className={`${first ? "mt-1" : ""} rounded-2xl border border-white/[0.06] bg-white/[0.04] px-3.5 py-2 text-sm text-white/85 ${last ? "" : "rounded-bl-md"}`}>{renderText(m.text, tokens, "font-semibold text-primary")}</div>
               </div>
@@ -177,7 +177,7 @@ export default function ChatTab({ project }) {
       </div>
       <form onSubmit={send} className="relative flex items-center gap-2 border-t border-white/[0.06] p-3">
         {mentionQuery !== null && mentionOptions.length > 0 && (
-          <div className="absolute bottom-full left-3 z-10 mb-2 w-72 overflow-hidden rounded-xl border border-white/[0.08] bg-popover p-1.5 shadow-pop">
+          <div className="absolute bottom-full left-3 right-3 z-10 mb-2 overflow-hidden rounded-xl border border-white/[0.08] bg-popover p-1.5 shadow-pop sm:right-auto sm:w-72">
             <p className="px-2 py-1 text-2xs font-medium uppercase tracking-[0.16em] text-white/35">Mencionar</p>
             <div className="max-h-52 overflow-y-auto">
               {mentionOptions.map((o) => (

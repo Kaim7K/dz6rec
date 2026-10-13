@@ -6,12 +6,14 @@ import DeleteUserButton from "@/components/users/DeleteUserButton";
 import ManageCargosDialog from "@/components/users/ManageCargosDialog";
 import { ActiveCargoChip, OrphanCargoChip } from "@/components/users/cargoChips";
 import { PERMISSAO, cargoList } from "@/lib/music";
-import { Loader2, Pencil, Plus, Search, ShieldCheck, Users as UsersIcon } from "lucide-react";
+import { Check, Loader2, Pencil, Plus, Search, ShieldCheck, Users as UsersIcon } from "lucide-react";
+import { useAuth } from "@/lib/AuthContext";
 
 const ALL = "__all__";
 const GRID = "sm:grid-cols-[minmax(0,2fr)_minmax(0,2fr)_minmax(0,3fr)_auto]";
 
 export default function Users() {
+  const { checkUserAuth } = useAuth();
   const [users, setUsers] = useState([]);
   const [me, setMe] = useState(null);
   const [cargos, setCargos] = useState([]);
@@ -25,12 +27,12 @@ export default function Users() {
   const [editUser, setEditUser] = useState(null);
   const [cargoUser, setCargoUser] = useState(null);
 
-  const load = () => { Promise.all([apiClient.auth.me(), apiClient.entities.User.list(), apiClient.entities.Cargo.list()]).then(([m, u, c]) => { setMe(m); setUsers(u); setCargos(c); setLoading(false); }); };
+  const load = () => { Promise.all([apiClient.auth.me(), apiClient.entities.User.list(), apiClient.entities.Cargo.list()]).then(([m, u, c]) => { setMe(m); setUsers(u); setCargos(c); setLoading(false); checkUserAuth(); }); };
   useEffect(() => { load(); }, []);
 
   const invite = async (e) => {
     e.preventDefault(); setSending(true); setMsg("");
-    try { await apiClient.users.inviteUser(email, "user"); setMsg("Convite enviado com sucesso."); setEmail(""); setInviteCargo(""); }
+    try { await apiClient.users.inviteUser(email, "user", inviteCargo); setMsg("Convite enviado com sucesso."); setEmail(""); setInviteCargo(""); }
     catch (err) { setMsg(err.message || "Não foi possível enviar o convite."); }
     finally { setSending(false); }
   };
@@ -46,7 +48,7 @@ export default function Users() {
   }, [users, search, filterCargo]);
 
   if (loading) return <div className="grid min-h-[50vh] place-items-center"><Loader2 className="animate-spin text-stage-accent" /></div>;
-  if (me?.role !== "admin") return (
+  if (me?.permissao !== "superadmin") return (
     <div className="dz-card mx-auto max-w-md p-7 text-center">
       <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-stage-accent-soft"><ShieldCheck className="text-stage-accent" /></div>
       <h1 className="mt-4 font-jakarta text-title font-bold text-stage-ink">Área restrita</h1>
@@ -54,7 +56,17 @@ export default function Users() {
     </div>
   );
 
-  const activeCount = users.filter((u) => u.status !== "inativo").length;
+  const activeCount = users.filter((u) => u.status === "ativo").length;
+  const pendingCount = users.filter((u) => u.status === "pendente").length;
+  const approve = async (u) => {
+    await apiClient.entities.User.update(u.id, { status: "ativo" });
+    load();
+  };
+  const statusBadge = (status) => {
+    if (status === "pendente") return <span className="rounded-full bg-amber-500/15 px-1.5 py-0.5 text-micro font-medium text-amber-500">Pendente</span>;
+    if (status === "inativo") return <span className="rounded-full bg-stage-warn-soft px-1.5 py-0.5 text-micro font-medium text-stage-warn">Inativo</span>;
+    return null;
+  };
   const chipsFor = (u, list) => list.map((n) => (catalogNames.includes(n)
     ? <ActiveCargoChip key={n} name={n} />
     : <OrphanCargoChip key={n} name={n} />));
@@ -70,7 +82,7 @@ export default function Users() {
         <div>
           <p className="dz-kicker">Administração</p>
           <h1 className="dz-page-title">Usuários</h1>
-          <p className="dz-page-subtitle">{users.length} usuários · {activeCount} ativos</p>
+          <p className="dz-page-subtitle">{users.length} usuários · {activeCount} ativos{pendingCount ? ` · ${pendingCount} pendentes` : ""}</p>
         </div>
       </div>
 
@@ -111,7 +123,7 @@ export default function Users() {
               <div className="min-w-0">
                 <p className="flex items-center gap-1.5 truncate text-body font-semibold text-stage-ink">
                   {u.full_name || "Usuário"}
-                  {u.status === "inativo" && <span className="rounded-full bg-stage-warn-soft px-1.5 py-0.5 text-micro font-medium text-stage-warn">Inativo</span>}
+                  {statusBadge(u.status)}
                 </p>
                 <p className="text-micro text-stage-muted">{PERMISSAO[u.permissao] || "Membro"}</p>
               </div>
@@ -123,6 +135,7 @@ export default function Users() {
             <div className="flex flex-wrap gap-1.5">{chipsFor(u, cargoList(u.cargo))}</div>
             <div className="flex items-center justify-end gap-1">
               <button onClick={() => setCargoUser(u)} className="inline-flex h-8 items-center gap-1.5 rounded-md border border-stage-border bg-stage-card px-2.5 text-micro font-semibold text-stage-accent transition-colors hover:border-stage-accent/40 hover:bg-stage-accent-soft">Gerenciar Cargos</button>
+              {u.status === "pendente" && <button onClick={() => approve(u)} className="inline-flex h-8 items-center gap-1.5 rounded-md bg-emerald-600 px-2.5 text-micro font-semibold text-white transition-colors hover:bg-emerald-700"><Check size={14} />Aprovar</button>}
               <button onClick={() => setEditUser(u)} aria-label="Editar usuário" className="rounded-full p-2 text-stage-muted transition-colors hover:bg-stage-surface hover:text-stage-ink"><Pencil size={15} /></button>
               {u.id !== me.id && <DeleteUserButton user={u} onDeleted={load} />}
             </div>
@@ -139,7 +152,7 @@ export default function Users() {
               <div className="flex items-start gap-3">
                 <Avatar u={u} size="h-10 w-10" />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-body font-semibold text-stage-ink">{u.full_name || "Usuário"}</p>
+                  <p className="flex items-center gap-1.5 truncate text-body font-semibold text-stage-ink">{u.full_name || "Usuário"}{statusBadge(u.status)}</p>
                   <p className="truncate text-micro text-stage-muted">{u.email} · {PERMISSAO[u.permissao] || "Membro"}</p>
                 </div>
                 <button onClick={() => setEditUser(u)} aria-label="Editar usuário" className="rounded-full p-2 text-stage-muted transition-colors hover:bg-stage-surface hover:text-stage-ink"><Pencil size={15} /></button>
@@ -152,6 +165,7 @@ export default function Users() {
               <button onClick={() => setCargoUser(u)} className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-sl bg-stage-accent text-body font-semibold text-white transition-colors hover:bg-stage-accent/90">
                 <UsersIcon size={15} />Gerenciar Cargos
               </button>
+              {u.status === "pendente" && <button onClick={() => approve(u)} className="mt-2 flex h-11 w-full items-center justify-center gap-2 rounded-sl bg-emerald-600 text-body font-semibold text-white transition-colors hover:bg-emerald-700"><Check size={15} />Aprovar acesso</button>}
             </div>
           );
         })}

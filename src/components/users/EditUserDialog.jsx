@@ -47,7 +47,7 @@ export default function EditUserDialog({ user, cargos, onClose, onSaved }) {
             <Select value={permissao} onValueChange={setPermissao}><SelectTrigger className={selectCls}><SelectValue /></SelectTrigger><SelectContent className={contentCls}>{Object.entries(PERMISSAO).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}</SelectContent></Select>
           </Field>
           <Field label="Status">
-            <Select value={status} onValueChange={setStatus}><SelectTrigger className={selectCls}><SelectValue /></SelectTrigger><SelectContent className={contentCls}><SelectItem value="ativo">Ativo</SelectItem><SelectItem value="inativo">Inativo</SelectItem></SelectContent></Select>
+            <Select value={status} onValueChange={setStatus}><SelectTrigger className={selectCls}><SelectValue /></SelectTrigger><SelectContent className={contentCls}><SelectItem value="pendente">Pendente</SelectItem><SelectItem value="ativo">Ativo</SelectItem><SelectItem value="inativo">Inativo</SelectItem></SelectContent></Select>
           </Field>
           <Field label="@usuário"><Input value={handle} onChange={(e) => setHandle(e.target.value)} placeholder="handle" className={selectCls + " placeholder:text-stage-muted"} /></Field>
           <Field label="Foto de perfil">

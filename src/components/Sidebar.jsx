@@ -42,7 +42,7 @@ function NavItem({ label, to, Icon, onClose }) {
 
 export default function Sidebar({ open, onClose }) {
   const [isAdmin, setIsAdmin] = useState(false);
-  useEffect(() => { apiClient.auth.me().then((u) => setIsAdmin(u?.role === "admin")).catch(() => {}); }, []);
+  useEffect(() => { apiClient.auth.me().then((u) => setIsAdmin(u?.permissao === "superadmin")).catch(() => {}); }, []);
   const visible = items.filter((i) => !i.admin || isAdmin);
   const geral = visible.filter((i) => !i.admin);
   const admin = visible.filter((i) => i.admin);

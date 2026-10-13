@@ -171,8 +171,34 @@ export async function mockRequest(path, options = {}) {
   const parts = url.pathname.replace(/^\/api\/?/, "").split("/").filter(Boolean);
 
   if (parts[0] === "auth") {
-    if (parts[1] === "me" || parts[1] === "login" || parts[1] === "register") {
+    if (parts[1] === "me") {
       return clone(getCurrentUser());
+    }
+    if (parts[1] === "login") {
+      const body = options.body instanceof FormData ? {} : JSON.parse(options.body || "{}");
+      const store = getMockStore();
+      const user = store.User.find((entry) => entry.email?.toLowerCase() === body.email?.toLowerCase()) || getCurrentUser();
+      setMockProfileId(user.id);
+      return { access_token: "mock-token", user: clone(user) };
+    }
+    if (parts[1] === "register") {
+      const body = options.body instanceof FormData ? {} : JSON.parse(options.body || "{}");
+      const store = getMockStore();
+      const firstUser = !store.User.length;
+      const user = {
+        id: nextId("User"),
+        email: body.email,
+        full_name: body.full_name || "",
+        role: firstUser ? "admin" : "user",
+        permissao: firstUser ? "superadmin" : "membro",
+        cargo: [],
+        status: firstUser ? "ativo" : "pendente",
+        created_date: new Date().toISOString(),
+      };
+      store.User.push(user);
+      saveMockStore(store);
+      setMockProfileId(user.id);
+      return { access_token: "mock-token", user: clone(user) };
     }
     if (parts[1] === "google") return clone(getCurrentUser());
   }

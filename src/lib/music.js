@@ -217,8 +217,8 @@ export function usersForCargo(users, cargoName) {
   return users.filter((u) => cargoList(u.cargo).includes(cargoName));
 }
 
-export async function uploadFile(file) {
-  const { file_url } = await apiClient.integrations.Core.UploadFile({ file });
+export async function uploadFile(file, options = {}) {
+  const { file_url } = await apiClient.integrations.Core.UploadFile({ file, onProgress: options.onProgress });
   return file_url;
 }
 

@@ -49,7 +49,7 @@ export default function Artists() {
         ))}</div>
       )}
       <Dialog open={open} onOpenChange={setOpen}><DialogContent className="max-w-md"><DialogHeader><DialogTitle>Novo artista</DialogTitle></DialogHeader>
-        <form onSubmit={submit} className="space-y-4">
+        <form onSubmit={submit} className="min-w-0 space-y-4">
           <div className="space-y-1.5"><Label>Nome</Label><Input required value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="Nome do artista" /></div>
           <div className="space-y-1.5"><Label>@usuário</Label><Input value={form.handle} onChange={(e) => setForm((f) => ({ ...f, handle: e.target.value }))} placeholder="handle" /></div>
           <div className="space-y-1.5"><Label>Foto</Label><FileField value={photo} onChange={setPhoto} accept="image/*" hint="Retrato do artista" /></div>
