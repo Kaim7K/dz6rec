@@ -23,8 +23,8 @@ function NavItem({ label, to, Icon, onClose }) {
       onClick={onClose}
       className={({ isActive }) =>
         cn(
-          "group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
-          isActive ? "bg-primary/20 text-white shadow-[inset_0_0_0_1px_rgba(220,0,0,0.18)]" : "text-white/48 hover:bg-white/[0.03] hover:text-white/82"
+          "group relative flex items-center gap-3 rounded-md px-3 py-2.5 text-sm transition-colors",
+          isActive ? "bg-primary/16 text-white shadow-[inset_0_0_0_1px_rgba(220,0,0,0.22)]" : "text-white/50 hover:bg-white/[0.035] hover:text-white/82"
         )
       }
     >
@@ -49,7 +49,7 @@ export default function Sidebar({ open, onClose }) {
   return (
     <>
       {open && <button className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm lg:hidden" onClick={onClose} aria-label="Fechar menu" />}
-      <aside className={cn("fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-white/[0.045] bg-[#070606]/95 backdrop-blur-xl transition-transform duration-300 lg:translate-x-0", open ? "translate-x-0" : "-translate-x-full")}>
+      <aside className={cn("fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-white/[0.055] bg-[#070606]/96 backdrop-blur-xl transition-transform duration-300 lg:translate-x-0", open ? "translate-x-0" : "-translate-x-full")}>
         <div className="flex h-20 items-center justify-between px-5">
           <div className="flex items-center gap-3">
             <span className="grid h-12 w-12 place-items-center overflow-hidden rounded-md bg-black">
@@ -60,7 +60,7 @@ export default function Sidebar({ open, onClose }) {
               <span className="block text-[0.58rem] font-bold uppercase tracking-[0.28em] text-white/35">Gravadora</span>
             </span>
           </div>
-          <button onClick={onClose} className="rounded-lg p-1.5 text-white/40 hover:bg-white/5 hover:text-white lg:hidden"><X size={18} /></button>
+          <button onClick={onClose} className="rounded-md p-1.5 text-white/40 hover:bg-white/5 hover:text-white lg:hidden"><X size={18} /></button>
         </div>
         <nav className="flex-1 overflow-y-auto px-4 py-3">
           <p className="px-3 pb-3 pt-1 text-2xs font-bold uppercase tracking-[0.22em] text-white/28">Geral</p>
@@ -74,7 +74,7 @@ export default function Sidebar({ open, onClose }) {
           )}
         </nav>
         <div className="px-4 py-5">
-          <div className="relative overflow-hidden rounded-lg border border-primary/20 bg-primary/10 px-4 py-5">
+          <div className="relative overflow-hidden rounded-md border border-primary/18 bg-primary/[0.08] px-4 py-5">
             <div className="absolute bottom-5 right-0 flex h-10 items-end gap-0.5 opacity-30">
               {[16, 24, 18, 30, 22, 36, 20, 28, 34, 18, 25, 31].map((height, index) => <span key={index} className="w-0.5 rounded-full bg-primary" style={{ height }} />)}
             </div>

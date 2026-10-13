@@ -9,6 +9,50 @@
 import { upload as uploadBlobClient } from "@vercel/blob/client";
 
 const TOKEN_KEY = "dz6_access_token";
+const ENTITY_POLL_INTERVAL = 1200;
+const realtimeChannel = typeof BroadcastChannel !== "undefined" ? new BroadcastChannel("dz6-entity-events") : null;
+
+function emitEntityChange(entity) {
+  const payload = { entity, at: Date.now() };
+  realtimeChannel?.postMessage(payload);
+  window.dispatchEvent(new CustomEvent("dz6:entity-change", { detail: payload }));
+}
+
+function subscribeEntity(entity, callback, interval = ENTITY_POLL_INTERVAL) {
+  let stopped = false;
+  let timer = null;
+  const notify = () => {
+    if (!stopped && document.visibilityState !== "hidden") callback?.();
+  };
+  const schedule = () => {
+    timer = window.setInterval(notify, interval);
+  };
+  const onLocal = (event) => {
+    if (!event.detail?.entity || event.detail.entity === entity) notify();
+  };
+  const onRemote = (event) => {
+    if (!event.data?.entity || event.data.entity === entity) notify();
+  };
+  const onFocus = () => notify();
+  const onVisibility = () => {
+    if (document.visibilityState === "visible") notify();
+  };
+
+  schedule();
+  window.addEventListener("dz6:entity-change", onLocal);
+  window.addEventListener("focus", onFocus);
+  document.addEventListener("visibilitychange", onVisibility);
+  realtimeChannel?.addEventListener("message", onRemote);
+
+  return () => {
+    stopped = true;
+    if (timer) window.clearInterval(timer);
+    window.removeEventListener("dz6:entity-change", onLocal);
+    window.removeEventListener("focus", onFocus);
+    document.removeEventListener("visibilitychange", onVisibility);
+    realtimeChannel?.removeEventListener("message", onRemote);
+  };
+}
 
 function getToken() {
   return localStorage.getItem(TOKEN_KEY);
@@ -124,6 +168,12 @@ async function uploadFileRequest(file, onProgress) {
 }
 
 function entityClient(entity) {
+  const write = async (promise) => {
+    const result = await promise;
+    emitEntityChange(entity);
+    return result;
+  };
+
   return {
     list: (sort, limit) => {
       const params = new URLSearchParams();
@@ -138,14 +188,14 @@ function entityClient(entity) {
       if (limit) params.set("limit", String(limit));
       return request(`/api/entities/${entity}?${params}`);
     },
-    create: (data) => request(`/api/entities/${entity}`, { method: "POST", body: JSON.stringify(data) }),
-    bulkCreate: (items) => request(`/api/entities/${entity}/bulk`, { method: "POST", body: JSON.stringify({ items }) }),
-    update: (id, data) => request(`/api/entities/${entity}/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
-    bulkUpdate: (items) => request(`/api/entities/${entity}/bulk`, { method: "PATCH", body: JSON.stringify({ items }) }),
-    updateMany: (where, patch) => request(`/api/entities/${entity}/many`, { method: "PATCH", body: JSON.stringify({ where, patch }) }),
-    delete: (id) => request(`/api/entities/${entity}/${id}`, { method: "DELETE" }),
-    deleteMany: (where) => request(`/api/entities/${entity}/many`, { method: "DELETE", body: JSON.stringify({ where }) }),
-    subscribe: () => () => {},
+    create: (data) => write(request(`/api/entities/${entity}`, { method: "POST", body: JSON.stringify(data) })),
+    bulkCreate: (items) => write(request(`/api/entities/${entity}/bulk`, { method: "POST", body: JSON.stringify({ items }) })),
+    update: (id, data) => write(request(`/api/entities/${entity}/${id}`, { method: "PATCH", body: JSON.stringify(data) })),
+    bulkUpdate: (items) => write(request(`/api/entities/${entity}/bulk`, { method: "PATCH", body: JSON.stringify({ items }) })),
+    updateMany: (where, patch) => write(request(`/api/entities/${entity}/many`, { method: "PATCH", body: JSON.stringify({ where, patch }) })),
+    delete: (id) => write(request(`/api/entities/${entity}/${id}`, { method: "DELETE" })),
+    deleteMany: (where) => write(request(`/api/entities/${entity}/many`, { method: "DELETE", body: JSON.stringify({ where }) })),
+    subscribe: (callback, options = {}) => subscribeEntity(entity, callback, options.interval),
   };
 }
 

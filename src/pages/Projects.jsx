@@ -49,7 +49,7 @@ export default function Projects() {
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
-              className={`rounded-md px-3 py-1.5 text-xs transition-colors ${statusFilter === status ? "bg-white/10 text-white" : "bg-white/[0.025] text-white/45 hover:bg-white/[0.05] hover:text-white/75"}`}
+              className={`rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${statusFilter === status ? "border-primary/30 bg-primary/12 text-white" : "border-white/[0.06] bg-white/[0.02] text-white/48 hover:border-white/[0.12] hover:bg-white/[0.045] hover:text-white/75"}`}
             >
               {status === "todos" ? "Todos" : STATUS[status] || status}
             </button>
@@ -71,7 +71,7 @@ export default function Projects() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
           {visibleProjects.map((p) => <ProjectCard key={p.id} project={p} progress={byP[p.id]} onEdit={setEditing} onDeleted={load} />)}
         </div>
       )}

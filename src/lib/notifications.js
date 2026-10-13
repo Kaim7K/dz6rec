@@ -1,77 +1,82 @@
 import { apiClient } from "@/api/appClient";
 import { usersForCargo } from "@/lib/music";
 
-// Envia uma notificação para uma lista de ids de usuários (deduplicada, sem o autor)
 export async function notifyUsers(userIds, { text, projectId, link }, excludeId = null) {
   const ids = [...new Set((userIds || []).filter(Boolean).filter((id) => id !== excludeId))];
   if (!ids.length) return;
-  await apiClient.entities.Notification.bulkCreate(ids.map((user_id) => ({ user_id, text, project_id: projectId, link })));
+  await apiClient.entities.Notification.bulkCreate(ids.map((user_id) => ({ user_id, text, project_id: projectId, link, read: false })));
 }
 
-// Extrai menções @Nome de um texto — resolve pessoas (por nome, @handle ou e-mail) e cargos (todos do cargo)
 export function parseMentions(text, users = [], cargos = []) {
   const out = { users: [], tokens: [] };
   const lower = (text || "").toLowerCase();
   if (!lower.includes("@")) return out;
 
   const candidates = [];
-  for (const u of users) {
-    for (const label of [u.full_name, u.handle, u.email]) {
-      if (label) candidates.push({ label: String(label), user: u });
+  for (const user of users) {
+    for (const label of [user.full_name, user.handle, user.email]) {
+      if (label) candidates.push({ label: String(label), user });
     }
   }
-  for (const c of cargos) if (c?.name) candidates.push({ label: c.name, cargo: c.name });
+  for (const cargo of cargos) {
+    if (cargo?.name) candidates.push({ label: cargo.name, cargo: cargo.name });
+  }
   candidates.sort((a, b) => b.label.length - a.label.length);
 
   const seenIds = new Set();
   const seenTokens = new Set();
   const taken = [];
-  const addPerson = (u) => {
-    if (u?.id && !seenIds.has(u.id)) { seenIds.add(u.id); out.users.push(u); }
+  const addPerson = (user) => {
+    if (user?.id && !seenIds.has(user.id)) {
+      seenIds.add(user.id);
+      out.users.push(user);
+    }
   };
 
-  for (const cand of candidates) {
-    const token = "@" + cand.label;
-    const tl = token.toLowerCase();
-    let idx = lower.indexOf(tl);
-    while (idx !== -1) {
-      const end = idx + token.length;
-      const nextOk = end === lower.length || !/[a-z0-9à-ÿ]/.test(lower[end]);
-      const free = !taken.some(([a, b]) => idx < b && end > a);
+  for (const candidate of candidates) {
+    const token = `@${candidate.label}`;
+    const tokenLower = token.toLowerCase();
+    let index = lower.indexOf(tokenLower);
+    while (index !== -1) {
+      const end = index + token.length;
+      const nextOk = end === lower.length || !/[\p{L}\p{N}_-]/u.test(lower[end]);
+      const free = !taken.some(([start, finish]) => index < finish && end > start);
       if (nextOk && free) {
-        taken.push([idx, end]);
-        if (cand.user) addPerson(cand.user);
-        else usersForCargo(users, cand.cargo).forEach(addPerson);
-        if (!seenTokens.has(token)) { seenTokens.add(token); out.tokens.push(token); }
+        taken.push([index, end]);
+        if (candidate.user) addPerson(candidate.user);
+        else usersForCargo(users, candidate.cargo).forEach(addPerson);
+        if (!seenTokens.has(token)) {
+          seenTokens.add(token);
+          out.tokens.push(token);
+        }
       }
-      idx = lower.indexOf(tl, idx + 1);
+      index = lower.indexOf(tokenLower, index + 1);
     }
   }
   return out;
 }
 
-// Quando todos os itens de uma seção ficam concluídos, notifica os responsáveis da próxima seção
 export async function notifyNextStage({ project, sectionId, toggledItemId, items, sections, users, excludeUserId }) {
   try {
-    const sectionItems = items.filter((i) => i.section_id === sectionId && !i.parent_id);
+    const sectionItems = items.filter((item) => item.section_id === sectionId && !item.parent_id);
     if (!sectionItems.length) return;
-    if (!sectionItems.every((i) => i.completed || i.id === toggledItemId)) return;
+    if (!sectionItems.every((item) => item.completed || item.id === toggledItemId)) return;
 
     const sorted = [...sections].sort((a, b) => (a.order || 0) - (b.order || 0));
-    const done = sorted.find((s) => s.id === sectionId);
+    const done = sorted.find((section) => section.id === sectionId);
     if (!done) return;
 
-    const sectionComplete = (s) => {
-      const its = items.filter((i) => i.section_id === s.id && !i.parent_id);
-      return its.length > 0 && its.every((i) => i.completed);
+    const sectionComplete = (section) => {
+      const sectionTasks = items.filter((item) => item.section_id === section.id && !item.parent_id);
+      return sectionTasks.length > 0 && sectionTasks.every((item) => item.completed);
     };
-    const next = sorted.find((s) => (s.order || 0) > (done.order || 0) && !sectionComplete(s));
+    const next = sorted.find((section) => (section.order || 0) > (done.order || 0) && !sectionComplete(section));
     if (!next) return;
 
     const ids = [...(next.responsible_ids || [])];
-    usersForCargo(users, next.cargo).forEach((u) => ids.push(u.id));
+    usersForCargo(users, next.cargo).forEach((user) => ids.push(user.id));
     await notifyUsers(ids, {
-      text: `Etapa "${done.name}" concluída em "${project.name}" — "${next.name}" é a próxima.`,
+      text: `Etapa "${done.name}" concluida em "${project.name}" - "${next.name}" e a proxima.`,
       projectId: project.id,
       link: `/projetos/${project.id}`,
     }, excludeUserId);

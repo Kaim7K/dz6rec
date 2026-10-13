@@ -9,9 +9,9 @@ import { isOverdue, STATUS, STATUS_TONE, taskScore } from "@/lib/music";
 
 function Panel({ title, action = "Ver todos", children }) {
   return (
-    <section className="min-h-[14.4rem] rounded-lg border border-white/[0.055] bg-white/[0.022] p-5">
+    <section className="dz-card min-h-[14.4rem] p-4 sm:p-5">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-bold tracking-tight text-white">{title}</h2>
+        <h2 className="dz-panel-title">{title}</h2>
         <Link to="/projetos" className="inline-flex items-center gap-2 text-xs font-medium text-white/45 transition-colors hover:text-white">
           {action} <ArrowRight size={13} />
         </Link>
@@ -23,7 +23,7 @@ function Panel({ title, action = "Ver todos", children }) {
 
 function MiniCover({ project }) {
   return (
-    <div className="h-12 w-12 shrink-0 overflow-hidden rounded-md bg-black">
+    <div className="h-12 w-12 shrink-0 overflow-hidden rounded-md border border-white/[0.06] bg-black">
       <img src={project.cover_url || dz6ProfileLogo} alt="" className="h-full w-full object-cover" />
     </div>
   );
@@ -33,7 +33,7 @@ function ActionIcon({ index }) {
   const icons = [Image, UsersRound, Megaphone, Music2];
   const Icon = icons[index % icons.length];
   return (
-    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-md bg-white/[0.055] text-white/70">
+    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md border border-white/[0.06] bg-white/[0.035] text-white/64">
       <Icon size={20} />
     </span>
   );
@@ -43,13 +43,13 @@ function ActionRow({ task, project, index }) {
   const status = /capa|aprovar|aprovação|revisar|validar/i.test(task.text || "") ? "Aguardando aprovação" : "Planejamento";
   const warn = status.includes("aprovação");
   return (
-    <Link to={task.project_id ? `/projetos/${task.project_id}` : "/minhas-tarefas"} className="flex items-center gap-4 border-b border-white/[0.055] py-2.5 last:border-b-0">
+    <Link to={task.project_id ? `/projetos/${task.project_id}` : "/minhas-tarefas"} className="dz-list-row flex items-center gap-3 py-2.5">
       <ActionIcon index={index} />
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-bold text-white/88">{task.text}</p>
         <p className="mt-1 truncate text-xs text-white/42">{project?.name || "Projeto"} - {project?.main_artist_name || "DZ6"}</p>
       </div>
-      <span className={`rounded-full px-4 py-2 text-xs font-bold ${warn ? "bg-yellow-500/18 text-yellow-300" : "bg-white/[0.055] text-white/62"}`}>{status}</span>
+      <span className={`hidden rounded-md px-2.5 py-1 text-xs font-bold sm:inline-flex ${warn ? "bg-yellow-500/15 text-yellow-300" : "bg-white/[0.04] text-white/62"}`}>{status}</span>
     </Link>
   );
 }
@@ -57,13 +57,13 @@ function ActionRow({ task, project, index }) {
 function ProjectRow({ project }) {
   const tone = STATUS_TONE[project.status] || STATUS_TONE.rascunho;
   return (
-    <Link to={`/projetos/${project.id}`} className="flex items-center gap-4 border-b border-white/[0.055] py-2.5 last:border-b-0">
+    <Link to={`/projetos/${project.id}`} className="dz-list-row flex items-center gap-3 py-2.5">
       <MiniCover project={project} />
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-bold text-white/88">{project.name}</p>
         <p className="mt-1 truncate text-xs text-white/42">{project.main_artist_name || "Sem artista"}</p>
       </div>
-      <span className={`rounded-full px-4 py-2 text-xs font-medium ${tone.bg} ${tone.text}`}>{STATUS[project.status] || project.status}</span>
+      <span className={`hidden rounded-md px-2.5 py-1 text-xs font-medium sm:inline-flex ${tone.bg} ${tone.text}`}>{STATUS[project.status] || project.status}</span>
     </Link>
   );
 }
@@ -108,14 +108,14 @@ export default function Home() {
 
   if (error) {
     return (
-      <div className="max-w-lg rounded-lg border border-white/[0.055] bg-white/[0.025] p-5">
+      <div className="dz-card max-w-lg p-5">
         <h1 className="font-display text-2xl font-bold text-white">Não foi possível carregar o painel</h1>
         <p className="mt-2 text-sm text-white/50">{error}</p>
       </div>
     );
   }
 
-  if (!data) return <p className="text-white/40">Carregando...</p>;
+  if (!data) return <p className="text-sm text-white/40">Carregando...</p>;
 
   const metrics = [
     { label: "Projetos ativos", value: data.active, icon: FolderKanban },
@@ -124,7 +124,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <FeaturedProject project={data.featured} progress={data.byProject[data.featured?.id]} />
       <MetricStrip metrics={metrics} />
 

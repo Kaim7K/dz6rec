@@ -96,10 +96,10 @@ export default function Users() {
       <div className="dz-card flex flex-col gap-2.5 p-3 sm:flex-row">
         <div className="relative flex-1">
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-stage-muted" />
-          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar por nome ou e-mail..." className="h-10 w-full rounded-sl border border-stage-border bg-stage-card pl-9 pr-3 text-body text-stage-ink outline-none transition placeholder:text-stage-muted focus:border-stage-accent/50" />
+          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar por nome ou e-mail..." className="h-10 w-full rounded-md border border-white/[0.08] bg-white/[0.026] pl-9 pr-3 text-sm text-white outline-none transition placeholder:text-white/34 focus:border-primary/45" />
         </div>
         <Select value={filterCargo} onValueChange={setFilterCargo}>
-          <SelectTrigger className="h-10 w-full rounded-sl border-stage-border bg-stage-card text-body text-stage-ink sm:w-56"><SelectValue placeholder="Filtrar por cargo" /></SelectTrigger>
+          <SelectTrigger className="h-10 w-full rounded-md border-white/[0.08] bg-white/[0.026] text-sm text-white sm:w-56"><SelectValue placeholder="Filtrar por cargo" /></SelectTrigger>
           <SelectContent className="border-stage-border bg-stage-card text-stage-ink">
             <SelectItem value={ALL}>Todos os cargos</SelectItem>
             {cargos.map((c) => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}
@@ -108,18 +108,18 @@ export default function Users() {
       </div>
 
       <form onSubmit={invite} className="dz-card flex flex-col gap-2.5 p-3 sm:flex-row sm:items-center">
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@gravadora.com" required className="h-10 flex-1 rounded-sl border border-stage-border bg-stage-surface px-3 text-body text-stage-ink outline-none transition placeholder:text-stage-muted focus:border-stage-accent/50" />
+        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@gravadora.com" required className="h-10 flex-1 rounded-md border border-white/[0.08] bg-white/[0.026] px-3 text-sm text-white outline-none transition placeholder:text-white/34 focus:border-primary/45" />
         <Select value={inviteCargo} onValueChange={setInviteCargo}>
-          <SelectTrigger className="h-10 w-full rounded-sl border-stage-border bg-stage-surface text-body text-stage-ink sm:w-48"><SelectValue placeholder="Cargo (opcional)" /></SelectTrigger>
+          <SelectTrigger className="h-10 w-full rounded-md border-white/[0.08] bg-white/[0.026] text-sm text-white sm:w-48"><SelectValue placeholder="Cargo (opcional)" /></SelectTrigger>
           <SelectContent className="border-stage-border bg-stage-card text-stage-ink">{cargos.map((c) => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}</SelectContent>
         </Select>
-        <button disabled={sending} className="inline-flex h-10 items-center justify-center gap-2 rounded-sl bg-stage-accent px-4 text-body font-semibold text-white transition-colors hover:bg-stage-accent/90 disabled:opacity-60">
+        <button disabled={sending} className="dz-primary-button disabled:opacity-60">
           {sending ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />}Convidar
         </button>
       </form>
       {msg && <p className="text-body text-stage-muted">{msg}</p>}
 
-      <div className="overflow-hidden rounded-2xl border border-stage-border bg-stage-card shadow-soft">
+      <div className="dz-card overflow-hidden">
         <div className={`hidden items-center gap-4 border-b border-stage-border bg-stage-surface px-4 py-2.5 text-micro font-semibold uppercase tracking-wide text-stage-muted sm:grid ${GRID}`}>
           <span>Usuário</span><span>E-mail</span><span>Cargos</span><span className="text-right">Ações</span>
         </div>

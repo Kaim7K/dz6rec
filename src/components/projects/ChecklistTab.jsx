@@ -28,7 +28,15 @@ export default function ChecklistTab({ project }) {
     apiClient.entities.ChecklistItem.filter({ project_id: project.id }).then(setItems);
   };
 
-  useEffect(load, [project.id]);
+  useEffect(() => {
+    load();
+    const unsubItems = apiClient.entities.ChecklistItem.subscribe(() => load(), { interval: 1200 });
+    const unsubSections = apiClient.entities.ChecklistSection.subscribe(() => load(), { interval: 2500 });
+    return () => {
+      unsubItems();
+      unsubSections();
+    };
+  }, [project.id]);
   useEffect(() => {
     Promise.all([apiClient.entities.User.list().catch(() => []), apiClient.entities.Cargo.list().catch(() => [])]).then(([us, cs]) => {
       setUsers(us);
@@ -113,7 +121,7 @@ export default function ChecklistTab({ project }) {
   };
 
   const assign = async (item, user) => {
-    await apiClient.entities.ChecklistItem.update(item.id, { responsible_id: user?.id || null, responsible_name: user?.full_name || user?.email || null });
+    await apiClient.entities.ChecklistItem.update(item.id, { responsible_id: user?.id || null, responsible_name: user?.full_name || user?.email || null, cargo: user ? item.cargo || null : null });
     const me = await apiClient.auth.me().catch(() => null);
     await logActivity(project.id, `Responsável definido em "${item.text}": ${user?.full_name || "removido"}`, me?.full_name);
     if (user && user.id !== me?.id) await notifyUsers([user.id], { text: `Você foi atribuído à tarefa "${item.text}" em "${project.name}"`, projectId: project.id, link: `/projetos/${project.id}` });
@@ -121,7 +129,7 @@ export default function ChecklistTab({ project }) {
   };
 
   const assignCargo = async (item, cargoName) => {
-    await apiClient.entities.ChecklistItem.update(item.id, { cargo: cargoName || null });
+    await apiClient.entities.ChecklistItem.update(item.id, { cargo: cargoName || null, responsible_id: cargoName ? item.responsible_id || null : null, responsible_name: cargoName ? item.responsible_name || null : null });
     const me = await apiClient.auth.me().catch(() => null);
     await logActivity(project.id, cargoName ? `Cargo "${cargoName}" atribuído à tarefa "${item.text}"` : `Cargo removido da tarefa "${item.text}"`, me?.full_name);
     if (cargoName) await notifyUsers(usersForCargo(users, cargoName).map((u) => u.id), { text: `Você foi atribuído à tarefa "${item.text}" (${cargoName}) em "${project.name}"`, projectId: project.id, link: `/projetos/${project.id}` }, me?.id);

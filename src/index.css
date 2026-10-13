@@ -32,7 +32,7 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.55rem;
+    --radius: 0.5rem;
     --font-heading: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
     --font-body: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
     --font-display: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
@@ -65,6 +65,17 @@
       linear-gradient(180deg, rgba(255,255,255,0.012), transparent 20rem),
       hsl(var(--background));
   }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.014) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent 70%);
+  }
   h1, h2, h3, h4 {
     @apply font-display tracking-tight;
   }
@@ -87,20 +98,27 @@
   button, a, input, textarea, select {
     @apply transition-colors duration-200;
   }
+  input, textarea, select {
+    letter-spacing: 0;
+  }
 }
 
 @layer components {
   .dz-card {
-    @apply rounded-xl border border-white/[0.055] bg-white/[0.025] backdrop-blur;
-    background-image: linear-gradient(135deg, rgba(255,255,255,0.035), rgba(255,255,255,0.012));
+    @apply rounded-lg border border-white/[0.07] bg-white/[0.028] shadow-soft backdrop-blur;
+    background-image: linear-gradient(180deg, rgba(255,255,255,0.028), rgba(255,255,255,0.014));
   }
 
   .dz-card-soft {
-    @apply rounded-lg border border-white/[0.05] bg-white/[0.022];
+    @apply rounded-lg border border-white/[0.06] bg-white/[0.02] shadow-soft;
+  }
+
+  .dz-card-hover {
+    @apply transition-colors hover:border-white/[0.12] hover:bg-white/[0.04];
   }
 
   .dz-panel-title {
-    @apply font-display text-lg font-bold tracking-tight text-white;
+    @apply font-display text-base font-bold tracking-tight text-white;
   }
 
   .dz-kicker {
@@ -108,31 +126,47 @@
   }
 
   .dz-page {
-    @apply space-y-7 lg:space-y-8;
+    @apply space-y-5 lg:space-y-6;
   }
 
   .dz-page-head {
-    @apply flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between;
+    @apply flex flex-col gap-3 border-b border-white/[0.055] pb-5 sm:flex-row sm:items-end sm:justify-between;
   }
 
   .dz-page-title {
-    @apply mt-1.5 font-display text-2xl font-bold tracking-tight text-white sm:text-3xl;
+    @apply mt-1 font-display text-2xl font-bold tracking-tight text-white sm:text-[1.8rem] sm:leading-9;
   }
 
   .dz-page-subtitle {
-    @apply mt-1.5 max-w-2xl text-sm text-white/45;
+    @apply mt-1 max-w-2xl text-sm leading-6 text-white/48;
   }
 
   .dz-primary-button {
-    @apply inline-flex h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-60;
+    @apply inline-flex h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-bold text-primary-foreground shadow-soft transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-60;
   }
 
   .dz-ghost-button {
-    @apply inline-flex h-9 items-center justify-center gap-2 rounded-md border border-white/[0.06] bg-white/[0.02] px-3.5 text-sm font-medium text-white/72 transition-colors hover:bg-white/[0.05] hover:text-white;
+    @apply inline-flex h-9 items-center justify-center gap-2 rounded-md border border-white/[0.07] bg-white/[0.025] px-3.5 text-sm font-medium text-white/70 transition-colors hover:border-white/[0.12] hover:bg-white/[0.045] hover:text-white;
+  }
+
+  .dz-icon-button {
+    @apply grid h-9 w-9 shrink-0 place-items-center rounded-md border border-transparent text-white/45 transition-colors hover:border-white/[0.08] hover:bg-white/[0.045] hover:text-white;
+  }
+
+  .dz-input {
+    @apply h-10 rounded-md border border-white/[0.08] bg-white/[0.026] px-3 text-sm text-white outline-none placeholder:text-white/34 focus:border-primary/45 focus:bg-white/[0.04];
+  }
+
+  .dz-list-row {
+    @apply border-b border-white/[0.055] transition-colors last:border-b-0 hover:bg-white/[0.025];
+  }
+
+  .dz-pill {
+    @apply inline-flex h-7 items-center gap-1.5 rounded-md border border-white/[0.07] bg-white/[0.035] px-2.5 text-xs font-medium text-white/62;
   }
 
   .dz-empty {
-    @apply flex min-h-44 flex-col items-center justify-center gap-3 rounded-xl border border-white/[0.055] bg-white/[0.025] p-7 text-center text-sm text-white/40 backdrop-blur;
-    background-image: linear-gradient(135deg, rgba(255,255,255,0.035), rgba(255,255,255,0.012));
+    @apply flex min-h-44 flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-white/[0.08] bg-white/[0.02] p-7 text-center text-sm text-white/42 backdrop-blur;
+    background-image: linear-gradient(180deg, rgba(255,255,255,0.026), rgba(255,255,255,0.01));
   }
 }

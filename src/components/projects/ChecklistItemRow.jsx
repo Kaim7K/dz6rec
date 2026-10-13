@@ -81,14 +81,14 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
               )}
             </div>
 
-            <div className="mt-2 grid gap-1.5 border-t border-white/[0.05] pt-2 sm:grid-cols-[1fr_1.25fr] sm:gap-0">
+            <div className="mt-2 grid gap-1.5 border-t border-white/[0.05] pt-2 sm:grid-cols-[minmax(0,0.85fr)_minmax(0,1.6fr)] sm:gap-0">
               <label className={`flex h-8 items-center gap-2 text-2xs ${overdue ? "text-primary" : soon ? "text-amber-300" : "text-white/58"}`}>
                 <CalendarDays size={15} className="text-white/50" />
                 <span>{item.due_date ? dueLabel(item.due_date) : "Sem prazo"}</span>
                 <input type="date" value={item.due_date || ""} onChange={(e) => onPatch(item, { due_date: e.target.value || null })} className="w-5 bg-transparent text-transparent outline-none [color-scheme:dark]" aria-label={`Prazo de ${item.text}`} />
               </label>
-              <div className="flex h-8 items-center sm:border-l sm:border-white/[0.055] sm:pl-3">
-                <AssignResponsible item={item} users={users} cargos={cargos} onAssign={onAssign} onAssignCargo={onAssignCargo} className="h-7 border-0 bg-transparent px-0 text-2xs text-white/72" />
+              <div className="flex min-w-0 items-center sm:border-l sm:border-white/[0.055] sm:pl-3">
+                <AssignResponsible item={item} users={users} cargos={cargos} onAssign={onAssign} onAssignCargo={onAssignCargo} className="w-full justify-between" />
               </div>
             </div>
           </div>
