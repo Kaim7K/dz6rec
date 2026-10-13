@@ -6,6 +6,7 @@
   resetMockStore,
   setMockProfileId,
 } from "@/api/mockData";
+import { upload as uploadBlobClient } from "@vercel/blob/client";
 
 const TOKEN_KEY = "dz6_access_token";
 
@@ -79,6 +80,47 @@ function uploadRequest(path, form, onProgress) {
     xhr.onabort = () => reject(new Error("Upload cancelado"));
     xhr.send(form);
   });
+}
+
+function safeUploadName(name = "file") {
+  return name
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\w.-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 160) || "file";
+}
+
+async function blobUploadRequest(file, onProgress) {
+  if (isLocalMockEnabled()) {
+    onProgress?.(100);
+    const form = new FormData();
+    form.append("file", file);
+    return mockRequest("/api/upload", { method: "POST", body: form });
+  }
+
+  const token = getToken();
+  const blob = await uploadBlobClient(`uploads/${Date.now()}-${safeUploadName(file.name)}`, file, {
+    access: "public",
+    contentType: file.type || undefined,
+    handleUploadUrl: "/api/upload",
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    multipart: true,
+    onUploadProgress: ({ percentage }) => onProgress?.(Math.round(percentage)),
+  });
+  onProgress?.(100);
+  return { file_url: blob.url };
+}
+
+async function uploadFileRequest(file, onProgress) {
+  try {
+    return await blobUploadRequest(file, onProgress);
+  } catch (error) {
+    if (file.size > 3.5 * 1024 * 1024) throw error;
+    const form = new FormData();
+    form.append("file", file);
+    return uploadRequest("/api/upload", form, onProgress);
+  }
 }
 
 function entityClient(entity) {
@@ -175,9 +217,7 @@ export const apiClient = {
   integrations: {
     Core: {
       UploadFile: async ({ file, onProgress }) => {
-        const form = new FormData();
-        form.append("file", file);
-        return uploadRequest("/api/upload", form, onProgress);
+        return uploadFileRequest(file, onProgress);
       },
     },
   },

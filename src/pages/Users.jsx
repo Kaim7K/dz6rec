@@ -7,13 +7,11 @@ import ManageCargosDialog from "@/components/users/ManageCargosDialog";
 import { ActiveCargoChip, OrphanCargoChip } from "@/components/users/cargoChips";
 import { PERMISSAO, cargoList } from "@/lib/music";
 import { Check, Loader2, Pencil, Plus, Search, ShieldCheck, Users as UsersIcon } from "lucide-react";
-import { useAuth } from "@/lib/AuthContext";
 
 const ALL = "__all__";
 const GRID = "sm:grid-cols-[minmax(0,2fr)_minmax(0,2fr)_minmax(0,3fr)_auto]";
 
 export default function Users() {
-  const { checkUserAuth } = useAuth();
   const [users, setUsers] = useState([]);
   const [me, setMe] = useState(null);
   const [cargos, setCargos] = useState([]);
@@ -27,7 +25,16 @@ export default function Users() {
   const [editUser, setEditUser] = useState(null);
   const [cargoUser, setCargoUser] = useState(null);
 
-  const load = () => { Promise.all([apiClient.auth.me(), apiClient.entities.User.list(), apiClient.entities.Cargo.list()]).then(([m, u, c]) => { setMe(m); setUsers(u); setCargos(c); setLoading(false); checkUserAuth(); }); };
+  const load = () => {
+    setLoading(true);
+    Promise.all([apiClient.auth.me(), apiClient.entities.User.list(), apiClient.entities.Cargo.list()])
+      .then(([m, u, c]) => {
+        setMe(m);
+        setUsers(u);
+        setCargos(c);
+      })
+      .finally(() => setLoading(false));
+  };
   useEffect(() => { load(); }, []);
 
   const invite = async (e) => {

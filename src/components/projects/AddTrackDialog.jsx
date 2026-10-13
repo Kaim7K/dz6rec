@@ -22,17 +22,18 @@ export default function AddTrackDialog({ open, onClose, onCreated, project, trac
   const submit = async (e) => {
     e.preventDefault(); setLoading(true); setUploadProgress(0); setError("");
     try {
+      const trackName = form.name.trim() || project.name || "Faixa sem nome";
       let audio_url = "";
       if (audio) {
         setUploading(true);
         audio_url = await uploadFile(audio, { onProgress: setUploadProgress });
         setUploading(false);
       }
-      const data = { ...form, project_id: project.id, audio_url, bpm: form.bpm ? Number(form.bpm) : undefined, track_number: Number(form.track_number) };
+      const data = { ...form, name: trackName, project_id: project.id, audio_url, bpm: form.bpm ? Number(form.bpm) : undefined, track_number: Number(form.track_number) };
       const track = await apiClient.entities.Track.create(data);
       if (audio_url) await apiClient.entities.TrackVersion.create({ track_id: track.id, name: form.version_label, audio_url });
       const me = await apiClient.auth.me().catch(() => null);
-      await logActivity(project.id, `Faixa adicionada: ${form.name}`, me?.full_name);
+      await logActivity(project.id, `Faixa adicionada: ${trackName}`, me?.full_name);
       await apiClient.entities.Project.update(project.id, { track_count: trackCount + 1 });
       setAudio(null); setUploadProgress(0);
       onCreated(); onClose();
@@ -52,7 +53,7 @@ export default function AddTrackDialog({ open, onClose, onCreated, project, trac
         </DialogHeader>
         {error && <div className="rounded-md border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</div>}
         <form onSubmit={submit} className="space-y-4">
-          <Field label="Nome"><Input required value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Ex. Noite Clara" /></Field>
+          <Field label="Nome"><Input value={form.name} onChange={(e) => set("name", e.target.value)} placeholder={project?.name || "Ex. Noite Clara"} /></Field>
           <div className="grid gap-3 sm:grid-cols-2">
             <Field label="Artista principal"><Input value={form.main_artist_name} onChange={(e) => set("main_artist_name", e.target.value)} /></Field>
             <Field label="Nº da faixa"><Input type="number" value={form.track_number} onChange={(e) => set("track_number", e.target.value)} /></Field>

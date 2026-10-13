@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import { put } from "@vercel/blob";
+import { handleUpload as handleBlobUpload } from "@vercel/blob/client";
 import formidable from "formidable";
 import { ensureDatabase, getSql } from "./_db.js";
 import {
@@ -413,7 +414,22 @@ async function handleEntities(req, res, parts, sql) {
   return methodNotAllowed(res);
 }
 
-async function handleUpload(req, res) {
+async function assertActiveUploadUser(req, res, sql) {
+  const user = await currentUser(req, sql);
+  if (!user) {
+    send(res, 401, { error: "Authentication required" });
+    return null;
+  }
+  if (user.status !== "ativo") {
+    send(res, 403, { error: "Seu acesso ainda nao foi aprovado" });
+    return null;
+  }
+  return user;
+}
+
+async function handleMultipartUpload(req, res, sql) {
+  const user = await assertActiveUploadUser(req, res, sql);
+  if (!user) return;
   if (req.method !== "POST") return methodNotAllowed(res);
   const form = formidable({ multiples: false, keepExtensions: true });
   const { files } = await new Promise((resolve, reject) => {
@@ -434,18 +450,56 @@ async function handleUpload(req, res) {
   return send(res, 200, { file_url: blob.url });
 }
 
+async function handleUpload(req, res, sql) {
+  if (req.method !== "POST") return methodNotAllowed(res);
+
+  const contentType = req.headers["content-type"] || "";
+  if (!contentType.includes("application/json")) {
+    return handleMultipartUpload(req, res, sql);
+  }
+
+  const body = await readJson(req);
+  if (body.type !== "blob.upload-completed") {
+    const user = await assertActiveUploadUser(req, res, sql);
+    if (!user) return;
+  }
+
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    return send(res, 503, { error: "Upload de arquivos grandes exige BLOB_READ_WRITE_TOKEN configurado" });
+  }
+
+  try {
+    const result = await handleBlobUpload({
+      request: req,
+      body,
+      onBeforeGenerateToken: async (pathname, clientPayload, multipart) => {
+        if (!pathname.startsWith("uploads/")) throw new Error("Caminho de upload invalido");
+        return {
+          allowedContentTypes: ["audio/*", "image/*", "video/*", "application/pdf", "application/octet-stream"],
+          maximumSizeInBytes: 1024 * 1024 * 1024,
+          addRandomSuffix: true,
+          tokenPayload: JSON.stringify({ clientPayload, multipart }),
+        };
+      },
+    });
+    return send(res, 200, result);
+  } catch (error) {
+    return send(res, 400, { error: error.message || "Nao foi possivel preparar o upload" });
+  }
+}
+
 export default async function handler(req, res) {
   try {
     await ensureDatabase();
     const sql = getSql();
     const parts = pathParts(req);
     if (parts[0] === "auth") return handleAuth(req, res, parts[1], parts[2], sql);
+    if (parts[0] === "upload") return handleUpload(req, res, sql);
     const user = await currentUser(req, sql);
     if (!user) return send(res, 401, { error: "Authentication required" });
     if (user.status !== "ativo") return send(res, 403, { error: "Seu acesso ainda nao foi aprovado" });
     if (parts[0] === "users") return handleUsers(req, res, parts[1], sql);
     if (parts[0] === "entities") return handleEntities(req, res, parts, sql);
-    if (parts[0] === "upload") return handleUpload(req, res);
     return send(res, 404, { error: "Not found" });
   } catch (error) {
     console.error(error);

@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { MoreHorizontal, Plus } from "lucide-react";
+import { LayoutTemplate, Loader2, MoreHorizontal, Plus } from "lucide-react";
 import { apiClient } from "@/api/appClient";
 import CargoBadge from "@/components/CargoBadge";
 import ChecklistItemRow from "@/components/projects/ChecklistItemRow";
 import NotesDialog from "@/components/projects/NotesDialog";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { CATEGORIES, cargoList, logActivity, usersForCargo } from "@/lib/music";
 import { notifyNextStage, notifyUsers } from "@/lib/notifications";
 
@@ -14,6 +18,10 @@ export default function ChecklistTab({ project }) {
   const [newSection, setNewSection] = useState("");
   const [users, setUsers] = useState([]);
   const [cargos, setCargos] = useState([]);
+  const [templateOpen, setTemplateOpen] = useState(false);
+  const [templateName, setTemplateName] = useState("");
+  const [templateSaving, setTemplateSaving] = useState(false);
+  const [templateMessage, setTemplateMessage] = useState("");
 
   const load = () => {
     apiClient.entities.ChecklistSection.filter({ project_id: project.id }).then((s) => setSections(s.sort((a, b) => a.order - b.order)));
@@ -120,8 +128,77 @@ export default function ChecklistTab({ project }) {
     load();
   };
 
+  const openTemplateDialog = () => {
+    setTemplateName(`${project.name} - checklist`);
+    setTemplateMessage("");
+    setTemplateOpen(true);
+  };
+
+  const saveAsTemplate = async (e) => {
+    e.preventDefault();
+    const name = templateName.trim();
+    if (!name || templateSaving) return;
+    if (!sections.length) {
+      setTemplateMessage("Crie pelo menos uma seção antes de salvar como template.");
+      return;
+    }
+
+    setTemplateSaving(true);
+    setTemplateMessage("");
+    try {
+      const template = await apiClient.entities.ChecklistTemplate.create({ name, project_type: project.type || "custom" });
+      for (const section of sections.sort((a, b) => (a.order || 0) - (b.order || 0))) {
+        const copiedSection = await apiClient.entities.ChecklistSection.create({
+          template_id: template.id,
+          name: section.name,
+          cargo: section.cargo || null,
+          category: section.category || sectionCategory(section),
+          order: section.order || 0,
+        });
+        const sectionItems = items
+          .filter((item) => item.section_id === section.id)
+          .sort((a, b) => (a.order || 0) - (b.order || 0));
+        const idMap = {};
+        for (const item of sectionItems.filter((item) => !item.parent_id)) {
+          const copied = await apiClient.entities.ChecklistItem.create({
+            section_id: copiedSection.id,
+            text: item.text,
+            completed: false,
+            order: item.order || 0,
+            cargo: item.cargo || null,
+            priority: item.priority || "normal",
+          });
+          idMap[item.id] = copied.id;
+        }
+        for (const item of sectionItems.filter((item) => item.parent_id && idMap[item.parent_id])) {
+          await apiClient.entities.ChecklistItem.create({
+            section_id: copiedSection.id,
+            text: item.text,
+            completed: false,
+            parent_id: idMap[item.parent_id],
+            order: item.order || 0,
+            cargo: item.cargo || null,
+            priority: item.priority || "normal",
+          });
+        }
+      }
+      const me = await apiClient.auth.me().catch(() => null);
+      await logActivity(project.id, `Checklist salvo como template: ${name}`, me?.full_name);
+      setTemplateOpen(false);
+    } catch (err) {
+      setTemplateMessage(err.message || "Não foi possível salvar o template.");
+    } finally {
+      setTemplateSaving(false);
+    }
+  };
+
   return (
     <div className="space-y-5">
+      <div className="flex justify-end">
+        <button type="button" onClick={openTemplateDialog} className="dz-ghost-button">
+          <LayoutTemplate size={15} />Salvar como template
+        </button>
+      </div>
       <div className="grid gap-4 2xl:grid-cols-3">
         {CATEGORIES.map((category) => {
           const categorySections = sections.filter((section) => sectionCategory(section) === category.key);
@@ -155,9 +232,14 @@ export default function ChecklistTab({ project }) {
                   <p className="rounded-md border border-dashed border-white/[0.08] px-3 py-3 text-sm text-white/35">Nenhuma seção nesta operação.</p>
                 )}
 
-                <form onSubmit={(e) => { e.preventDefault(); const f = e.currentTarget; addCategoryItems(category, f.text.value); f.reset(); }} className="flex min-h-20 items-start gap-3 rounded-md border border-dashed border-white/[0.13] px-3.5 py-3">
-                  <Plus size={18} className="mt-1 text-white/55" />
-                  <textarea name="text" rows={2} placeholder={"Adicionar tarefas...\nUma tarefa por linha"} className="min-w-0 flex-1 resize-none bg-transparent text-sm leading-5 outline-none placeholder:text-white/38" />
+                <form onSubmit={(e) => { e.preventDefault(); const f = e.currentTarget; addCategoryItems(category, f.text.value); f.reset(); }} className="grid min-h-[4.5rem] grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-2 rounded-md border border-dashed border-white/[0.12] bg-black/10 px-3 py-2.5 transition-colors focus-within:border-primary/45 focus-within:bg-white/[0.025]">
+                  <span className="grid h-8 w-8 place-items-center rounded-md bg-white/[0.045] text-white/60">
+                    <Plus size={16} />
+                  </span>
+                  <textarea name="text" rows={2} placeholder={"Adicionar tarefas...\nUma tarefa por linha"} className="min-h-10 min-w-0 resize-none bg-transparent py-0.5 text-sm leading-5 text-white/82 outline-none placeholder:text-white/40" />
+                  <button type="submit" className="h-8 rounded-md border border-white/[0.08] px-3 text-xs font-bold text-white/62 transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-white">
+                    Adicionar
+                  </button>
                 </form>
               </div>
             </section>
@@ -174,6 +256,24 @@ export default function ChecklistTab({ project }) {
       </form>
 
       {noteSection && <NotesDialog section={noteSection} onClose={() => setNoteSection(null)} />}
+      <Dialog open={templateOpen} onOpenChange={setTemplateOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader><DialogTitle>Salvar checklist como template</DialogTitle></DialogHeader>
+          {templateMessage && <p className="rounded-md border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-200">{templateMessage}</p>}
+          <form onSubmit={saveAsTemplate} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label>Nome do template</Label>
+              <Input value={templateName} onChange={(e) => setTemplateName(e.target.value)} placeholder="Ex. Lançamento completo" autoFocus />
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="ghost" onClick={() => setTemplateOpen(false)} disabled={templateSaving} className="text-white/55">Cancelar</Button>
+              <Button type="submit" disabled={templateSaving || !templateName.trim()} className="bg-primary text-primary-foreground">
+                {templateSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Salvar template
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { apiClient } from "@/api/appClient";
 
 const AuthContext = createContext();
@@ -12,17 +12,7 @@ export const AuthProvider = ({ children }) => {
   const [authChecked, setAuthChecked] = useState(false);
   const [appPublicSettings] = useState({ public_settings: {} });
 
-  useEffect(() => {
-    checkAppState();
-  }, []);
-
-  const checkAppState = async () => {
-    setIsLoadingPublicSettings(false);
-    setAuthError(null);
-    await checkUserAuth();
-  };
-
-  const checkUserAuth = async () => {
+  const checkUserAuth = useCallback(async () => {
     try {
       setIsLoadingAuth(true);
       const currentUser = await apiClient.auth.me();
@@ -35,17 +25,27 @@ export const AuthProvider = ({ children }) => {
       setIsLoadingAuth(false);
       setAuthChecked(true);
     }
-  };
+  }, []);
 
-  const logout = (shouldRedirect = true) => {
+  const checkAppState = useCallback(async () => {
+    setIsLoadingPublicSettings(false);
+    setAuthError(null);
+    await checkUserAuth();
+  }, [checkUserAuth]);
+
+  useEffect(() => {
+    checkAppState();
+  }, [checkAppState]);
+
+  const logout = useCallback((shouldRedirect = true) => {
     setUser(null);
     setIsAuthenticated(false);
     apiClient.auth.logout(shouldRedirect ? "/login" : undefined);
-  };
+  }, []);
 
-  const navigateToLogin = () => {
+  const navigateToLogin = useCallback(() => {
     apiClient.auth.redirectToLogin(window.location.pathname + window.location.search);
-  };
+  }, []);
 
   return (
     <AuthContext.Provider
