@@ -14,13 +14,13 @@ export default function AuthLayout({ title, subtitle, footer, children }) {
             />
           </div>
           <h1 className="break-words font-display text-2xl font-bold tracking-tight text-white">{title}</h1>
-          {subtitle && <p className="mt-2 break-words text-sm text-white/45">{subtitle}</p>}
+          {subtitle && <p className="mt-2 break-words text-sm text-muted-foreground">{subtitle}</p>}
         </div>
         <div className="rounded-lg border border-white/[0.075] bg-white/[0.035] p-5 shadow-pop backdrop-blur sm:p-6">
           {children}
         </div>
         {footer && (
-          <p className="mt-6 text-center text-sm text-white/45">{footer}</p>
+          <p className="mt-6 text-center text-sm text-muted-foreground">{footer}</p>
         )}
       </div>
     </div>

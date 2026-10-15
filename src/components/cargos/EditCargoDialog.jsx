@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import Field from "@/components/ui/form-field";
 import { apiClient } from "@/api/appClient";
 import { cargoList } from "@/lib/music";
 
@@ -95,10 +95,10 @@ export default function EditCargoDialog({ cargo, onClose, onSaved }) {
           <DialogDescription>Altere o nome ou a cor. A alteração se aplica a todos os perfis e tarefas que usam este cargo.</DialogDescription>
         </DialogHeader>
         <div className="space-y-5">
-          <div className="space-y-1.5"><Label>Nome</Label><Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nome do cargo" /></div>
-          <div className="space-y-1.5"><Label>Cor</Label>
+          <Field label="Nome"><Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nome do cargo" /></Field>
+          <Field label="Cor">
             <ColorSelect value={color} onChange={setColor} triggerClassName="w-full" />
-          </div>
+          </Field>
         </div>
         <DialogFooter>
           <Button variant="ghost" onClick={onClose} className="text-white/55">Cancelar</Button>

@@ -18,7 +18,7 @@ export default function ProjectProgress({ items, sections, className }) {
       <div className="flex items-center justify-between">
         <span className="inline-flex items-center gap-2 text-xs font-bold text-white xl:text-sm">
           Progresso geral
-          <Info size={12} className="text-white/38" />
+          <Info size={12} className="text-muted-foreground" />
         </span>
         <span className="text-sm font-bold tabular-nums text-white xl:text-base">{prog.total.pct}%</span>
       </div>

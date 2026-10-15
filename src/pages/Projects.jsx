@@ -49,7 +49,7 @@ export default function Projects() {
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
-              className={`rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${statusFilter === status ? "border-primary/30 bg-primary/12 text-white" : "border-white/[0.06] bg-white/[0.02] text-white/48 hover:border-white/[0.12] hover:bg-white/[0.045] hover:text-white/75"}`}
+              className={`rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${statusFilter === status ? "border-primary/30 bg-primary/12 text-white" : "border-white/[0.06] bg-white/[0.02] text-muted-foreground hover:border-white/[0.12] hover:bg-white/[0.045] hover:text-white/75"}`}
             >
               {status === "todos" ? "Todos" : STATUS[status] || status}
             </button>
@@ -60,11 +60,11 @@ export default function Projects() {
       {projects.length === 0 ? (
         <div className="dz-empty">
           <div className="grid h-14 w-14 place-items-center rounded-full bg-white/[0.04] ring-1 ring-white/[0.06]">
-            <Disc3 size={22} className="text-white/30" />
+            <Disc3 size={22} className="text-muted-foreground" />
           </div>
           <div>
             <p className="font-display text-lg font-semibold text-white/70">Nenhum projeto ainda</p>
-            <p className="mt-1 text-sm text-white/35">Crie o primeiro single, EP ou álbum da gravadora.</p>
+            <p className="mt-1 text-sm text-muted-foreground">Crie o primeiro single, EP ou álbum da gravadora.</p>
           </div>
           <button onClick={() => setOpen(true)} className="dz-primary-button mt-2">
             <Plus size={16} /> Novo projeto

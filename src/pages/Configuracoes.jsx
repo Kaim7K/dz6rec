@@ -20,7 +20,7 @@ export default function Configuracoes() {
   };
   useEffect(() => { load(); }, []);
 
-  if (loading) return <p className="text-white/40">Carregando...</p>;
+  if (loading) return <p className="text-muted-foreground">Carregando...</p>;
   if (me?.permissao !== "superadmin") return (
     <div className="dz-card mx-auto max-w-md p-7 text-center">
       <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-white/[0.05]"><ShieldCheck className="text-white/50" /></div>
@@ -56,7 +56,7 @@ export default function Configuracoes() {
 
       <section className="dz-card p-5">
         <h2 className="font-display text-lg font-bold text-white">Cargos & badges</h2>
-        <p className="mt-1 text-sm text-white/45">Defina os cargos da equipe. Eles aparecem como badges ao atribuir tarefas e nos perfis.</p>
+        <p className="mt-1 text-sm text-muted-foreground">Defina os cargos da equipe. Eles aparecem como badges ao atribuir tarefas e nos perfis.</p>
         <form onSubmit={add} className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
           <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Novo cargo (ex. Produtor Musical)" className="dz-input h-11 flex-1 px-4" />
           <div className="flex items-center gap-2">
@@ -68,12 +68,12 @@ export default function Configuracoes() {
           <button className="dz-primary-button"><Plus size={16} />Adicionar</button>
         </form>
         <div className="mt-5 flex flex-wrap gap-2">
-          {cargos.length === 0 && <p className="text-sm text-white/35">Nenhum cargo criado ainda.</p>}
+          {cargos.length === 0 && <p className="text-sm text-muted-foreground">Nenhum cargo criado ainda.</p>}
           {cargos.map((c) => (
             <div key={c.id} className="flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.04] py-1 pl-3 pr-2">
               <button onClick={() => setEditCargo(c)} className="transition-opacity hover:opacity-75"><CargoBadge cargo={c.name} cargos={cargos} /></button>
-              <button onClick={() => setEditCargo(c)} aria-label="Editar cargo" className="rounded-full p-1 text-white/30 transition-colors hover:bg-white/5 hover:text-white"><Pencil size={13} /></button>
-              <button onClick={() => remove(c)} aria-label="Excluir cargo" className="rounded-full p-1 text-white/30 transition-colors hover:bg-white/5 hover:text-red-400"><Trash2 size={13} /></button>
+              <button onClick={() => setEditCargo(c)} aria-label="Editar cargo" className="rounded-full p-1 text-muted-foreground transition-colors hover:bg-white/5 hover:text-white"><Pencil size={13} /></button>
+              <button onClick={() => remove(c)} aria-label="Excluir cargo" className="rounded-full p-1 text-muted-foreground transition-colors hover:bg-white/5 hover:text-red-400"><Trash2 size={13} /></button>
             </div>
           ))}
         </div>
@@ -81,20 +81,20 @@ export default function Configuracoes() {
 
       <section className="dz-card max-w-xl p-5">
         <h2 className="font-display text-lg font-bold text-white">Controle do painel</h2>
-        <p className="mt-1 text-sm text-white/45">Force a atualizacao da sessao de todos os usuarios conectados.</p>
+        <p className="mt-1 text-sm text-muted-foreground">Force a atualizacao da sessao de todos os usuarios conectados.</p>
         <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
           <button type="button" onClick={requestGlobalReload} disabled={reloadSending} className="dz-primary-button">
             {reloadSending ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} />}
             Recarregar todos
           </button>
-          {reloadMessage && <p className="text-sm text-white/45">{reloadMessage}</p>}
+          {reloadMessage && <p className="text-sm text-muted-foreground">{reloadMessage}</p>}
         </div>
       </section>
 
       <section className="max-w-xl space-y-2.5">{["Notificações", "Preferências da equipe", "Integrações"].map((s) => (
         <div key={s} className="dz-card flex items-center justify-between p-4">
-          <div><p className="text-sm font-medium text-white">{s}</p><p className="text-2xs text-white/40">Em breve</p></div>
-          <span className="rounded-full bg-white/[0.04] px-2.5 py-1 text-2xs text-white/35">em breve</span>
+          <div><p className="text-sm font-medium text-white">{s}</p><p className="text-2xs text-muted-foreground">Em breve</p></div>
+          <span className="rounded-full bg-white/[0.04] px-2.5 py-1 text-2xs text-muted-foreground">em breve</span>
         </div>
       ))}</section>
 

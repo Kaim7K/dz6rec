@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import Field from "@/components/ui/form-field";
 import { Textarea } from "@/components/ui/textarea";
 import FileField from "@/components/ui/file-field";
 import { apiClient } from "@/api/appClient";
@@ -46,14 +46,15 @@ export default function EditArtistDialog({ artist, open, onClose, onSaved }) {
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Editar artista</DialogTitle>
+          <DialogDescription>Atualize o perfil e a foto do artista.</DialogDescription>
         </DialogHeader>
         <form onSubmit={submit} className="space-y-4">
           {error && <div role="alert" className="rounded-md border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</div>}
           <fieldset disabled={loading} className="space-y-4">
-          <div className="space-y-1.5"><Label>Nome</Label><Input required value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Nome do artista" /></div>
-          <div className="space-y-1.5"><Label>@usuário</Label><Input value={form.handle} onChange={(e) => set("handle", e.target.value)} placeholder="handle" /></div>
-          <div className="space-y-1.5"><Label>Foto</Label><FileField value={photo} onChange={setPhoto} disabled={loading} existingUrl={removePhoto ? "" : artist?.photo_url} existingLabel="Foto atual" onRemoveExisting={() => setRemovePhoto(true)} removeLabel="Remover foto" accept="image/*" hint="Retrato do artista" />{removePhoto && !photo && <p role="status" className="text-xs text-white/55">A foto será removida ao salvar.</p>}</div>
-          <div className="space-y-1.5"><Label>Bio</Label><Textarea value={form.bio} onChange={(e) => set("bio", e.target.value)} rows={3} placeholder="Breve descrição" /></div>
+          <Field label="Nome"><Input required value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Nome do artista" /></Field>
+          <Field label="@usuário"><Input value={form.handle} onChange={(e) => set("handle", e.target.value)} placeholder="handle" /></Field>
+          <Field label="Foto"><FileField value={photo} onChange={setPhoto} disabled={loading} existingUrl={removePhoto ? "" : artist?.photo_url} existingLabel="Foto atual" onRemoveExisting={() => setRemovePhoto(true)} removeLabel="Remover foto" accept="image/*" hint="Retrato do artista" />{removePhoto && !photo && <p role="status" className="text-xs text-white/55">A foto será removida ao salvar.</p>}</Field>
+          <Field label="Bio"><Textarea value={form.bio} onChange={(e) => set("bio", e.target.value)} rows={3} placeholder="Breve descrição" /></Field>
           </fieldset>
           <DialogFooter>
             <Button type="button" variant="ghost" onClick={onClose} disabled={loading} className="text-white/55">Cancelar</Button>

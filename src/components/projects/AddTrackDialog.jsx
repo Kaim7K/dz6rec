@@ -2,14 +2,13 @@ import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import Field from "@/components/ui/form-field";
 import { Textarea } from "@/components/ui/textarea";
 import FileField from "@/components/ui/file-field";
 import { apiClient } from "@/api/appClient";
 import { uploadFile, logActivity } from "@/lib/music";
 import { Loader2 } from "lucide-react";
 
-const Field = ({ label, children }) => <div className="space-y-1.5"><Label>{label}</Label>{children}</div>;
 
 export default function AddTrackDialog({ open, onClose, onCreated, project, trackCount }) {
   const [form, setForm] = useState({ name: "", main_artist_name: project?.main_artist_name || "", featuring: "", version_label: "Demo 01", track_number: trackCount + 1, bpm: "", key: "", isrc: "", notes: "" });
@@ -69,7 +68,7 @@ export default function AddTrackDialog({ open, onClose, onCreated, project, trac
             <FileField value={audio} onChange={(file) => { setAudio(file); setUploadProgress(0); setError(""); }} accept="audio/*" hint="MP3, WAV, FLAC..." />
             {(loading && audio) && (
               <div className="mt-2 space-y-1.5">
-                <div className="flex items-center justify-between text-2xs text-white/45">
+                <div className="flex items-center justify-between text-2xs text-muted-foreground">
                   <span>{uploading ? "Enviando arquivo" : "Finalizando"}</span>
                   <span>{uploadProgress}%</span>
                 </div>
@@ -79,7 +78,7 @@ export default function AddTrackDialog({ open, onClose, onCreated, project, trac
               </div>
             )}
           </Field>
-          <p className="pt-1 text-2xs font-medium uppercase tracking-[0.16em] text-white/30">Detalhes opcionais</p>
+          <p className="pt-1 text-2xs font-medium uppercase tracking-[0.16em] text-muted-foreground">Detalhes opcionais</p>
           <div className="grid gap-3 sm:grid-cols-2">
             <Field label="BPM"><Input type="number" value={form.bpm} onChange={(e) => set("bpm", e.target.value)} /></Field>
             <Field label="Tom"><Input value={form.key} onChange={(e) => set("key", e.target.value)} placeholder="Cm" /></Field>

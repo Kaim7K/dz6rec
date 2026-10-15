@@ -22,7 +22,7 @@ export default function AccountAccessStatus({ user }) {
         </p>
         <div className="mt-5 w-full rounded-lg border border-white/[0.08] bg-white/[0.035] px-4 py-3 text-left shadow-soft">
           <p className="text-sm font-semibold text-white">{user?.full_name || "Conta DZ6"}</p>
-          <p className="mt-1 truncate text-xs text-white/42">{user?.email}</p>
+          <p className="mt-1 truncate text-xs text-muted-foreground">{user?.email}</p>
         </div>
         <button
           type="button"

@@ -164,7 +164,7 @@
   }
 
   .dz-kicker {
-    @apply text-2xs font-bold uppercase tracking-[0.2em] text-primary/85;
+    @apply text-2xs font-semibold uppercase tracking-[0.16em] text-muted-foreground;
   }
 
   .dz-page {
@@ -184,11 +184,12 @@
   }
 
   .dz-primary-button {
-    @apply inline-flex min-h-10 min-w-0 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-bold leading-5 text-primary-foreground shadow-glow transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-60;
+    @apply inline-flex min-h-10 min-w-0 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold leading-5 text-primary-foreground transition-colors hover:bg-[#d10b0b] disabled:pointer-events-none disabled:opacity-50;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
   }
 
   .dz-ghost-button {
-    @apply inline-flex min-h-9 min-w-0 items-center justify-center gap-2 rounded-md border px-3.5 py-2 text-sm font-semibold leading-5 text-white/72 transition-colors hover:bg-white/[0.055] hover:text-white;
+    @apply inline-flex min-h-10 min-w-0 items-center justify-center gap-2 rounded-md border px-3.5 py-2 text-sm font-medium leading-5 text-white/75 transition-colors hover:bg-white/[0.055] hover:text-white disabled:pointer-events-none disabled:opacity-50;
     border-color: var(--line-soft);
     background: rgba(255,255,255,0.032);
   }
@@ -199,8 +200,8 @@
   }
 
   .dz-input {
-    @apply h-10 min-w-0 rounded-md border px-3 text-sm text-white outline-none placeholder:text-white/36 focus:border-primary/50 focus:bg-white/[0.055];
-    border-color: var(--line-soft);
+    @apply h-10 min-w-0 rounded-md border px-3 text-sm text-white outline-none placeholder:text-white/50 hover:border-white/20 focus:border-white/35 focus:ring-2 focus:ring-primary/20 disabled:opacity-50;
+    border-color: var(--line-strong);
     background: rgba(255,255,255,0.035);
   }
 
@@ -233,4 +234,28 @@
     border-color: var(--line-soft);
     background: rgba(255,255,255,0.032);
   }
+  .dz-dialog form, .dz-dialog fieldset { min-width: 0; }
+  .dz-dialog-footer > button { min-height: 40px; }
+  .dz-dialog-footer > button:last-child { min-width: 96px; }
+  .dz-dialog-footer {
+    position: sticky;
+    bottom: -1.25rem;
+    z-index: 2;
+    margin-inline: -1.25rem;
+    margin-bottom: -1.25rem;
+    padding: 1rem 1.25rem 1.25rem;
+    background: var(--surface-3);
+  }
+}
+
+@media (min-width: 640px) {
+  .dz-dialog-footer { bottom: -1.5rem; margin-inline: -1.5rem; margin-bottom: -1.5rem; padding-inline: 1.5rem; padding-bottom: 1.5rem; }
+}
+
+@media (max-width: 639px) {
+  .dz-dialog input:not([type="checkbox"]):not([type="file"]):not([type="color"]), .dz-dialog textarea { font-size: 16px; }
+  .dz-dialog-footer > button { min-height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dz-dialog { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }

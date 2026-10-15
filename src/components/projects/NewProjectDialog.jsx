@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import Field from "@/components/ui/form-field";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import DateField from "@/components/ui/date-field";
@@ -11,8 +11,7 @@ import { apiClient } from "@/api/appClient";
 import { TYPE, STATUS, STATUS_ORDER, uploadFile, applyTemplate, logActivity } from "@/lib/music";
 import { Loader2 } from "lucide-react";
 
-const Field = ({ label, children }) => <div className="space-y-1.5"><Label>{label}</Label>{children}</div>;
-const SectionLabel = ({ children }) => <p className="pt-1 text-2xs font-medium uppercase tracking-[0.16em] text-white/30">{children}</p>;
+const SectionLabel = ({ children }) => <p className="pt-1 text-2xs font-medium uppercase tracking-[0.16em] text-muted-foreground">{children}</p>;
 
 export default function NewProjectDialog({ open, onClose, onCreated, artists, templates }) {
   const [form, setForm] = useState({ name: "", type: "single", main_artist_id: "", featuring: "", description: "", release_date: "", status: "rascunho" });

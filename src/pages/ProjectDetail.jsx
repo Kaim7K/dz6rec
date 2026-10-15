@@ -39,7 +39,7 @@ export default function ProjectDetail() {
     });
   };
   useEffect(() => { load(); }, [id]);
-  if (!project) return <p className="text-white/40">Carregando...</p>;
+  if (!project) return <p className="text-muted-foreground">Carregando...</p>;
 
   const patch = async (field, value, text) => {
     setProject((p) => ({ ...p, [field]: value }));
@@ -90,7 +90,7 @@ export default function ProjectDetail() {
             </div>
             <h1 className="mt-3 break-words font-display text-2xl font-bold tracking-tight text-white sm:text-3xl xl:text-[2.25rem] xl:leading-[1.08]">{project.name}</h1>
             <p className="mt-1 text-xs text-white/55 xl:text-sm">{project.main_artist_name}{project.featuring ? ` feat. ${project.featuring}` : ""}</p>
-            <p className="mt-2.5 max-w-2xl text-xs leading-5 text-white/48 xl:mt-3 xl:text-sm xl:leading-6">{project.description || "Projeto sem descrição."}</p>
+            <p className="mt-2.5 max-w-2xl text-xs leading-5 text-muted-foreground xl:mt-3 xl:text-sm xl:leading-6">{project.description || "Projeto sem descrição."}</p>
 
             <div className="mt-4 grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:items-center xl:mt-5 xl:gap-3">
               <button onClick={() => tracks.length && player.play(tracks[0], project, tracks)} className="dz-primary-button h-9 px-4"><Play size={14} fill="currentColor" />Reproduzir</button>
@@ -114,7 +114,7 @@ export default function ProjectDetail() {
 
       <Tabs defaultValue="faixas" className="min-w-0 pt-1">
         <TabsList className="h-auto w-full justify-start gap-1 overflow-x-auto overscroll-x-contain rounded-lg border border-white/[0.085] bg-white/[0.035] p-1 shadow-soft">
-          {tabs.map(([v, label, Icon]) => <TabsTrigger key={v} value={v} className="shrink-0 gap-2 rounded-md border border-transparent bg-transparent px-3 py-2 text-sm font-semibold text-white/48 transition-colors data-[state=active]:border-white/[0.08] data-[state=active]:bg-white/[0.07] data-[state=active]:text-white"><Icon size={16} />{label}</TabsTrigger>)}
+          {tabs.map(([v, label, Icon]) => <TabsTrigger key={v} value={v} className="shrink-0 gap-2 rounded-md border border-transparent bg-transparent px-3 py-2 text-sm font-semibold text-muted-foreground transition-colors data-[state=active]:border-white/[0.08] data-[state=active]:bg-white/[0.07] data-[state=active]:text-white"><Icon size={16} />{label}</TabsTrigger>)}
         </TabsList>
         <TabsContent value="operacao" className="mt-5"><ProjectWorkspace project={project} sections={sections} items={items} files={files} onChanged={load} /></TabsContent>
         <TabsContent value="faixas" className="mt-5">

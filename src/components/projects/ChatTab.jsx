@@ -44,7 +44,7 @@ function renderText(text, tokens, mentionClass) {
 function MentionMenu({ options, onPick }) {
   return (
     <div className="absolute bottom-full left-3 right-3 z-10 mb-2 overflow-hidden rounded-lg border border-white/[0.08] bg-popover p-1.5 shadow-pop sm:right-auto sm:w-80">
-      <p className="px-2 py-1 text-2xs font-medium uppercase tracking-[0.16em] text-white/35">Mencionar</p>
+      <p className="px-2 py-1 text-2xs font-medium uppercase tracking-[0.16em] text-muted-foreground">Mencionar</p>
       <div className="max-h-56 overflow-y-auto">
         {options.map((option) => (
           <button
@@ -61,7 +61,7 @@ function MentionMenu({ options, onPick }) {
               </span>
             )}
             <span className="min-w-0 flex-1 truncate">{option.label}</span>
-            {option.type === "cargo" && <span className="shrink-0 text-2xs text-white/30">cargo</span>}
+            {option.type === "cargo" && <span className="shrink-0 text-2xs text-muted-foreground">cargo</span>}
           </button>
         ))}
       </div>
@@ -228,13 +228,13 @@ export default function ChatTab({ project }) {
               ))}
             </div>
           ) : (
-            <span className="grid h-9 w-9 place-items-center rounded-md border border-white/[0.07] bg-white/[0.03] text-white/42">
+            <span className="grid h-9 w-9 place-items-center rounded-md border border-white/[0.07] bg-white/[0.03] text-muted-foreground">
               <MessageSquare size={17} />
             </span>
           )}
           <div className="min-w-0">
             <p className="text-sm font-bold text-white">Conversa do projeto</p>
-            <p className="truncate text-2xs text-white/40">Use @ para mencionar pessoas ou cargos.</p>
+            <p className="truncate text-2xs text-muted-foreground">Use @ para mencionar pessoas ou cargos.</p>
           </div>
         </div>
         <span className="dz-pill h-7">{messages.length}</span>
@@ -246,13 +246,13 @@ export default function ChatTab({ project }) {
         ) : messages.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
             <span className="grid h-12 w-12 place-items-center rounded-md border border-white/[0.07] bg-white/[0.03]">
-              <MessageSquare className="text-white/35" size={20} />
+              <MessageSquare className="text-muted-foreground" size={20} />
             </span>
-            <p className="max-w-sm text-sm leading-6 text-white/38">Nenhuma mensagem ainda. Comece a conversa, alinhe decisoes e mencione responsaveis com @.</p>
+            <p className="max-w-sm text-sm leading-6 text-muted-foreground">Nenhuma mensagem ainda. Comece a conversa, alinhe decisoes e mencione responsaveis com @.</p>
           </div>
         ) : rows.map((row) => {
           if (row.type === "day") {
-            return <div key={row.key} className="flex justify-center py-3"><span className="dz-pill h-7 text-white/45">{row.label}</span></div>;
+            return <div key={row.key} className="flex justify-center py-3"><span className="dz-pill h-7 text-muted-foreground">{row.label}</span></div>;
           }
 
           const { message, date, mine, first, last, sender } = row;
@@ -269,7 +269,7 @@ export default function ChatTab({ project }) {
                 {first && (
                   <p className="px-1 text-2xs">
                     <span className="font-medium text-white/80">{mine ? "Voce" : name}</span>
-                    <span className="text-white/35"> · {format(date, "HH:mm")}</span>
+                    <span className="text-muted-foreground"> · {format(date, "HH:mm")}</span>
                   </p>
                 )}
                 <div className={`${first ? "mt-1" : ""} whitespace-pre-wrap break-words rounded-lg ${bubble}`}>

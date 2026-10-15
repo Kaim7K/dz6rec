@@ -32,7 +32,7 @@ export default function FeaturedProject({ project, progress }) {
             <div className="flex flex-wrap items-center gap-2">
               <span className={`h-1.5 w-1.5 rounded-full ${tone.dot}`} />
               <span className={`text-2xs font-bold uppercase tracking-[0.18em] ${tone.text}`}>{STATUS[project.status]}</span>
-              <span className="text-2xs uppercase tracking-[0.18em] text-white/26">· {TYPE[project.type]}</span>
+              <span className="text-2xs uppercase tracking-[0.18em] text-muted-foreground">· {TYPE[project.type]}</span>
             </div>
             <h2 className="mt-2 break-words font-display text-2xl font-bold leading-[1.05] tracking-tight text-white sm:text-[2rem]">{project.name}</h2>
             <p className="mt-1.5 text-sm text-white/52">{project.main_artist_name || "Sem artista"}</p>
@@ -52,29 +52,29 @@ export default function FeaturedProject({ project, progress }) {
           </div>
         </div>
 
-        <dl className="grid min-w-0 content-center gap-5 border-t border-white/[0.055] pt-5 lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0 xl:pl-9">
+        <div className="grid min-w-0 content-center gap-5 border-t border-white/[0.055] pt-5 lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0 xl:pl-9">
           <div className="flex gap-3">
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md border border-white/[0.08] bg-white/[0.04]"><UserRound size={17} className="text-white/45" /></span>
-            <div>
-              <dt className="text-xs text-white/42">Artista</dt>
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md border border-white/[0.08] bg-white/[0.04]"><UserRound size={17} className="text-muted-foreground" /></span>
+            <dl>
+              <dt className="text-xs text-muted-foreground">Artista</dt>
               <dd className="mt-1 text-sm font-bold text-white/82">{project.main_artist_name || "Sem artista"}</dd>
-            </div>
+            </dl>
           </div>
           <div className="flex gap-3">
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md border border-white/[0.08] bg-white/[0.04]"><Music2 size={17} className="text-white/45" /></span>
-            <div>
-              <dt className="text-xs text-white/42">Tipo</dt>
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md border border-white/[0.08] bg-white/[0.04]"><Music2 size={17} className="text-muted-foreground" /></span>
+            <dl>
+              <dt className="text-xs text-muted-foreground">Tipo</dt>
               <dd className="mt-1 text-sm font-bold text-white/82">{TYPE[project.type] || project.type}</dd>
-            </div>
+            </dl>
           </div>
           <div className="flex gap-3">
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md border border-white/[0.08] bg-white/[0.04]"><CalendarDays size={17} className="text-white/45" /></span>
-            <div>
-              <dt className="text-xs text-white/42">Lançamento</dt>
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md border border-white/[0.08] bg-white/[0.04]"><CalendarDays size={17} className="text-muted-foreground" /></span>
+            <dl>
+              <dt className="text-xs text-muted-foreground">Lançamento</dt>
               <dd className="mt-1 text-sm font-bold text-white/82">{releaseDate}</dd>
-            </div>
+            </dl>
           </div>
-        </dl>
+        </div>
       </div>
     </section>
   );

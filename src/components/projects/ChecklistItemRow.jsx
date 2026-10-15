@@ -34,9 +34,9 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
   if (depth > 0) {
     return (
       <div className="group ml-8 flex items-center gap-2 py-0.5 text-xs">
-        <Checkbox checked={item.completed} onCheckedChange={() => onToggle(item)} className="h-4 w-4 rounded-full border-white/45 data-[state=checked]:border-primary data-[state=checked]:bg-primary" />
-        <span className={`min-w-0 flex-1 ${item.completed ? "line-through text-white/35" : "text-white/52"}`}>{item.text}</span>
-        <button type="button" onClick={() => onDelete(item)} aria-label={`Excluir ${item.text}`} className="rounded p-1 text-white/20 opacity-0 transition-colors hover:bg-red-500/10 hover:text-red-300 group-hover:opacity-100">
+        <Checkbox aria-label={`${item.completed ? "Reabrir" : "Concluir"} tarefa: ${item.text}`} checked={item.completed} onCheckedChange={() => onToggle(item)} className="h-4 w-4 rounded-full border-white/45 data-[state=checked]:border-primary data-[state=checked]:bg-primary" />
+        <span className={`min-w-0 flex-1 ${item.completed ? "line-through text-muted-foreground" : "text-white/52"}`}>{item.text}</span>
+        <button type="button" onClick={() => onDelete(item)} aria-label={`Excluir ${item.text}`} className="rounded p-1 text-muted-foreground opacity-0 transition-colors hover:bg-red-500/10 hover:text-red-300 group-hover:opacity-100">
           <Trash2 size={12} />
         </button>
       </div>
@@ -51,12 +51,12 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
     >
       <div className="p-2.5">
         <div className="flex items-center gap-2">
-          <button type="button" {...(provided?.dragHandleProps || {})} className="shrink-0 cursor-grab touch-none rounded p-0.5 text-white/30 transition-colors hover:bg-white/[0.045] hover:text-white/65 active:cursor-grabbing" aria-label={`Mover ${item.text}`}>
+          <button type="button" {...(provided?.dragHandleProps || {})} className="shrink-0 cursor-grab touch-none rounded p-0.5 text-muted-foreground transition-colors hover:bg-white/[0.045] hover:text-white/65 active:cursor-grabbing" aria-label={`Mover ${item.text}`}>
             <GripVertical size={15} />
           </button>
-          <Checkbox checked={item.completed} onCheckedChange={() => onToggle(item)} className="h-4 w-4 rounded-[4px] border-white/60 data-[state=checked]:border-primary data-[state=checked]:bg-primary" />
+          <Checkbox aria-label={`${item.completed ? "Reabrir" : "Concluir"} tarefa: ${item.text}`} checked={item.completed} onCheckedChange={() => onToggle(item)} className="h-4 w-4 rounded-[4px] border-white/60 data-[state=checked]:border-primary data-[state=checked]:bg-primary" />
           <div className="min-w-0 flex-1">
-            <p className={`text-sm font-medium leading-5 ${item.completed ? "line-through text-white/38" : "text-white/88"}`}>{item.text}</p>
+            <p className={`text-sm font-medium leading-5 ${item.completed ? "line-through text-muted-foreground" : "text-white/88"}`}>{item.text}</p>
           </div>
           {responsibleUsers.length > 0 && (
             <div className="flex shrink-0 -space-x-1.5">
@@ -68,10 +68,10 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
             </div>
           )}
 
-          <button type="button" onClick={() => onDelete(item)} className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-white/[0.02] text-white/26 transition-colors hover:bg-red-500/10 hover:text-red-300" aria-label={`Excluir ${item.text}`}>
+          <button type="button" onClick={() => onDelete(item)} className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-white/[0.02] text-muted-foreground transition-colors hover:bg-red-500/10 hover:text-red-300" aria-label={`Excluir ${item.text}`}>
             <Trash2 size={13} />
           </button>
-          <button type="button" onClick={() => setExpanded((value) => !value)} className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-white/[0.03] text-white/42 transition-colors hover:bg-white/[0.055] hover:text-white" aria-label={expanded ? "Recolher tarefa" : "Expandir tarefa"}>
+          <button type="button" onClick={() => setExpanded((value) => !value)} className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-white/[0.03] text-muted-foreground transition-colors hover:bg-white/[0.055] hover:text-white" aria-label={expanded ? "Recolher tarefa" : "Expandir tarefa"}>
             <ChevronDown size={14} className={`transition-transform ${expanded ? "rotate-180" : ""}`} />
           </button>
         </div>
@@ -81,7 +81,7 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
               <div className="flex min-w-0 flex-wrap items-center gap-2">
                 <div className="flex h-7 items-center gap-1.5 rounded-md bg-white/[0.035] pl-2 text-2xs text-white/50">
-                  <span className="text-white/30">Tipo</span>
+                  <span className="text-muted-foreground">Tipo</span>
                   <Select value={detailMode} onValueChange={(value) => onPatch(item, { detail_mode: value })}>
                     <SelectTrigger className="h-7 w-[7.75rem] border-0 bg-transparent px-1.5 py-0 text-2xs shadow-none focus:bg-transparent [&>svg]:h-3 [&>svg]:w-3">
                       <SelectValue />
@@ -94,7 +94,7 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
                 {canUseSubtasks(detailMode) && (
                   <button
                     onClick={() => setAdding(true)}
-                    className="h-7 rounded-md bg-white/[0.025] px-2 text-2xs text-white/35 transition-colors hover:bg-white/[0.05] hover:text-white/65"
+                    className="h-7 rounded-md bg-white/[0.025] px-2 text-2xs text-muted-foreground transition-colors hover:bg-white/[0.05] hover:text-white/65"
                   >
                     + Subtarefa
                   </button>
@@ -126,7 +126,7 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
                     }}
                     className="ml-8 flex items-center gap-2 py-0.5"
                   >
-                    <Circle size={13} className="text-white/35" />
+                    <Circle size={13} className="text-muted-foreground" />
                     <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Subtarefa..." className="min-w-0 flex-1 bg-transparent text-xs text-white/70 outline-none placeholder:text-white/25" autoFocus />
                   </form>
                 )}
@@ -135,7 +135,7 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
 
             {canUseNotes(detailMode) && (
               <label className="mt-2 block rounded-md border border-white/[0.055] bg-black/10 p-2 focus-within:border-primary/35">
-                <span className="mb-1.5 flex items-center gap-1.5 text-2xs font-medium uppercase tracking-[0.14em] text-white/32">
+                <span className="mb-1.5 flex items-center gap-1.5 text-2xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
                   <MessageSquareText size={13} /> Observacao
                 </span>
                 <textarea

@@ -10,7 +10,7 @@ export default function MetricStrip({ metrics }) {
               {metric.icon && <metric.icon size={21} />}
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-medium text-white/48">{metric.label}</p>
+              <p className="text-sm font-medium text-muted-foreground">{metric.label}</p>
               <p className="mt-1 font-display text-3xl font-bold leading-none tracking-tight text-white">{metric.value}</p>
             </div>
           </div>

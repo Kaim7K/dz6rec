@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { apiClient } from "@/api/appClient";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Trash2 } from "lucide-react";
 import CargoBadge from "@/components/CargoBadge";
@@ -37,9 +37,8 @@ export default function TemplateEditorDialog({ template, cargos, onClose, onSave
 
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
-        <DialogHeader><DialogTitle>Editar template — {template.name}</DialogTitle></DialogHeader>
-        <p className="text-sm text-white/40">Ajuste seções, tarefas e subtarefas. Projetos já criados não são alterados.</p>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader><DialogTitle>Editar template</DialogTitle><DialogDescription>{template.name} · Alterações salvas automaticamente. Projetos existentes mantêm suas tarefas.</DialogDescription></DialogHeader>
         <div className="space-y-4">
           {sections.map((s) => {
             const sItems = sectionItems(s.id);
@@ -49,13 +48,13 @@ export default function TemplateEditorDialog({ template, cargos, onClose, onSave
                   <input defaultValue={s.name} onBlur={(e) => { if (e.target.value !== s.name) renameSection(s, e.target.value); }} className="rounded-md border border-transparent bg-white/[0.045] px-2.5 py-1 text-sm font-medium outline-none transition-colors focus:border-primary/45" />
                   <CargoBadge cargo={s.cargo} cargos={cargos} />
                   <Select value={s.cargo || undefined} onValueChange={(v) => setSectionCargo(s, v === NONE ? null : v)}>
-                    <SelectTrigger className="h-7 w-auto min-w-[5rem] border-white/[0.08] bg-white/[0.04] px-2 text-2xs text-white/45"><SelectValue placeholder="cargo" /></SelectTrigger>
+                    <SelectTrigger className="h-7 w-auto min-w-[5rem] border-white/[0.08] bg-white/[0.04] px-2 text-2xs text-muted-foreground"><SelectValue placeholder="cargo" /></SelectTrigger>
                     <SelectContent>
-                      {s.cargo && <SelectItem value={NONE} className="text-white/45">— Limpar —</SelectItem>}
+                      {s.cargo && <SelectItem value={NONE} className="text-muted-foreground">— Limpar —</SelectItem>}
                       {cargos.map((c) => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}
                     </SelectContent>
                   </Select>
-                  <button onClick={() => delSection(s)} className="ml-auto rounded-lg p-1.5 text-white/30 transition-colors hover:bg-white/5 hover:text-red-400"><Trash2 size={15} /></button>
+                  <button onClick={() => delSection(s)} className="ml-auto rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-white/5 hover:text-red-400"><Trash2 size={15} /></button>
                 </div>
                 <div className="space-y-1">
                   {sItems.filter((i) => !i.parent_id).map((item) => (
@@ -63,7 +62,7 @@ export default function TemplateEditorDialog({ template, cargos, onClose, onSave
                   ))}
                 </div>
                 <form onSubmit={(e) => { e.preventDefault(); const f = e.target; addItem(s.id, f.text.value); f.reset(); }} className="mt-2 flex items-center gap-2">
-                  <Plus size={14} className="text-white/30" />
+                  <Plus size={14} className="text-muted-foreground" />
                   <input name="text" placeholder="Adicionar tarefa..." className="flex-1 bg-transparent text-sm outline-none placeholder:text-white/30" />
                 </form>
               </div>

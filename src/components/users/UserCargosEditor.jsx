@@ -2,8 +2,8 @@ import React from "react";
 import { AlertTriangle } from "lucide-react";
 import { ActiveCargoChip, AddableCargoChip, OrphanCargoChip } from "@/components/users/cargoChips";
 
-const SectionTitle = ({ children }) => <h3 className="font-jakarta text-section font-bold text-stage-ink">{children}</h3>;
-const EmptyHint = ({ children }) => <p className="text-body text-stage-muted">{children}</p>;
+const SectionTitle = ({ children }) => <h3 className="text-xs font-medium text-white/65">{children}</h3>;
+const EmptyHint = ({ children }) => <p className="text-xs leading-5 text-stage-muted">{children}</p>;
 
 export default function UserCargosEditor({ value = [], onChange, catalog = [], layout = "modal" }) {
   const active = value.filter(Boolean);
@@ -18,7 +18,7 @@ export default function UserCargosEditor({ value = [], onChange, catalog = [], l
     return (
       <div className="space-y-6">
         <div className="space-y-2.5">
-          <SectionTitle>Cargos Atuais</SectionTitle>
+          <SectionTitle>Cargos atuais</SectionTitle>
           {registered.length === 0 ? <EmptyHint>Nenhum cargo atribuído.</EmptyHint> : (
             <div className="flex flex-col items-start gap-2">{registered.map((n) => <ActiveCargoChip key={n} name={n} onRemove={remove} big />)}</div>
           )}
@@ -31,7 +31,7 @@ export default function UserCargosEditor({ value = [], onChange, catalog = [], l
           </div>
         )}
         <div className="space-y-2.5">
-          <SectionTitle>Adicionar Cargos</SectionTitle>
+          <SectionTitle>Adicionar cargos</SectionTitle>
           {addable.length === 0 ? <EmptyHint>Todos os cargos do catálogo já estão atribuídos.</EmptyHint> : (
             <div className="flex flex-wrap gap-2">{addable.map((n) => <AddableCargoChip key={n} name={n} onAdd={add} big />)}</div>
           )}
@@ -43,7 +43,7 @@ export default function UserCargosEditor({ value = [], onChange, catalog = [], l
   return (
     <div className="space-y-5">
       <div className="space-y-2.5">
-        <SectionTitle>Cargos Atuais</SectionTitle>
+        <SectionTitle>Cargos atuais</SectionTitle>
         {active.length === 0 ? <EmptyHint>Nenhum cargo atribuído.</EmptyHint> : (
           <div className="flex flex-wrap gap-2">
             {active.map((n) => orphans.includes(n)
@@ -53,7 +53,7 @@ export default function UserCargosEditor({ value = [], onChange, catalog = [], l
         )}
       </div>
       <div className="space-y-2.5">
-        <SectionTitle>Adicionar Cargos</SectionTitle>
+        <SectionTitle>Adicionar cargos</SectionTitle>
         {addable.length === 0 ? <EmptyHint>Todos os cargos do catálogo já estão atribuídos.</EmptyHint> : (
           <div className="flex flex-wrap gap-2">{addable.map((n) => <AddableCargoChip key={n} name={n} onAdd={add} />)}</div>
         )}

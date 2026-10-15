@@ -68,7 +68,7 @@ export default function TrackRow({ track, project, queue, index, provided, progr
 
   return (
     <div ref={provided?.innerRef} {...(provided?.draggableProps || {})} className="group grid min-w-0 gap-3 border-b border-white/[0.055] px-3 py-3 transition-colors last:border-b-0 hover:bg-white/[0.025] lg:grid-cols-[3rem_minmax(0,1fr)_6rem_9rem_minmax(12rem,18rem)_2rem] lg:items-center lg:px-4">
-      <div className="flex items-center gap-2 text-sm text-white/45">
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <button {...(provided?.dragHandleProps || {})} className="hidden shrink-0 cursor-grab touch-none text-white/18 opacity-0 transition group-hover:opacity-100 hover:text-white/55 active:cursor-grabbing lg:block" aria-label="Mover faixa">
           <GripVertical size={14} />
         </button>
@@ -83,11 +83,11 @@ export default function TrackRow({ track, project, queue, index, provided, progr
         </div>
         <div className="min-w-0">
           <p className={`truncate text-sm font-bold ${isCurrent ? "text-white" : "text-white/88"}`}>{track.name}</p>
-          <p className="truncate text-xs text-white/42">{[track.main_artist_name || project?.main_artist_name, track.featuring && `feat. ${track.featuring}`].filter(Boolean).join(" · ")}</p>
+          <p className="truncate text-xs text-muted-foreground">{[track.main_artist_name || project?.main_artist_name, track.featuring && `feat. ${track.featuring}`].filter(Boolean).join(" · ")}</p>
         </div>
       </div>
 
-      <span className="hidden text-sm text-white/48 lg:block">{track.duration || track.duration_label || "03:24"}</span>
+      <span className="hidden text-sm text-muted-foreground lg:block">{track.duration || track.duration_label || "03:24"}</span>
       <span className={`inline-flex w-fit items-center gap-2 rounded-md border px-2.5 py-1 text-xs ${tone.bg} ${tone.text} ${tone.border}`}>
         <span className={`h-1.5 w-1.5 rounded-full ${tone.dot}`} />
         {STATUS[project?.status] || "Status"}
@@ -98,7 +98,7 @@ export default function TrackRow({ track, project, queue, index, provided, progr
       </div>
 
       <div className="relative justify-self-end">
-        <button onClick={() => setMenu(!menu)} className="rounded-lg p-1 text-white/40 hover:bg-white/5 hover:text-white"><MoreHorizontal size={16} /></button>
+        <button onClick={() => setMenu(!menu)} className="rounded-lg p-1 text-muted-foreground hover:bg-white/5 hover:text-white"><MoreHorizontal size={16} /></button>
         {menu && <div className="absolute right-0 z-20 mt-1 w-44 rounded-lg border border-white/[0.08] bg-popover p-1.5 shadow-elev">
           {versions.map((v) => <button key={v.id} onClick={() => switchVersion(v)} className="block w-full rounded-md px-3 py-2 text-left text-xs text-white/70 hover:bg-white/5">{v.name}</button>)}
           {track.audio_url && <button onClick={downloadTrack} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs text-white/70 hover:bg-white/5"><Download size={13} />Baixar áudio</button>}

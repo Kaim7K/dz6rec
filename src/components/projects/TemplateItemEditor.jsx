@@ -29,9 +29,9 @@ export default function TemplateItemEditor({ item, allItems, depth, cargos, onAd
         <span className="min-w-0 flex-1 text-sm text-white/85">{item.text}</span>
         <CargoBadge cargo={item.cargo} cargos={cargos} small />
         <Select value={item.cargo || undefined} onValueChange={(v) => onSetCargo(item, v === NONE ? null : v)}>
-          <SelectTrigger className="h-6 w-auto min-w-[4.5rem] border-white/[0.08] bg-white/[0.04] px-2 text-2xs text-white/45"><SelectValue placeholder="cargo" /></SelectTrigger>
+          <SelectTrigger className="h-6 w-auto min-w-[4.5rem] border-white/[0.08] bg-white/[0.04] px-2 text-2xs text-muted-foreground"><SelectValue placeholder="cargo" /></SelectTrigger>
           <SelectContent>
-            {item.cargo && <SelectItem value={NONE} className="text-white/45">— Limpar —</SelectItem>}
+            {item.cargo && <SelectItem value={NONE} className="text-muted-foreground">— Limpar —</SelectItem>}
             {cargos.map((c) => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}
           </SelectContent>
         </Select>
@@ -45,12 +45,12 @@ export default function TemplateItemEditor({ item, allItems, depth, cargos, onAd
             </SelectContent>
           </Select>
         )}
-        <button onClick={() => onDelete(item)} className="rounded p-1 text-white/25 transition-colors hover:bg-white/5 hover:text-red-400"><Trash2 size={13} /></button>
-        {depth < 1 && canUseSubtasks(detailMode) && <button onClick={() => setAdding((a) => !a)} className="rounded p-1 text-white/30 transition-colors hover:bg-white/5 hover:text-white"><Plus size={13} /></button>}
+        <button onClick={() => onDelete(item)} className="rounded p-1 text-muted-foreground transition-colors hover:bg-white/5 hover:text-red-400"><Trash2 size={13} /></button>
+        {depth < 1 && canUseSubtasks(detailMode) && <button onClick={() => setAdding((a) => !a)} className="rounded p-1 text-muted-foreground transition-colors hover:bg-white/5 hover:text-white"><Plus size={13} /></button>}
       </div>
       {depth < 1 && canUseNotes(detailMode) && (
         <label className="mb-1 block rounded-lg border border-white/[0.06] bg-white/[0.025] p-2" style={{ marginLeft: depth * 18 + 24 }}>
-          <span className="mb-1 flex items-center gap-1.5 text-2xs uppercase tracking-[0.14em] text-white/32">
+          <span className="mb-1 flex items-center gap-1.5 text-2xs uppercase tracking-[0.14em] text-muted-foreground">
             <MessageSquareText size={12} /> Observacao
           </span>
           <textarea

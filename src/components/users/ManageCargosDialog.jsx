@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { apiClient } from "@/api/appClient";
@@ -14,7 +14,7 @@ function UserSummary({ user }) {
         {user.photo_url ? <img src={user.photo_url} alt="" className="h-full w-full object-cover" /> : (user.full_name || user.email || "U")[0].toUpperCase()}
       </span>
       <div className="min-w-0">
-        <p className="truncate font-jakarta text-section font-bold text-stage-ink">{user.full_name || "Usuário"}</p>
+        <p className="truncate font-display text-base font-semibold text-stage-ink">{user.full_name || "Usuário"}</p>
         <p className="truncate text-micro text-stage-muted">{user.email}{user.handle ? ` · @${user.handle}` : ""}</p>
       </div>
     </div>
@@ -36,10 +36,10 @@ export default function ManageCargosDialog({ user, catalog, onClose, onSaved }) 
   };
 
   const actions = (
-    <div className="flex gap-2.5">
-      <Button variant="outline" onClick={onClose} className="h-11 flex-1 rounded-sl border-stage-border bg-stage-card text-body font-medium text-stage-muted hover:bg-stage-surface hover:text-stage-ink">Cancelar</Button>
-      <Button onClick={save} disabled={loading} className="h-11 flex-1 rounded-sl bg-stage-accent text-body font-semibold text-white hover:bg-stage-accent/90">{loading ? "Salvando..." : "Salvar Alterações"}</Button>
-    </div>
+    <>
+      <Button variant="ghost" onClick={onClose}>Cancelar</Button>
+      <Button onClick={save} disabled={loading}>{loading ? "Salvando..." : "Salvar alterações"}</Button>
+    </>
   );
 
   const editor = <UserCargosEditor value={value} onChange={setValue} catalog={catalog} layout={isMobile ? "sheet" : "modal"} />;
@@ -48,29 +48,29 @@ export default function ManageCargosDialog({ user, catalog, onClose, onSaved }) 
     <Drawer open onOpenChange={(o) => !o && onClose()}>
       <DrawerContent className="max-h-[88vh] border-stage-border bg-stage-card text-stage-ink">
         <div className="border-b border-stage-border px-4 pb-3 pt-1">
-          <DrawerTitle className="font-jakarta text-section font-bold text-stage-ink">Editar Cargos</DrawerTitle>
+          <DrawerTitle className="font-display text-base font-semibold text-stage-ink">Editar Cargos</DrawerTitle>
         </div>
         <div className="flex-1 overflow-y-auto px-4 py-4">
           <UserSummary user={user} />
           <div className="mt-5">{editor}</div>
         </div>
-        <div className="border-t border-stage-border bg-stage-card p-4">{actions}</div>
+        <div className="flex flex-wrap justify-end gap-2 border-t border-stage-border bg-stage-card p-4">{actions}</div>
       </DrawerContent>
     </Drawer>
   );
 
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="max-w-[600px] border-stage-border bg-stage-card text-stage-ink">
+      <DialogContent className="max-w-[600px] text-stage-ink">
         <DialogHeader>
-          <DialogTitle className="font-jakarta text-title font-bold text-stage-ink">Editar Cargos</DialogTitle>
-          <DialogDescription className="text-body text-stage-muted">Adicione ou remova os cargos deste usuário. Cargos descontinuados também podem ser removidos aqui.</DialogDescription>
+          <DialogTitle className="text-lg font-semibold text-stage-ink">Editar Cargos</DialogTitle>
+          <DialogDescription>Adicione ou remova cargos deste usuário, incluindo os descontinuados.</DialogDescription>
         </DialogHeader>
         <div className="max-h-[52vh] overflow-y-auto pr-1">
           <UserSummary user={user} />
           <div className="mt-5">{editor}</div>
         </div>
-        <div className="mt-4 border-t border-stage-border pt-4">{actions}</div>
+        <DialogFooter>{actions}</DialogFooter>
       </DialogContent>
     </Dialog>
   );

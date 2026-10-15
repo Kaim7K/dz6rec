@@ -2,15 +2,14 @@ import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import Field from "@/components/ui/form-field";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiClient } from "@/api/appClient";
 import { PERMISSAO, cargoList, uploadFile } from "@/lib/music";
 import FileField from "@/components/ui/file-field";
 import UserCargosEditor from "@/components/users/UserCargosEditor";
 
-const Field = ({ label, children }) => <div className="space-y-1.5"><Label className="text-stage-ink">{label}</Label>{children}</div>;
-const selectCls = "border-stage-border bg-stage-card text-stage-ink";
+const selectCls = "text-stage-ink";
 const contentCls = "border-stage-border bg-stage-card text-stage-ink";
 
 export default function EditUserDialog({ user, cargos, onClose, onSaved }) {
@@ -33,15 +32,15 @@ export default function EditUserDialog({ user, cargos, onClose, onSaved }) {
   };
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="max-w-md border-stage-border bg-stage-card text-stage-ink">
+      <DialogContent className="max-w-md text-stage-ink">
         <DialogHeader>
-          <DialogTitle className="font-jakarta text-title font-bold text-stage-ink">Editar usuário</DialogTitle>
-          <DialogDescription className="text-body text-stage-muted">Defina cargos, permissão e status. Um usuário pode ter vários cargos.</DialogDescription>
+          <DialogTitle className="text-lg font-semibold text-stage-ink">Editar usuário</DialogTitle>
+          <DialogDescription>Defina cargos, permissão e status de acesso.</DialogDescription>
         </DialogHeader>
         <div className="space-y-5">
-          <Field label="Cargos">
+          <fieldset aria-label="Cargos" className="min-w-0">
             <UserCargosEditor value={cargosArr} onChange={setCargosArr} catalog={cargos} />
-          </Field>
+          </fieldset>
           <Field label="Permissão">
             <Select value={permissao} onValueChange={setPermissao}><SelectTrigger className={selectCls}><SelectValue /></SelectTrigger><SelectContent className={contentCls}>{Object.entries(PERMISSAO).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}</SelectContent></Select>
           </Field>

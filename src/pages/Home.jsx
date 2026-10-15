@@ -12,7 +12,7 @@ function Panel({ title, action = "Ver todos", children }) {
     <section className="dz-card min-h-[14.4rem] p-4 sm:p-5">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="dz-panel-title">{title}</h2>
-        <Link to="/projetos" className="inline-flex items-center gap-2 text-xs font-medium text-white/45 transition-colors hover:text-white">
+        <Link to="/projetos" className="inline-flex items-center gap-2 text-xs font-medium text-muted-foreground transition-colors hover:text-white">
           {action} <ArrowRight size={13} />
         </Link>
       </div>
@@ -47,7 +47,7 @@ function ActionRow({ task, project, index }) {
       <ActionIcon index={index} />
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-bold text-white/88">{task.text}</p>
-        <p className="mt-1 truncate text-xs text-white/42">{project?.name || "Projeto"} - {project?.main_artist_name || "DZ6"}</p>
+        <p className="mt-1 truncate text-xs text-muted-foreground">{project?.name || "Projeto"} - {project?.main_artist_name || "DZ6"}</p>
       </div>
       <span className={`hidden rounded-md px-2.5 py-1 text-xs font-bold sm:inline-flex ${warn ? "bg-yellow-500/15 text-yellow-300" : "bg-white/[0.04] text-white/62"}`}>{status}</span>
     </Link>
@@ -61,7 +61,7 @@ function ProjectRow({ project }) {
       <MiniCover project={project} />
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-bold text-white/88">{project.name}</p>
-        <p className="mt-1 truncate text-xs text-white/42">{project.main_artist_name || "Sem artista"}</p>
+        <p className="mt-1 truncate text-xs text-muted-foreground">{project.main_artist_name || "Sem artista"}</p>
       </div>
       <span className={`hidden rounded-md px-2.5 py-1 text-xs font-medium sm:inline-flex ${tone.bg} ${tone.text}`}>{STATUS[project.status] || project.status}</span>
     </Link>
@@ -115,7 +115,7 @@ export default function Home() {
     );
   }
 
-  if (!data) return <p className="text-sm text-white/40">Carregando...</p>;
+  if (!data) return <p className="text-sm text-muted-foreground">Carregando...</p>;
 
   const metrics = [
     { label: "Projetos ativos", value: data.active, icon: FolderKanban },
@@ -125,6 +125,7 @@ export default function Home() {
 
   return (
     <div className="space-y-5">
+      <h1 className="sr-only">Visão geral</h1>
       <FeaturedProject project={data.featured} progress={data.byProject[data.featured?.id]} />
       <MetricStrip metrics={metrics} />
 

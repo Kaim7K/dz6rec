@@ -9,7 +9,7 @@ export default function HistoryTab({ project }) {
     <div className="space-y-2">{logs.map((l) => (
       <div key={l.id} className="flex items-start gap-3 rounded-lg border border-white/[0.07] bg-white/[0.035] p-3.5 text-sm">
         <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary/50" />
-        <div><p className="text-white/85">{l.text}</p><p className="mt-0.5 text-2xs text-white/35">{l.user_name} · {new Date(l.created_date).toLocaleString("pt-BR")}</p></div>
+        <div><p className="text-white/85">{l.text}</p><p className="mt-0.5 text-2xs text-muted-foreground">{l.user_name} · {new Date(l.created_date).toLocaleString("pt-BR")}</p></div>
       </div>
     ))}</div>
   );

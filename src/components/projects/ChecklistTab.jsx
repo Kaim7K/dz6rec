@@ -336,7 +336,7 @@ export default function ChecklistTab({ project }) {
                 <div className="flex min-w-0 max-w-[11rem] flex-wrap items-center justify-end gap-2 sm:max-w-[14rem] 2xl:max-w-[10.5rem]">
                   {firstSection?.cargo && <CargoBadge cargo={firstSection.cargo} cargos={cargos} className="h-8 max-w-full px-3 text-xs" />}
                   <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: category.color }} />
-                  <button onClick={() => firstSection && setNoteSection(firstSection)} className="grid h-7 w-7 shrink-0 place-items-center rounded-md text-white/45 transition-colors hover:bg-white/[0.04] hover:text-white" aria-label="Notas da seção"><MoreHorizontal size={17} /></button>
+                  <button onClick={() => firstSection && setNoteSection(firstSection)} className="grid h-7 w-7 shrink-0 place-items-center rounded-md text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-white" aria-label="Notas da seção"><MoreHorizontal size={17} /></button>
                 </div>
               </div>
 
@@ -373,14 +373,14 @@ export default function ChecklistTab({ project }) {
                 </Droppable>
 
                 {categorySections.length === 0 && (
-                  <p className="rounded-md border border-dashed border-white/[0.08] px-3 py-3 text-sm text-white/35">Nenhuma seção nesta operação.</p>
+                  <p className="rounded-md border border-dashed border-white/[0.08] px-3 py-3 text-sm text-muted-foreground">Nenhuma seção nesta operação.</p>
                 )}
 
                 <form onSubmit={(e) => { e.preventDefault(); const f = e.currentTarget; addCategoryItems(category, f.text.value); f.reset(); }} className="grid min-h-[4.5rem] grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-md border border-dashed border-white/[0.12] bg-black/10 px-3 py-2.5 transition-colors focus-within:border-primary/45 focus-within:bg-white/[0.025] sm:grid-cols-[2rem_minmax(0,1fr)_auto]">
                   <span className="grid h-8 w-8 place-items-center rounded-md bg-white/[0.045] text-white/60">
                     <Plus size={16} />
                   </span>
-                  <textarea name="text" rows={2} placeholder={"Adicionar tarefas...\nUma tarefa por linha"} className="min-h-10 min-w-0 resize-none bg-transparent py-0.5 text-sm leading-5 text-white/82 outline-none placeholder:text-white/40" />
+                  <textarea aria-label={`Adicionar tarefas de ${category.label}`} name="text" rows={2} placeholder={"Adicionar tarefas...\nUma tarefa por linha"} className="min-h-10 min-w-0 resize-none bg-transparent py-0.5 text-sm leading-5 text-white/82 outline-none placeholder:text-white/40" />
                   <button type="submit" className="col-span-2 h-8 rounded-md border border-white/[0.08] px-3 text-xs font-bold text-white/62 transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-white sm:col-span-1">
                     Adicionar
                   </button>
