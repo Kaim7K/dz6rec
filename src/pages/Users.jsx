@@ -9,7 +9,7 @@ import { PERMISSAO, cargoList } from "@/lib/music";
 import { Check, Loader2, Pencil, Plus, Search, ShieldCheck, Users as UsersIcon } from "lucide-react";
 
 const ALL = "__all__";
-const GRID = "lg:grid-cols-[minmax(0,2fr)_minmax(0,2fr)_minmax(0,3fr)_auto]";
+const GRID = "grid-cols-[minmax(0,2fr)_minmax(0,2fr)_minmax(0,3fr)_auto]";
 
 export default function Users() {
   const [users, setUsers] = useState([]);
@@ -107,10 +107,10 @@ export default function Users() {
         </Select>
       </div>
 
-      <form onSubmit={invite} className="dz-card flex flex-col gap-2.5 p-3.5 sm:flex-row sm:items-center">
+      <form onSubmit={invite} className="dz-invite-form dz-card gap-2.5 p-3.5">
         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@gravadora.com" required className="dz-input flex-1" />
         <Select value={inviteCargo} onValueChange={setInviteCargo}>
-          <SelectTrigger aria-label="Cargo do convidado" className="h-10 w-full rounded-md text-sm text-white sm:w-48"><SelectValue placeholder="Cargo (opcional)" /></SelectTrigger>
+          <SelectTrigger aria-label="Cargo do convidado" className="h-10 w-full rounded-md text-sm text-white"><SelectValue placeholder="Cargo (opcional)" /></SelectTrigger>
           <SelectContent className="border-stage-border bg-stage-card text-stage-ink">{cargos.map((c) => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}</SelectContent>
         </Select>
         <button disabled={sending} className="dz-primary-button disabled:opacity-60">
@@ -119,12 +119,12 @@ export default function Users() {
       </form>
       {msg && <p className="text-body text-stage-muted">{msg}</p>}
 
-      <div className="dz-card overflow-hidden">
-        <div className={`hidden items-center gap-4 border-b border-white/[0.07] bg-white/[0.035] px-4 py-3 text-micro font-semibold uppercase tracking-wide text-stage-muted lg:grid ${GRID}`}>
+      <div className="dz-users-table dz-card overflow-hidden">
+        <div className={`grid items-center gap-4 border-b border-white/[0.07] bg-white/[0.035] px-4 py-3 text-micro font-semibold uppercase tracking-wide text-stage-muted ${GRID}`}>
           <span>Usuário</span><span>E-mail</span><span>Cargos</span><span className="text-right">Ações</span>
         </div>
         {filtered.map((u) => (
-          <div key={u.id} className={`hidden items-center gap-4 border-b border-white/[0.06] px-4 py-3 transition-colors last:border-0 hover:bg-white/[0.025] lg:grid ${GRID}`}>
+          <div key={u.id} className={`grid items-center gap-4 border-b border-white/[0.06] px-4 py-3 transition-colors last:border-0 hover:bg-white/[0.025] ${GRID}`}>
             <div className="flex min-w-0 items-center gap-3">
               <Avatar u={u} size="h-8 w-8" />
               <div className="min-w-0">
@@ -151,7 +151,7 @@ export default function Users() {
         {filtered.length === 0 && <p className="p-6 text-center text-body text-stage-muted">Nenhum usuário encontrado.</p>}
       </div>
 
-      <div className="space-y-3 lg:hidden">
+      <div className="dz-users-cards">
         {filtered.map((u) => {
           const list = cargoList(u.cargo);
           return (

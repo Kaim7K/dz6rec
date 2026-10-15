@@ -8,12 +8,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { uploadFile } from "@/lib/music";
 import FileField from "@/components/ui/file-field";
 import EditArtistDialog from "@/components/artists/EditArtistDialog";
+import ArtistUserField from "@/components/artists/ArtistUserField";
 import { Mic2, Plus, Pencil } from "lucide-react";
 
 export default function Artists() {
   const [artists, setArtists] = useState([]);
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ name: "", handle: "", bio: "" });
+  const [form, setForm] = useState({ name: "", handle: "", bio: "", user_id: "" });
   const [photo, setPhoto] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -27,7 +28,7 @@ export default function Artists() {
     try {
       const photo_url = photo ? await uploadFile(photo) : "";
       await apiClient.entities.Artist.create({ ...form, photo_url });
-      setForm({ name: "", handle: "", bio: "" }); setPhoto(null); setOpen(false); load();
+      setForm({ name: "", handle: "", bio: "", user_id: "" }); setPhoto(null); setOpen(false); load();
     } catch (err) {
       setError(err.message || "Não foi possível criar o artista. Tente novamente.");
     } finally {
@@ -47,11 +48,11 @@ export default function Artists() {
       {artists.length === 0 ? (
         <div className="dz-empty">Nenhum artista cadastrado.</div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{artists.map((a) => (
+        <div className="dz-catalog-grid">{artists.map((a) => (
           <div key={a.id} className="group min-w-0 overflow-hidden rounded-lg border border-white/[0.08] bg-[#111010] p-2.5 shadow-soft transition-colors duration-300 hover:border-white/[0.14] hover:bg-[#171414]">
             <div className="aspect-square w-full overflow-hidden rounded-md border border-white/[0.07] bg-black">{a.photo_url ? <img src={a.photo_url} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" alt="" /> : <div className="grid h-full place-items-center bg-white/[0.02]"><Mic2 className="text-white/18" size={28} /></div>}</div>
             <div className="flex items-center justify-between gap-3 px-1 pb-1 pt-4">
-              <div><p className="font-medium text-white">{a.name}</p><p className="text-xs text-muted-foreground">{a.handle ? `@${a.handle}` : "—"}</p></div>
+              <div className="min-w-0 flex-1"><p className="break-words font-medium text-white">{a.name}</p><p className="truncate text-xs text-muted-foreground">{a.handle ? `@${a.handle}` : "—"}</p></div>
               <button onClick={() => setEditing(a)} aria-label={`Editar ${a.name}`} className="dz-icon-button h-8 w-8"><Pencil size={15} /></button>
             </div>
           </div>
@@ -63,6 +64,7 @@ export default function Artists() {
           <fieldset disabled={loading} className="min-w-0 space-y-4">
           <Field label="Nome"><Input required value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="Nome do artista" /></Field>
           <Field label="@usuário"><Input value={form.handle} onChange={(e) => setForm((f) => ({ ...f, handle: e.target.value }))} placeholder="handle" /></Field>
+          <ArtistUserField value={form.user_id} onChange={user_id => setForm(f => ({ ...f, user_id }))} disabled={loading} />
           <Field label="Foto"><FileField value={photo} onChange={setPhoto} accept="image/*" hint="Retrato do artista" /></Field>
           <Field label="Bio"><Textarea value={form.bio} onChange={(e) => setForm((f) => ({ ...f, bio: e.target.value }))} rows={3} placeholder="Breve descrição" /></Field>
           </fieldset>

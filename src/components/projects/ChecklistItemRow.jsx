@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { CalendarDays, ChevronDown, Circle, GripVertical, MessageSquareText, Trash2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import AssignResponsible from "@/components/projects/AssignResponsible";
@@ -15,9 +15,16 @@ const DETAIL_MODE = {
 const canUseSubtasks = (mode) => mode !== "notes";
 const canUseNotes = (mode) => mode === "notes" || mode === "both";
 
-export default function ChecklistItemRow({ item, allItems, depth, users, cargos, onToggle, onAddSub, onAssign, onUnassign, onAssignCargo, onPatch, onDelete, provided, isDragging = false }) {
+export default function ChecklistItemRow({ item, allItems, depth, users, cargos, onToggle, onAddSub, onAssign, onUnassign, onAssignCargo, onPatch, onDelete, provided, isDragging = false, focused = false }) {
+  const rowRef = useRef(null);
   const children = allItems.filter((i) => i.parent_id === item.id);
   const [expanded, setExpanded] = useState(false);
+  useEffect(() => {
+    if (!focused) return;
+    setExpanded(true);
+    rowRef.current?.scrollIntoView({ block: "center", behavior: "smooth" });
+    rowRef.current?.focus({ preventScroll: true });
+  }, [focused]);
   const [adding, setAdding] = useState(false);
   const [text, setText] = useState("");
   const [observation, setObservation] = useState(item.observation || "");
@@ -45,7 +52,9 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
 
   return (
     <article
-      ref={provided?.innerRef}
+      ref={node => { rowRef.current = node; provided?.innerRef?.(node); }}
+      tabIndex={-1}
+      data-task-id={item.id}
       {...(provided?.draggableProps || {})}
       className={`overflow-hidden rounded-md border border-white/[0.075] bg-[#171414] shadow-[inset_0_1px_0_rgba(255,255,255,0.035)] ${isDragging ? "border-primary/35 bg-white/[0.055] shadow-2xl" : ""}`}
     >
@@ -56,7 +65,7 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
           </button>
           <Checkbox aria-label={`${item.completed ? "Reabrir" : "Concluir"} tarefa: ${item.text}`} checked={item.completed} onCheckedChange={() => onToggle(item)} className="h-4 w-4 rounded-[4px] border-white/60 data-[state=checked]:border-primary data-[state=checked]:bg-primary" />
           <div className="min-w-0 flex-1">
-            <p className={`text-sm font-medium leading-5 ${item.completed ? "line-through text-muted-foreground" : "text-white/88"}`}>{item.text}</p>
+            <p className={`text-sm font-medium leading-5 [overflow-wrap:anywhere] ${item.completed ? "line-through text-muted-foreground" : "text-white/88"}`}>{item.text}</p>
           </div>
           {responsibleUsers.length > 0 && (
             <div className="flex shrink-0 -space-x-1.5">

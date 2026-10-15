@@ -36,7 +36,7 @@ try {
   await page.getByRole("button", { name: "Adicionar faixa", exact: true }).first().click();
   await page.getByLabel("Nome", { exact: true }).fill("Faixa QA");
   await page.getByRole("dialog").getByRole("button", { name: "Adicionar faixa", exact: true }).click();
-  await page.getByText("Faixa QA", { exact: true }).waitFor();
+  await page.getByTitle("Faixa QA (Demo 01)", { exact: true }).waitFor();
 
   await page.getByRole("tab", { name: "Tarefas", exact: true }).click();
   const input = page.getByRole("textbox", { name: "Adicionar tarefas de Música", exact: true });

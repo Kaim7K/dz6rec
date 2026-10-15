@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import FileField from "@/components/ui/file-field";
 import { apiClient } from "@/api/appClient";
 import { uploadFile } from "@/lib/music";
+import ArtistUserField from "@/components/artists/ArtistUserField";
 
 export default function EditArtistDialog({ artist, open, onClose, onSaved }) {
   const [form, setForm] = useState({ name: "", handle: "", bio: "" });
@@ -16,7 +17,7 @@ export default function EditArtistDialog({ artist, open, onClose, onSaved }) {
   const [removePhoto, setRemovePhoto] = useState(false);
 
   useEffect(() => {
-    if (artist) setForm({ name: artist.name || "", handle: artist.handle || "", bio: artist.bio || "" });
+    if (artist) setForm({ name: artist.name || "", handle: artist.handle || "", bio: artist.bio || "", user_id: artist.user_id || "" });
     setPhoto(null);
     setRemovePhoto(false);
     setError("");
@@ -53,6 +54,7 @@ export default function EditArtistDialog({ artist, open, onClose, onSaved }) {
           <fieldset disabled={loading} className="space-y-4">
           <Field label="Nome"><Input required value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Nome do artista" /></Field>
           <Field label="@usuário"><Input value={form.handle} onChange={(e) => set("handle", e.target.value)} placeholder="handle" /></Field>
+          <ArtistUserField value={form.user_id} onChange={user_id => set("user_id", user_id)} disabled={loading} />
           <Field label="Foto"><FileField value={photo} onChange={setPhoto} disabled={loading} existingUrl={removePhoto ? "" : artist?.photo_url} existingLabel="Foto atual" onRemoveExisting={() => setRemovePhoto(true)} removeLabel="Remover foto" accept="image/*" hint="Retrato do artista" />{removePhoto && !photo && <p role="status" className="text-xs text-white/55">A foto será removida ao salvar.</p>}</Field>
           <Field label="Bio"><Textarea value={form.bio} onChange={(e) => set("bio", e.target.value)} rows={3} placeholder="Breve descrição" /></Field>
           </fieldset>

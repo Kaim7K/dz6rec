@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CATEGORIES, cargoList, logActivity, taskResponsibleIds, taskResponsibleNames, usersForCargo } from "@/lib/music";
 import { notifyNextStage, notifyUsers } from "@/lib/notifications";
 
-export default function ChecklistTab({ project }) {
+export default function ChecklistTab({ project, focusTaskId }) {
   const [sections, setSections] = useState([]);
   const [items, setItems] = useState([]);
   const [noteSection, setNoteSection] = useState(null);
@@ -319,7 +319,7 @@ export default function ChecklistTab({ project }) {
         </button>
       </div>
       <DragDropContext onDragEnd={onDragEnd}>
-        <div className="grid gap-4 2xl:grid-cols-3">
+        <div className="dz-checklist-grid">
           {CATEGORIES.map((category) => {
           const categorySections = sections.filter((section) => sectionCategory(section) === category.key);
           const categoryItems = categoryParentItems(categorySections);
@@ -362,7 +362,7 @@ export default function ChecklistTab({ project }) {
                         return (
                           <Draggable key={item.id} draggableId={item.id} index={index}>
                             {(prov, snapshot) => (
-                              <ChecklistItemRow item={item} allItems={sectionItems} depth={0} users={users} cargos={cargos} onToggle={toggle} onAddSub={addSub} onAssign={assign} onUnassign={unassign} onAssignCargo={assignCargo} onPatch={patchItem} onDelete={deleteItem} provided={prov} isDragging={snapshot.isDragging} />
+                              <ChecklistItemRow item={item} allItems={sectionItems} depth={0} users={users} cargos={cargos} onToggle={toggle} onAddSub={addSub} onAssign={assign} onUnassign={unassign} onAssignCargo={assignCargo} onPatch={patchItem} onDelete={deleteItem} provided={prov} isDragging={snapshot.isDragging} focused={item.id === focusTaskId || sectionItems.some(child => child.id === focusTaskId && child.parent_id === item.id)} />
                             )}
                           </Draggable>
                         );

@@ -6,7 +6,7 @@ import dz6ProfileLogo from "@/assets/dz6-profile.png";
 
 function Cover({ project }) {
   return (
-    <div className="aspect-square w-full max-w-[var(--home-cover)] overflow-hidden rounded-lg border border-white/[0.08] bg-black shadow-elev">
+    <div className="dz-featured-cover aspect-square w-full overflow-hidden rounded-lg border border-white/[0.08] bg-black">
       <img src={project.cover_url || dz6ProfileLogo} className="h-full w-full object-cover" alt="" />
     </div>
   );
@@ -21,10 +21,8 @@ export default function FeaturedProject({ project, progress }) {
     : "Sem data";
 
   return (
-    <section className="dz-card relative overflow-hidden p-5 sm:p-6">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-primary/55 via-white/16 to-transparent" />
-      <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(255,255,255,0.045),rgba(255,255,255,0.006)_60%)]" />
-      <div className="relative grid min-w-0 gap-5 [--home-cover:12rem] lg:grid-cols-[minmax(10rem,var(--home-cover))_minmax(0,1fr)_minmax(13rem,17.5rem)] lg:items-start">
+    <section className="dz-featured dz-card relative overflow-hidden p-5 sm:p-6">
+      <div className="dz-featured-grid">
         <Cover project={project} />
 
         <div className="flex min-w-0 flex-col justify-between gap-5 py-0.5">
@@ -35,7 +33,7 @@ export default function FeaturedProject({ project, progress }) {
               <span className="text-2xs uppercase tracking-[0.18em] text-muted-foreground">· {TYPE[project.type]}</span>
             </div>
             <h2 className="mt-2 break-words font-display text-2xl font-bold leading-[1.05] tracking-tight text-white sm:text-[2rem]">{project.name}</h2>
-            <p className="mt-1.5 text-sm text-white/52">{project.main_artist_name || "Sem artista"}</p>
+            <p className="mt-1.5 text-sm text-white/52 [overflow-wrap:anywhere]">{project.main_artist_name || "Sem artista"}</p>
           </div>
 
           <div className="space-y-5">
@@ -52,7 +50,7 @@ export default function FeaturedProject({ project, progress }) {
           </div>
         </div>
 
-        <div className="grid min-w-0 content-center gap-5 border-t border-white/[0.055] pt-5 lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0 xl:pl-9">
+        <div className="dz-featured-details grid min-w-0 content-center gap-5 border-t border-white/[0.055] pt-5">
           <div className="flex gap-3">
             <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md border border-white/[0.08] bg-white/[0.04]"><UserRound size={17} className="text-muted-foreground" /></span>
             <dl>

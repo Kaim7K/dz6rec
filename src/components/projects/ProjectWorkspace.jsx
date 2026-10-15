@@ -1,7 +1,8 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { apiClient } from "@/api/appClient";
 import FileField from "@/components/ui/file-field";
-import { uploadFile, dueLabel, isDueSoon, isOverdue, nextProjectAction, STATUS } from "@/lib/music";
+import { uploadFile, dueLabel, isDueSoon, isOverdue, nextProjectAction, STATUS, taskHasResponsible, taskResponsibleLabel } from "@/lib/music";
+import AssignTaskDialog from "@/components/projects/AssignTaskDialog";
 import { AlertTriangle, CheckCircle2, Clock3, FileAudio, FileImage, FileText, Upload, ArrowRight } from "lucide-react";
 
 const FILE_TYPES = {
@@ -22,7 +23,7 @@ function projectHealth(items) {
   const open = items.filter((item) => !item.completed);
   const overdue = open.filter((item) => isOverdue(item.due_date)).length;
   const soon = open.filter((item) => isDueSoon(item.due_date)).length;
-  const unassigned = open.filter((item) => !item.responsible_id && !item.responsible_name).length;
+  const unassigned = open.filter((item) => !taskHasResponsible(item)).length;
   if (overdue) return { label: "Atrasado", tone: "text-red-300", Icon: AlertTriangle, detail: `${overdue} prazo(s) vencido(s)` };
   if (soon || unassigned) return { label: "Em risco", tone: "text-amber-300", Icon: Clock3, detail: soon ? `${soon} prazo(s) próximos` : `${unassigned} tarefa(s) sem responsável` };
   return { label: "Em dia", tone: "text-emerald-300", Icon: CheckCircle2, detail: "Sem bloqueios críticos" };
@@ -79,7 +80,7 @@ function Approvals({ items }) {
             <span className={`h-2 w-2 rounded-full ${item.completed ? "bg-emerald-400" : isOverdue(item.due_date) ? "bg-primary" : "bg-amber-300"}`} />
             <div className="min-w-0 flex-1">
               <p className="break-words text-sm text-white/82">{item.text}</p>
-              <p className="text-2xs text-muted-foreground">{item.responsible_name || item.cargo || "Sem responsável"}{item.due_date ? ` · ${dueLabel(item.due_date)}` : ""}</p>
+              <p className="text-2xs text-muted-foreground">{taskResponsibleLabel(item) || "Sem responsável"}{item.due_date ? ` · ${dueLabel(item.due_date)}` : ""}</p>
             </div>
             <span className="text-2xs text-muted-foreground">{item.completed ? "aprovado" : "pendente"}</span>
           </div>
@@ -115,7 +116,7 @@ function Files({ project, files, onChanged }) {
   };
 
   return (
-    <section>
+    <section id={`project-files-${project.id}`}>
       <ModuleHeader title="Arquivos" meta={`${files.length} itens`} />
       <div className="border-y border-white/[0.05]">
         {files.map((entry) => {
@@ -147,15 +148,39 @@ function Files({ project, files, onChanged }) {
   );
 }
 
-export default function ProjectWorkspace({ project, sections, items, files, onChanged }) {
+export default function ProjectWorkspace({ project, artist, sections, items, files, onChanged, onOpenTasks, onOpenProject, onEditArtist }) {
+  const [assignTask, setAssignTask] = useState(null);
+  const [ownerUser, setOwnerUser] = useState(null);
+  const [ownerLoading, setOwnerLoading] = useState(false);
+  const [ownerError, setOwnerError] = useState(false);
+  useEffect(() => {
+    let active = true;
+    setOwnerUser(null);
+    setOwnerError(false);
+    setOwnerLoading(!!artist?.user_id);
+    if (artist?.user_id) apiClient.entities.User.get(artist.user_id)
+      .then(user => { if (active) setOwnerUser(user); })
+      .catch(() => { if (active) setOwnerError(true); })
+      .finally(() => { if (active) setOwnerLoading(false); });
+    return () => { active = false; };
+  }, [artist?.user_id]);
   const health = useMemo(() => projectHealth(items), [items]);
   const nextAction = useMemo(() => nextProjectAction(project, items, files), [project, items, files]);
   const open = items.filter((item) => !item.completed);
   const HealthIcon = health.Icon;
+  const act = () => {
+    if (nextAction.target === "assign") setAssignTask(items.find(item => item.id === nextAction.task_id));
+    else if (nextAction.target === "task") onOpenTasks?.(nextAction.task_id);
+    else if (nextAction.target === "files") {
+      const section = document.getElementById(`project-files-${project.id}`);
+      section?.scrollIntoView({ block: "center", behavior: "smooth" });
+      section?.querySelector("input")?.focus({ preventScroll: true });
+    } else onOpenProject?.();
+  };
 
   return (
-    <div className="grid min-w-0 gap-8 xl:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.75fr)]">
-      <div className="space-y-7">
+    <div className="dz-workspace-grid min-w-0">
+      <div className="min-w-0 space-y-7">
         <section className="border-b border-white/[0.05] pb-5">
           <p className="text-2xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Próxima ação</p>
           <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -164,26 +189,33 @@ export default function ProjectWorkspace({ project, sections, items, files, onCh
               <p className="mt-1 break-words text-sm text-white/62">{nextAction.text}</p>
               <p className={`mt-2 text-xs ${nextAction.tone === "danger" ? "text-red-300" : nextAction.tone === "warn" ? "text-amber-300" : "text-muted-foreground"}`}>{nextAction.detail}</p>
             </div>
-            <a href={nextAction.href} className="inline-flex h-9 items-center gap-2 rounded-md bg-white/[0.055] px-3 text-sm font-bold text-white/78 hover:bg-white/[0.085]">
+            <button type="button" onClick={act} className="inline-flex min-h-9 shrink-0 items-center gap-2 self-start rounded-md bg-white/[0.055] px-3 py-2 text-sm font-bold text-white/78 hover:bg-white/[0.085]">
               {nextAction.action} <ArrowRight size={14} />
-            </a>
+            </button>
           </div>
         </section>
         <section>
-          <div className="flex items-center justify-between border-b border-white/[0.05] pb-3">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/[0.05] pb-3">
             <p className="text-sm font-bold text-white">Status do projeto</p>
             <div className={`flex items-center gap-2 text-sm font-bold ${health.tone}`}><HealthIcon size={15} />{health.label}</div>
           </div>
-          <div className="grid gap-3 border-b border-white/[0.05] py-4 sm:grid-cols-4">
+          <div className="dz-workspace-stats border-b border-white/[0.05] py-4">
+            <div className="min-w-0" data-project-owner>
+              <p className="text-2xs text-muted-foreground">Dono do projeto</p>
+              <p className="mt-1 break-words text-sm text-white/76">{artist?.name || project.main_artist_name || "Selecione um artista"}</p>
+              <p className="mt-1 break-words text-xs text-muted-foreground">{ownerLoading ? "Carregando conta..." : ownerUser ? `${ownerUser.full_name || ownerUser.email}${ownerUser.full_name ? ` · ${ownerUser.email}` : ""}` : ownerError ? "Usuário indisponível" : "Sem usuário vinculado"}</p>
+              {artist && <button type="button" onClick={onEditArtist} className="mt-2 text-xs font-medium text-red-200 hover:text-white">{artist.user_id ? "Editar vínculo" : "Vincular usuário"}</button>}
+            </div>
             <div><p className="text-2xs text-muted-foreground">Status</p><p className="mt-1 text-sm text-white/76">{STATUS[project.status] || project.status}</p></div>
             <div><p className="text-2xs text-muted-foreground">Lançamento</p><p className="mt-1 text-sm text-white/76">{project.release_date ? new Date(project.release_date).toLocaleDateString("pt-BR") : "Sem data"}</p></div>
             <div><p className="text-2xs text-muted-foreground">Tarefas abertas</p><p className="mt-1 text-sm text-white/76">{open.length}</p></div>
-            <div><p className="text-2xs text-muted-foreground">Sem responsável</p><p className="mt-1 text-sm text-white/76">{open.filter((item) => !item.responsible_id && !item.responsible_name).length}</p></div>
+            <div><p className="text-2xs text-muted-foreground">Sem responsável</p><p className="mt-1 text-sm text-white/76">{open.filter((item) => !taskHasResponsible(item)).length}</p></div>
           </div>
         </section>
         <Workflow sections={sections} items={items} />
       </div>
-      <div className="space-y-7 xl:border-l xl:border-white/[0.05] xl:pl-6">
+      {assignTask && <AssignTaskDialog task={assignTask} project={project} onClose={() => setAssignTask(null)} onSaved={onChanged} />}
+      <div className="dz-workspace-aside min-w-0 space-y-7">
         <Approvals items={items} />
         <Files project={project} files={files} onChanged={onChanged} />
       </div>

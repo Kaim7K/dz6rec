@@ -32,7 +32,7 @@ export default function ProjectCard({ project, progress, onEdit, onDeleted }) {
       </div>
       </Link>
       {(onEdit || onDeleted) && (
-        <div className="absolute right-5 top-5 flex gap-1.5 opacity-100 transition-opacity duration-300 sm:opacity-0 sm:group-hover:opacity-100">
+        <div className="dz-project-card-actions absolute right-5 top-5 flex gap-1.5 opacity-100 transition-opacity duration-300 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">
           {onEdit && (
             <button
               type="button"

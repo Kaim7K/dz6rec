@@ -20,8 +20,9 @@ export default function CargoBadge({ cargo, cargos, className = "", small = fals
   const color = cargoColor(cargo, cargos);
   return (
     <span
-      className={`inline-flex min-w-0 items-center gap-1.5 rounded-full font-medium ${small ? "px-1.5 py-0 text-2xs" : "px-2 py-0.5 text-2xs"} ${className}`}
-      style={{ color: color || "#fff", backgroundColor: (color || "#888") + "1f", border: `1px solid ${(color || "#888")}40` }}
+      title={label}
+      className={`inline-flex min-w-0 max-w-full items-center gap-1.5 rounded-full font-medium ${small ? "px-1.5 py-0 text-2xs" : "px-2 py-0.5 text-2xs"} ${className}`}
+      style={{ color: "#e5e5e5", backgroundColor: (color || "#888") + "1f", border: `1px solid ${(color || "#888")}40` }}
     >
       <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: color || "#888" }} />
       <span className="min-w-0 truncate">{label}</span>

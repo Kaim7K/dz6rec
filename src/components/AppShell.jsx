@@ -41,7 +41,7 @@ export default function AppShell() {
         <Sidebar open={menuOpen} onClose={() => setMenuOpen(false)} />
         <div className="min-w-0 lg:pl-[17rem]">
           <Topbar onMenu={() => setMenuOpen(true)} />
-          <main className="relative mx-auto min-h-[calc(100vh-4rem)] max-w-[1600px] overflow-x-hidden px-4 py-5 pb-28 sm:px-5 lg:px-7 lg:py-7 lg:pb-32 xl:px-9">
+          <main className="dz-app-content relative mx-auto min-w-0 min-h-[calc(100vh-4rem)] max-w-[1600px] px-4 py-5 pb-36 sm:px-5 lg:px-7 lg:py-7 lg:pb-36 xl:px-9">
             <Outlet />
           </main>
         </div>

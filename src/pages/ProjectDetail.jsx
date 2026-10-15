@@ -8,6 +8,7 @@ import { usePlayer } from "@/lib/playerContext";
 import { TYPE, STATUS, STATUS_ORDER, logActivity } from "@/lib/music";
 import { computeProgress } from "@/lib/progress";
 import EditProjectDialog from "@/components/projects/EditProjectDialog";
+import EditArtistDialog from "@/components/artists/EditArtistDialog";
 import TrackList from "@/components/projects/TrackList";
 import ChecklistTab from "@/components/projects/ChecklistTab";
 import HistoryTab from "@/components/projects/HistoryTab";
@@ -27,6 +28,9 @@ export default function ProjectDetail() {
   const [files, setFiles] = useState([]);
   const [artists, setArtists] = useState([]);
   const [editOpen, setEditOpen] = useState(false);
+  const [editArtistOpen, setEditArtistOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("faixas");
+  const [focusTaskId, setFocusTaskId] = useState(null);
   const player = usePlayer();
   const load = () => {
     Promise.all([apiClient.entities.Project.get(id), apiClient.entities.Track.filter({ project_id: id }), apiClient.entities.ChecklistItem.filter({ project_id: id }), apiClient.entities.ChecklistSection.filter({ project_id: id }), apiClient.entities.ProjectFile.filter({ project_id: id }).catch(() => []), apiClient.entities.Artist.list()]).then(([p, t, i, s, f, a]) => {
@@ -50,6 +54,7 @@ export default function ProjectDetail() {
   const changeType = (v) => patch("type", v, `Tipo alterado para ${TYPE[v]}`);
   const changeStatus = (v) => patch("status", v, `Status alterado para ${STATUS[v]}`);
   const progress = computeProgress(items, sections);
+  const artist = artists.find(row => row.id === project.main_artist_id);
 
   const tabs = [
     ["faixas", "Faixas", Music2],
@@ -87,7 +92,7 @@ export default function ProjectDetail() {
               </Select>
             </div>
             <h1 className="mt-3 break-words font-display text-2xl font-bold tracking-tight text-white sm:text-3xl xl:text-[2.25rem] xl:leading-[1.08]">{project.name}</h1>
-            <p className="mt-1 text-xs text-white/55 xl:text-sm">{project.main_artist_name}{project.featuring ? ` feat. ${project.featuring}` : ""}</p>
+            <p className="mt-1 text-xs text-white/55 [overflow-wrap:anywhere] xl:text-sm">{project.main_artist_name}{project.featuring ? ` feat. ${project.featuring}` : ""}</p>
             <p className="mt-2.5 max-w-2xl text-xs leading-5 text-muted-foreground xl:mt-3 xl:text-sm xl:leading-6">{project.description || "Projeto sem descrição."}</p>
 
             <div className="mt-4 flex flex-wrap items-center gap-2 xl:mt-5">
@@ -109,22 +114,23 @@ export default function ProjectDetail() {
         </div>
       </section>
 
-      <Tabs defaultValue="faixas" className="min-w-0 pt-1">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="min-w-0 pt-1">
         <TabsList className="dz-card h-auto w-full justify-start gap-1 overflow-x-auto overscroll-x-contain bg-[var(--surface-2)] p-1">
           {tabs.map(([v, label, Icon]) => <TabsTrigger key={v} value={v} className="shrink-0 gap-2 rounded-md border border-transparent bg-transparent px-3 py-2 text-sm font-semibold text-muted-foreground transition-colors data-[state=active]:border-white/[0.08] data-[state=active]:bg-white/[0.07] data-[state=active]:text-white"><Icon size={16} />{label}</TabsTrigger>)}
         </TabsList>
-        <TabsContent value="operacao" className="mt-5"><ProjectWorkspace project={project} sections={sections} items={items} files={files} onChanged={load} /></TabsContent>
+        <TabsContent value="operacao" className="mt-5"><ProjectWorkspace project={project} artist={artist} sections={sections} items={items} files={files} onChanged={load} onOpenTasks={taskId => { setFocusTaskId(taskId); setActiveTab("checklist"); }} onOpenProject={() => setActiveTab("faixas")} onEditArtist={() => setEditArtistOpen(true)} /></TabsContent>
         <TabsContent value="faixas" className="mt-5">
           <div className="space-y-5">
             <TrackList project={project} tracks={tracks} onChanged={load} progressPct={progress.total.pct} />
           </div>
         </TabsContent>
-        <TabsContent value="checklist" className="mt-5"><ChecklistTab project={project} /></TabsContent>
+        <TabsContent value="checklist" className="mt-5"><ChecklistTab project={project} focusTaskId={focusTaskId} /></TabsContent>
         <TabsContent value="historico" className="mt-5"><HistoryTab project={project} /></TabsContent>
         <TabsContent value="chat" className="mt-5"><ChatTab project={project} /></TabsContent>
       </Tabs>
 
       <EditProjectDialog project={project} open={editOpen} onClose={() => setEditOpen(false)} onSaved={load} artists={artists} />
+      <EditArtistDialog artist={artist} open={editArtistOpen} onClose={() => setEditArtistOpen(false)} onSaved={load} />
     </div>
   );
 }

@@ -92,18 +92,22 @@ export function nextProjectAction(project, items = [], files = []) {
       detail: overdue[0].due_date ? `Venceu ${dueLabel(overdue[0].due_date).toLowerCase()}` : "Prazo vencido",
       href: `/projetos/${project.id}`,
       action: "Abrir tarefa",
+      target: "task",
+      task_id: overdue[0].id,
     };
   }
 
-  const unassigned = open.find((item) => !item.responsible_id && !item.responsible_name);
+  const unassigned = open.find((item) => !taskHasResponsible(item));
   if (unassigned) {
     return {
       tone: "warn",
       title: "Definir responsável",
       text: unassigned.text,
-      detail: "Sem dono claro",
+      detail: "Tarefa sem responsável",
       href: `/projetos/${project.id}`,
       action: "Atribuir",
+      target: "assign",
+      task_id: unassigned.id,
     };
   }
 
@@ -116,6 +120,8 @@ export function nextProjectAction(project, items = [], files = []) {
       detail: approval.responsible_name || approval.cargo || "Pendente",
       href: `/projetos/${project.id}`,
       action: "Revisar",
+      target: "task",
+      task_id: approval.id,
     };
   }
 
@@ -127,6 +133,7 @@ export function nextProjectAction(project, items = [], files = []) {
       detail: "Nenhum arquivo anexado",
       href: `/projetos/${project.id}`,
       action: "Adicionar arquivo",
+      target: "files",
     };
   }
 
@@ -139,6 +146,8 @@ export function nextProjectAction(project, items = [], files = []) {
       detail: nextTask.due_date ? dueLabel(nextTask.due_date) : nextTask.responsible_name || "Sem prazo",
       href: `/projetos/${project.id}`,
       action: "Continuar",
+      target: "task",
+      task_id: nextTask.id,
     };
   }
 
@@ -149,6 +158,7 @@ export function nextProjectAction(project, items = [], files = []) {
     detail: STATUS[project.status] || project.status,
     href: `/projetos/${project.id}`,
     action: "Ver projeto",
+    target: "project",
   };
 }
 

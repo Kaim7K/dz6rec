@@ -1,16 +1,29 @@
 import { chromium } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { build } from 'esbuild';
 
-const origin = 'http://127.0.0.1:5173';
+const origin = process.env.AUDIT_URL || 'http://127.0.0.1:5173';
+const published = process.env.AUDIT_PUBLISHED === '1' && origin === 'https://dz6rec.vercel.app';
+if (!published && !['localhost', '127.0.0.1'].includes(new URL(origin).hostname)) throw new Error('Synthetic data only.');
+const bundle = published ? await build({ stdin: { contents: 'export { mockRequest } from "./src/api/mockData.js";', resolveDir: process.cwd() }, bundle: true, write: false, format: 'iife', globalName: 'QAMock' }) : null;
 const output = path.resolve(process.env.DESIGN_CAPTURE_DIR || 'artifacts/visual-audit/refinement');
 await mkdir(output, { recursive: true });
 const browser = await chromium.launch();
 const results = [];
 try {
   for (const width of (process.env.DESIGN_WIDTHS || '360,390,768,1024,1440').split(',').map(Number)) {
-    const context = await browser.newContext({ viewport: { width, height: width < 640 ? 844 : 1000 }, reducedMotion: 'reduce' });
+    const context = await browser.newContext({ viewport: { width, height: Number(process.env.DESIGN_HEIGHT) || (width < 640 ? 844 : 1000) }, reducedMotion: 'reduce' });
+    if (published) await context.addInitScript({ content: bundle.outputFiles[0].text + '\nglobalThis.QAMock = QAMock;' });
     const page = await context.newPage();
+    page.setDefaultTimeout(15000);
+    if (published) await page.route('**/api/**', async route => {
+      try {
+        const req = route.request();
+        const data = await page.evaluate(({ url, method, body }) => QAMock.mockRequest(url, { method, body }), { url: req.url(), method: req.method(), body: req.postData() || undefined });
+        await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(data) });
+      } catch { await route.fulfill({ status: 500, contentType: 'application/json', body: '{"error":"Synthetic test failed"}' }); }
+    });
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
     const capture = async name => {
@@ -18,6 +31,24 @@ try {
       const issues = await page.evaluate(() => {
         const found = [];
         if (document.documentElement.scrollWidth > innerWidth + 1) found.push('page overflow');
+        for (const el of document.querySelectorAll('main h1, main h2, main h3, main p')) {
+          const rect = el.getBoundingClientRect();
+          if (el.textContent.trim() && rect.height > 2 && rect.width < 4 && !el.closest('.sr-only')) found.push('collapsed text: ' + el.textContent.slice(0, 45));
+        }
+        for (const grid of document.querySelectorAll('.dz-catalog-grid')) {
+          const min = Math.min(grid.clientWidth, 240);
+          if ([...grid.children].some(card => card.getBoundingClientRect().width < min - 1)) found.push('catalog cards too narrow');
+        }
+        for (const popup of document.querySelectorAll('[data-radix-popper-content-wrapper]')) {
+          const r = popup.getBoundingClientRect();
+          if (r.width && (r.left < -1 || r.right > innerWidth + 1 || r.top < -1 || r.bottom > innerHeight + 1)) found.push('floating content outside viewport');
+        }
+        const player = document.querySelector('.dz-player');
+        if (player) {
+          const r = player.getBoundingClientRect();
+          if (r.left < -1 || r.right > innerWidth + 1 || r.bottom > innerHeight + 1 || player.scrollWidth > player.clientWidth + 1) found.push('player overflow');
+          if (parseFloat(getComputedStyle(document.querySelector('main')).paddingBottom) < r.height) found.push('player covers end of page');
+        }
         const dialog = document.querySelector('[role="dialog"], [role="alertdialog"]');
         if (dialog) {
           const r = dialog.getBoundingClientRect();
@@ -55,14 +86,44 @@ try {
       await capture(name);
       await page.keyboard.press('Escape');
     }
+    await visit('/projetos');
+    await page.getByRole('button', { name: 'Novo projeto', exact: true }).click();
+    await page.getByRole('combobox', { name: 'Status', exact: true }).click();
+    await capture('status-select');
+    await page.keyboard.press('Escape');
+    await page.getByRole('button', { name: 'Lançamento previsto', exact: true }).click();
+    await capture('calendar');
+    await page.keyboard.press('Escape');
+    await page.getByRole('button', { name: 'Fechar', exact: true }).click();
+    await visit('/');
+    await page.getByRole('button', { name: 'Notificações', exact: true }).click();
+    await capture('notifications');
+    await page.getByRole('button', { name: 'Menu da conta', exact: true }).click();
+    await capture('account-menu');
+    await page.getByRole('button', { name: 'Menu da conta', exact: true }).click();
+    if (width < 1024) {
+      await page.getByRole('button', { name: 'Abrir menu', exact: true }).click();
+      await capture('navigation');
+      await page.getByRole('complementary').getByRole('button', { name: 'Fechar menu', exact: true }).click();
+    }
     await visit('/projetos/project-1');
     for (const [tab, name] of [['Tarefas', 'checklist'], ['Operação', 'workspace'], ['Histórico', 'history'], ['Conversa', 'chat']]) {
       await page.getByRole('tab', { name: tab, exact: true }).click();
       await capture(name);
     }
     await page.getByRole('tab', { name: 'Tarefas', exact: true }).click();
+    await page.getByRole('button', { name: 'Expandir tarefa', exact: true }).first().click();
+    await capture('expanded-task');
+    await page.getByRole('combobox', { name: 'Prioridade da tarefa', exact: true }).first().click();
+    await capture('task-priority');
+    await page.keyboard.press('Escape');
     await page.getByRole('button', { name: 'Notas da seção' }).first().click();
     await capture('notes');
+    await page.keyboard.press('Escape');
+    await page.getByRole('tab', { name: 'Faixas', exact: true }).click();
+    await page.getByRole('button', { name: 'Reproduzir', exact: true }).click();
+    await page.getByRole('region', { name: 'Player de áudio', exact: true }).waitFor();
+    await capture('player');
     await context.close();
     console.log(`Reviewed ${width}px`);
   }

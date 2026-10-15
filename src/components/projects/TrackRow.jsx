@@ -72,9 +72,9 @@ export default function TrackRow({ track, project, queue, index, provided, progr
   };
 
   return (
-    <div ref={provided?.innerRef} {...(provided?.draggableProps || {})} className="group grid min-w-0 gap-3 border-b border-white/[0.055] px-3 py-3 transition-colors last:border-b-0 hover:bg-white/[0.025] lg:grid-cols-[2.5rem_minmax(0,1fr)_4rem_7.5rem_5rem_2rem] lg:items-center lg:px-4 xl:grid-cols-[3rem_minmax(0,1fr)_6rem_9rem_minmax(12rem,18rem)_2rem]">
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <button {...(provided?.dragHandleProps || {})} className="hidden shrink-0 cursor-grab touch-none text-white/18 opacity-0 transition group-hover:opacity-100 hover:text-white/55 active:cursor-grabbing lg:block" aria-label="Mover faixa">
+    <div ref={provided?.innerRef} {...(provided?.draggableProps || {})} className="dz-track-row group min-w-0 border-b border-white/[0.055] px-3 py-3 transition-colors last:border-b-0 hover:bg-white/[0.025]">
+      <div className="dz-track-index flex items-center gap-1 text-sm text-muted-foreground">
+        <button {...(provided?.dragHandleProps || {})} className="dz-track-drag shrink-0 cursor-grab touch-none text-white/35 transition hover:text-white/65 active:cursor-grabbing" aria-label="Mover faixa">
           <GripVertical size={14} />
         </button>
         <button onClick={play} className="grid h-8 w-8 shrink-0 place-items-center rounded-md text-sm text-white/55 group-hover:bg-white/[0.04] group-hover:text-white">
@@ -82,7 +82,7 @@ export default function TrackRow({ track, project, queue, index, provided, progr
         </button>
       </div>
 
-      <div className="flex min-w-0 items-center gap-3">
+      <div className="dz-track-title flex min-w-0 items-center gap-3">
         <div className="h-11 w-11 shrink-0 overflow-hidden rounded-md border border-white/[0.07] bg-black">
           {project?.cover_url ? <img src={project.cover_url} alt="" className="h-full w-full object-cover" /> : <img src={dz6ProfileLogo} alt="" className="h-full w-full object-cover opacity-90" />}
         </div>
@@ -92,17 +92,17 @@ export default function TrackRow({ track, project, queue, index, provided, progr
         </div>
       </div>
 
-      <span className="hidden text-sm text-muted-foreground lg:block">{track.duration || track.duration_label || "03:24"}</span>
-      <span className={`inline-flex w-fit items-center gap-2 rounded-md border px-2.5 py-1 text-xs ${tone.bg} ${tone.text} ${tone.border}`}>
+      <span className="dz-track-duration text-sm text-muted-foreground">{track.duration || track.duration_label || "03:24"}</span>
+      <span className={`dz-track-status inline-flex w-fit items-center gap-2 rounded-md border px-2.5 py-1 text-xs ${tone.bg} ${tone.text} ${tone.border}`}>
         <span className={`h-1.5 w-1.5 rounded-full ${tone.dot}`} />
         {STATUS[project?.status] || "Status"}
       </span>
-      <div className="hidden items-center gap-3 lg:flex">
-        <div className="hidden xl:block"><Waveform pct={progressPct} /></div>
+      <div className="dz-track-progress items-center gap-3">
+        <div className="dz-track-waveform"><Waveform pct={progressPct} /></div>
         <span className="text-sm font-bold tabular-nums text-white/78">{progressPct}%</span>
       </div>
 
-      <div className="relative justify-self-end">
+      <div className="dz-track-menu relative justify-self-end">
         <DropdownMenu open={menu} onOpenChange={setMenu}>
           <DropdownMenuTrigger asChild>
             <button type="button" aria-label={`Opções da faixa ${track.name}`} className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-white/5 hover:text-white"><MoreHorizontal size={16} /></button>

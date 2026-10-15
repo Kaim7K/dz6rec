@@ -9,8 +9,8 @@ import { isOverdue, STATUS, STATUS_TONE, taskScore } from "@/lib/music";
 
 function Panel({ title, action = "Ver todos", children }) {
   return (
-    <section className="dz-card min-h-[14.4rem] p-4 sm:p-5">
-      <div className="mb-4 flex items-center justify-between">
+    <section className="dz-card min-w-0 min-h-[14.4rem] p-4 sm:p-5">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <h2 className="dz-panel-title">{title}</h2>
         <Link to="/projetos" className="inline-flex items-center gap-2 text-xs font-medium text-muted-foreground transition-colors hover:text-white">
           {action} <ArrowRight size={13} />
@@ -129,7 +129,7 @@ export default function Home() {
       <FeaturedProject project={data.featured} progress={data.byProject[data.featured?.id]} />
       <MetricStrip metrics={metrics} />
 
-      <div className="grid gap-4 lg:grid-cols-[1fr_0.96fr]">
+      <div className="dz-overview-grid">
         <Panel title="Próximas ações">
           <div>
             {data.pendingItems.slice(0, 3).map((task, index) => (

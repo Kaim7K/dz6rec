@@ -305,7 +305,7 @@ export default function ChatTab({ project }) {
             }
           }}
           placeholder="Escreva uma mensagem..."
-          className="max-h-32 min-h-10 flex-1 resize-none rounded-md border border-white/[0.07] bg-white/[0.03] px-3.5 py-2.5 text-sm leading-5 text-white outline-none placeholder:text-white/32 focus:border-primary/40 focus:bg-white/[0.045]"
+          className="max-h-32 min-h-10 min-w-0 flex-1 resize-none rounded-md border border-white/[0.07] bg-white/[0.03] px-3.5 py-2.5 text-sm leading-5 text-white outline-none placeholder:text-white/32 focus:border-primary/40 focus:bg-white/[0.045]"
         />
         <button
           type="button"

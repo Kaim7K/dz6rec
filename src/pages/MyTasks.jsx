@@ -74,7 +74,7 @@ function TaskCard({ task, project, cargos, users, provided, isDragging }) {
   const stageTone = stage === "concluido" ? "border-emerald-400/25 bg-emerald-500/[0.055]" : stage === "em_progresso" ? "border-amber-400/25 bg-amber-500/[0.055]" : overdue ? "border-primary/35 bg-primary/[0.055]" : "border-white/[0.08] bg-[#151212]";
 
   return (
-    <article ref={provided.innerRef} {...provided.draggableProps} className={`rounded-md border p-2.5 shadow-soft transition-colors hover:border-white/[0.14] ${stageTone} ${isDragging ? "border-primary/50 bg-white/[0.075] shadow-elev" : ""}`}>
+    <article ref={provided.innerRef} {...provided.draggableProps} className={`min-w-0 rounded-md border p-2.5 shadow-soft transition-colors hover:border-white/[0.14] ${stageTone} ${isDragging ? "border-primary/50 bg-white/[0.075] shadow-elev" : ""}`}>
       <div className="flex items-start gap-2.5">
         <button type="button" {...provided.dragHandleProps} className="mt-0.5 shrink-0 cursor-grab rounded p-0.5 text-muted-foreground hover:bg-white/[0.05] hover:text-white/70 active:cursor-grabbing" aria-label={`Mover ${task.text}`}>
           <GripVertical size={14} />
@@ -189,7 +189,7 @@ export default function MyTasks() {
           <h1 className="dz-page-title">Minhas tarefas</h1>
           <p className="dz-page-subtitle">Kanban das suas atribuicoes em projetos ativos. Projetos lancados saem daqui sem apagar a tarefa do projeto.</p>
         </div>
-        <div className="grid grid-cols-3 gap-2 sm:min-w-[22rem]">
+        <div className="grid w-full max-w-sm shrink-0 grid-cols-3 gap-2">
           <div className="dz-card-soft px-3 py-2">
             <p className="text-2xs uppercase tracking-[0.16em] text-muted-foreground">Ativas</p>
             <p className="mt-1 text-lg font-bold text-white">{activeCount}</p>
@@ -215,9 +215,9 @@ export default function MyTasks() {
         </div>
       ) : (
         <DragDropContext onDragEnd={onDragEnd}>
-          <div className="grid gap-4 xl:grid-cols-3">
+          <div className="dz-kanban-grid">
             {COLUMNS.map(({ key, label, description, Icon, tone }) => (
-              <section key={key} className="dz-card min-h-[22rem] p-3.5">
+              <section key={key} className="dz-card min-w-0 min-h-[22rem] p-3.5">
                 <div className="mb-3 flex items-start justify-between gap-3 px-1">
                   <div className="flex items-center gap-2.5">
                     <span className={`grid h-9 w-9 place-items-center rounded-md border border-white/[0.07] bg-white/[0.03] ${tone}`}>

@@ -2,7 +2,7 @@ import React from "react";
 
 export default function MetricStrip({ metrics }) {
   return (
-    <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+    <div className="dz-metrics-grid">
       {metrics.map((metric) => (
         <article key={metric.label} className="dz-card p-4 sm:p-5">
           <div className="flex items-center gap-4">

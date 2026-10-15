@@ -56,11 +56,11 @@ export default function AddTrackDialog({ open, onClose, onCreated, project, trac
         {error && <div className="rounded-md border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</div>}
         <form onSubmit={submit} className="space-y-4">
           <Field label="Nome"><Input value={form.name} onChange={(e) => set("name", e.target.value)} placeholder={project?.name || "Ex. Noite Clara"} /></Field>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="dz-form-columns">
             <Field label="Artista principal"><Input value={form.main_artist_name} onChange={(e) => set("main_artist_name", e.target.value)} /></Field>
             <Field label="Nº da faixa"><Input type="number" value={form.track_number} onChange={(e) => set("track_number", e.target.value)} /></Field>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="dz-form-columns">
             <Field label="Participações"><Input value={form.featuring} onChange={(e) => set("featuring", e.target.value)} placeholder="Artistas convidados" /></Field>
             <Field label="Versão"><Input value={form.version_label} onChange={(e) => set("version_label", e.target.value)} placeholder="Demo 01, Mix 01..." /></Field>
           </div>
@@ -79,11 +79,11 @@ export default function AddTrackDialog({ open, onClose, onCreated, project, trac
             )}
           </Field>
           <p className="pt-1 text-2xs font-medium uppercase tracking-[0.16em] text-muted-foreground">Detalhes opcionais</p>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="dz-form-columns">
             <Field label="BPM"><Input type="number" value={form.bpm} onChange={(e) => set("bpm", e.target.value)} /></Field>
             <Field label="Tom"><Input value={form.key} onChange={(e) => set("key", e.target.value)} placeholder="Cm" /></Field>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="dz-form-columns">
             <Field label="ISRC"><Input value={form.isrc} onChange={(e) => set("isrc", e.target.value)} /></Field>
           </div>
           <Field label="Observações"><Textarea value={form.notes} onChange={(e) => set("notes", e.target.value)} rows={2} /></Field>

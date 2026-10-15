@@ -70,8 +70,8 @@ export default function Configuracoes() {
         <div className="mt-5 flex flex-wrap gap-2">
           {cargos.length === 0 && <p className="text-sm text-muted-foreground">Nenhum cargo criado ainda.</p>}
           {cargos.map((c) => (
-            <div key={c.id} className="flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.04] py-1 pl-3 pr-2">
-              <button onClick={() => setEditCargo(c)} className="transition-opacity hover:opacity-75"><CargoBadge cargo={c.name} cargos={cargos} /></button>
+            <div key={c.id} className="flex min-w-0 max-w-full items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.04] py-1 pl-3 pr-2">
+              <button onClick={() => setEditCargo(c)} className="min-w-0 transition-opacity hover:opacity-75"><CargoBadge cargo={c.name} cargos={cargos} /></button>
               <button onClick={() => setEditCargo(c)} aria-label="Editar cargo" className="rounded-full p-1 text-muted-foreground transition-colors hover:bg-white/5 hover:text-white"><Pencil size={13} /></button>
               <button onClick={() => remove(c)} aria-label="Excluir cargo" className="rounded-full p-1 text-muted-foreground transition-colors hover:bg-white/5 hover:text-red-400"><Trash2 size={13} /></button>
             </div>

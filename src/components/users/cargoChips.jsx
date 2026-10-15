@@ -18,7 +18,7 @@ export function ActiveCargoChip({ name, onRemove, big = false }) {
 // Chip de cargo órfão (não existe mais no catálogo) — âmbar tracejado com alerta
 export function OrphanCargoChip({ name, onRemove, big = false }) {
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-md border border-dashed border-stage-warn bg-stage-warn-soft px-2.5 py-1 text-body font-medium text-stage-warn ${big ? "min-h-11 px-3" : ""}`}>
+    <span className={`inline-flex min-w-0 max-w-full flex-wrap items-center gap-1.5 rounded-md border border-dashed border-stage-warn bg-stage-warn-soft px-2.5 py-1 text-body font-medium text-stage-warn ${big ? "min-h-11 px-3" : ""}`}>
       <AlertTriangle size={13} className="shrink-0" />
       <span className="truncate">{name}</span>
       <span className="shrink-0 text-micro font-medium text-stage-warn/70">Descontinuado</span>
