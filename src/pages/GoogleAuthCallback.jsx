@@ -26,7 +26,7 @@ export default function GoogleAuthCallback() {
       {error ? (
         <div className="text-center">
           <p className="text-destructive mb-4">{error}</p>
-          <Link to="/login" className="text-primary font-medium hover:underline">Voltar para o login</Link>
+          <Link to="/login" className="text-red-300 font-medium hover:underline">Voltar para o login</Link>
         </div>
       ) : (
         <div className="flex items-center gap-3 text-muted-foreground">

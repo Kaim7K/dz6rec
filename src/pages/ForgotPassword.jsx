@@ -31,7 +31,7 @@ export default function ForgotPassword() {
       title="Redefinir senha"
       subtitle="Enviaremos um link para o seu e-mail"
       footer={
-        <Link to="/login" className="text-primary font-medium hover:underline">
+        <Link to="/login" className="text-red-300 font-medium hover:underline">
           <ArrowLeft className="w-3 h-3 inline mr-1" />Voltar para entrar
         </Link>
       }

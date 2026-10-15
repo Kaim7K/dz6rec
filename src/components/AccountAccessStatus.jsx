@@ -9,7 +9,7 @@ export default function AccountAccessStatus({ user }) {
   return (
     <div className="min-h-screen bg-background px-4 py-10 text-white">
       <div className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-md flex-col items-center justify-center text-center">
-        <div className="grid h-14 w-14 place-items-center rounded-full bg-primary/12 text-primary ring-1 ring-primary/20">
+        <div className="grid h-14 w-14 place-items-center rounded-full bg-primary/12 text-red-300 ring-1 ring-primary/20">
           <Icon size={24} />
         </div>
         <h1 className="mt-5 font-display text-2xl font-bold tracking-tight">

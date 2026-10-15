@@ -68,8 +68,8 @@ export default function TemplateEditorDialog({ template, cargos, onClose, onSave
               </div>
             );
           })}
-          <form onSubmit={addSection} className="flex items-center gap-2">
-            <input value={newSection} onChange={(e) => setNewSection(e.target.value)} placeholder="Nova seção..." className="dz-input flex-1 px-4 py-2.5" />
+          <form onSubmit={addSection} className="grid min-w-0 gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
+            <input aria-label="Nome da nova seção" value={newSection} onChange={(e) => setNewSection(e.target.value)} placeholder="Nova seção..." className="dz-input w-full px-3" />
             <button className="dz-primary-button h-10 px-4">Adicionar</button>
           </form>
         </div>

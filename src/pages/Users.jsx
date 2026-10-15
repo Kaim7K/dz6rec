@@ -99,7 +99,7 @@ export default function Users() {
           <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar por nome ou e-mail..." className="dz-input w-full pl-9" />
         </div>
         <Select value={filterCargo} onValueChange={setFilterCargo}>
-          <SelectTrigger className="h-10 w-full rounded-md text-sm text-white sm:w-56"><SelectValue placeholder="Filtrar por cargo" /></SelectTrigger>
+          <SelectTrigger aria-label="Filtrar por cargo" className="h-10 w-full rounded-md text-sm text-white sm:w-56"><SelectValue placeholder="Filtrar por cargo" /></SelectTrigger>
           <SelectContent className="border-stage-border bg-stage-card text-stage-ink">
             <SelectItem value={ALL}>Todos os cargos</SelectItem>
             {cargos.map((c) => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}
@@ -110,7 +110,7 @@ export default function Users() {
       <form onSubmit={invite} className="dz-card flex flex-col gap-2.5 p-3.5 sm:flex-row sm:items-center">
         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@gravadora.com" required className="dz-input flex-1" />
         <Select value={inviteCargo} onValueChange={setInviteCargo}>
-          <SelectTrigger className="h-10 w-full rounded-md text-sm text-white sm:w-48"><SelectValue placeholder="Cargo (opcional)" /></SelectTrigger>
+          <SelectTrigger aria-label="Cargo do convidado" className="h-10 w-full rounded-md text-sm text-white sm:w-48"><SelectValue placeholder="Cargo (opcional)" /></SelectTrigger>
           <SelectContent className="border-stage-border bg-stage-card text-stage-ink">{cargos.map((c) => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}</SelectContent>
         </Select>
         <button disabled={sending} className="dz-primary-button disabled:opacity-60">
@@ -141,7 +141,7 @@ export default function Users() {
             </div>
             <div className="flex flex-wrap gap-1.5">{chipsFor(u, cargoList(u.cargo))}</div>
             <div className="flex items-center justify-end gap-1">
-              <button onClick={() => setCargoUser(u)} className="inline-flex h-8 items-center gap-1.5 rounded-md border border-stage-border bg-stage-card px-2.5 text-micro font-semibold text-stage-accent transition-colors hover:border-stage-accent/40 hover:bg-stage-accent-soft">Gerenciar Cargos</button>
+              <button onClick={() => setCargoUser(u)} className="inline-flex h-8 items-center gap-1.5 rounded-md border border-stage-border bg-stage-card px-2.5 text-micro font-semibold text-red-200 transition-colors hover:border-stage-accent/40 hover:bg-stage-accent-soft">Gerenciar Cargos</button>
               {u.status === "pendente" && <button onClick={() => approve(u)} className="inline-flex h-8 items-center gap-1.5 rounded-md bg-emerald-600 px-2.5 text-micro font-semibold text-white transition-colors hover:bg-emerald-700"><Check size={14} />Aprovar</button>}
               <button onClick={() => setEditUser(u)} aria-label="Editar usuário" className="rounded-full p-2 text-stage-muted transition-colors hover:bg-stage-surface hover:text-stage-ink"><Pencil size={15} /></button>
               {u.id !== me.id && <DeleteUserButton user={u} onDeleted={load} />}

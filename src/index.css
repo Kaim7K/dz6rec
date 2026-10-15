@@ -10,7 +10,7 @@
   :root {
     --background: 0 10% 3.5%;
     --foreground: 0 0% 96%;
-    --card: 0 7% 8%;
+    --card: 0 4% 6.5%;
     --card-foreground: 0 0% 96%;
     --popover: 0 8% 9%;
     --popover-foreground: 0 0% 96%;
@@ -137,18 +137,81 @@
 }
 
 @layer components {
+  .dz-project-header {
+    container: project-header / inline-size;
+  }
+
+  .dz-project-hero {
+    display: grid;
+    min-width: 0;
+    gap: 1.25rem;
+  }
+
+  .dz-project-cover {
+    position: relative;
+    width: 100%;
+    max-width: 17rem;
+    aspect-ratio: 1;
+    margin-inline: auto;
+    overflow: hidden;
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius);
+    background: #080505;
+  }
+
+  .dz-project-cover > * {
+    position: absolute;
+    inset: 0;
+  }
+
+  .dz-project-progress {
+    container: project-progress / inline-size;
+  }
+
+  @container project-header (min-width: 42rem) {
+    .dz-project-hero {
+      grid-template-columns: minmax(0, 30%) minmax(0, 1fr);
+      align-items: center;
+    }
+    .dz-project-cover {
+      max-width: none;
+      margin: 0;
+    }
+    .dz-project-hero-progress {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @container project-header (min-width: 56rem) {
+    .dz-project-hero { align-items: stretch; }
+    .dz-project-cover {
+      grid-row: 1 / span 2;
+      min-height: 100%;
+      aspect-ratio: auto;
+    }
+    .dz-project-hero-progress {
+      grid-column: 2;
+    }
+  }
+
+  @container project-progress (min-width: 21rem) {
+    .dz-project-progress-categories { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  @container project-progress (min-width: 29rem) {
+    .dz-project-progress-categories { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+
   .dz-card {
-    @apply rounded-lg border shadow-soft backdrop-blur;
+    @apply rounded-lg border;
     border-color: var(--line-soft);
-    background:
-      linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.018)),
-      var(--surface-2);
+    background: var(--surface-2);
   }
 
   .dz-card-soft {
-    @apply rounded-lg border shadow-soft;
+    @apply rounded-lg border;
     border-color: var(--line-soft);
-    background: rgba(255,255,255,0.032);
+    background: var(--surface-1);
   }
 
   .dz-card-hover {
@@ -224,9 +287,9 @@
   }
 
   .dz-section {
-    @apply rounded-lg border p-4 shadow-soft sm:p-5;
+    @apply rounded-lg border p-4 sm:p-5;
     border-color: var(--line-soft);
-    background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.014)), var(--surface-1);
+    background: var(--surface-2);
   }
 
   .dz-field-surface {

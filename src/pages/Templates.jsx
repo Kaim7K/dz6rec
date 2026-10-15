@@ -39,7 +39,7 @@ export default function Templates() {
         <div className="dz-card overflow-hidden">{templates.map((t) => (
           <div key={t.id} className="dz-list-row group flex items-center justify-between gap-3 px-4 py-3.5">
             <div className="flex min-w-0 items-center gap-3">
-              <div className="grid h-10 w-10 place-items-center rounded-md bg-primary/12 text-primary ring-1 ring-primary/18"><LayoutTemplate size={18} /></div>
+              <div className="grid h-10 w-10 place-items-center rounded-md bg-primary/12 text-red-300 ring-1 ring-primary/18"><LayoutTemplate size={18} /></div>
               <div><p className="font-medium text-white">{t.name}</p><p className="text-2xs text-muted-foreground">Aplicável ao criar um projeto · editável</p></div>
             </div>
             <div className="flex shrink-0 items-center gap-1">

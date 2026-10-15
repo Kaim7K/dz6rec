@@ -44,7 +44,7 @@ export default function Login() {
       footer={
         <Link
           to={"/register" + (returnTo !== "/" ? "?returnTo=" + encodeURIComponent(returnTo) : "")}
-          className="text-primary font-medium hover:underline"
+          className="text-red-300 font-medium hover:underline"
         >
           Primeiro acesso? Criar conta
         </Link>

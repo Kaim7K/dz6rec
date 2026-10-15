@@ -29,7 +29,7 @@ export default function TrackList({ project, tracks, onChanged, progressPct = 0 
     <section className="dz-card min-w-0 p-4 sm:p-5">
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-center gap-3">
-          <span className="grid h-10 w-10 place-items-center rounded-md border border-white/[0.08] bg-white/[0.04] text-primary">
+          <span className="grid h-10 w-10 place-items-center rounded-md border border-white/[0.08] bg-white/[0.04] text-red-300">
             <Music2 size={20} />
           </span>
           <div>
@@ -46,7 +46,7 @@ export default function TrackList({ project, tracks, onChanged, progressPct = 0 
           <Droppable droppableId="tracks">
             {(provided) => (
               <div ref={provided.innerRef} {...provided.droppableProps} className="min-w-0 overflow-hidden rounded-lg border border-white/[0.07] bg-black/15">
-                <div className="hidden grid-cols-[3rem_1fr_6rem_9rem_18rem_2rem] border-b border-white/[0.065] bg-white/[0.025] px-4 py-3 text-2xs font-bold uppercase tracking-[0.12em] text-muted-foreground lg:grid">
+                <div className="hidden gap-3 border-b border-white/[0.065] bg-white/[0.025] px-4 py-3 text-2xs font-bold uppercase tracking-[0.12em] text-muted-foreground lg:grid lg:grid-cols-[2.5rem_minmax(0,1fr)_4rem_7.5rem_5rem_2rem] xl:grid-cols-[3rem_minmax(0,1fr)_6rem_9rem_minmax(12rem,18rem)_2rem]">
                   <span>#</span>
                   <span>Título</span>
                   <span>Duração</span>
@@ -56,7 +56,7 @@ export default function TrackList({ project, tracks, onChanged, progressPct = 0 
                 </div>
                 {list.map((t, i) => (
                   <Draggable key={t.id} draggableId={t.id} index={i}>
-                    {(prov) => <TrackRow track={t} project={project} queue={list} index={i} provided={prov} progressPct={progressPct} />}
+                    {(prov) => <TrackRow track={t} project={project} queue={list} index={i} provided={prov} progressPct={progressPct} onChanged={onChanged} />}
                   </Draggable>
                 ))}
                 {provided.placeholder}

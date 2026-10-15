@@ -54,8 +54,8 @@ export default function EditUserDialog({ user, cargos, onClose, onSaved }) {
           </Field>
         </div>
         <DialogFooter>
-          <Button variant="ghost" onClick={onClose} className="text-stage-muted hover:bg-stage-surface hover:text-stage-ink">Cancelar</Button>
-          <Button onClick={save} disabled={loading} className="bg-stage-accent text-white hover:bg-stage-accent/90">{loading ? "Salvando..." : "Salvar"}</Button>
+          <Button variant="ghost" onClick={onClose}>Cancelar</Button>
+          <Button onClick={save} disabled={loading}>{loading ? "Salvando..." : "Salvar"}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

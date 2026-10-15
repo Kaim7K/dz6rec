@@ -83,7 +83,7 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
                 <div className="flex h-7 items-center gap-1.5 rounded-md bg-white/[0.035] pl-2 text-2xs text-white/50">
                   <span className="text-muted-foreground">Tipo</span>
                   <Select value={detailMode} onValueChange={(value) => onPatch(item, { detail_mode: value })}>
-                    <SelectTrigger className="h-7 w-[7.75rem] border-0 bg-transparent px-1.5 py-0 text-2xs shadow-none focus:bg-transparent [&>svg]:h-3 [&>svg]:w-3">
+                    <SelectTrigger aria-label="Formato da tarefa" className="h-7 w-[7.75rem] border-0 bg-transparent px-1.5 py-0 text-2xs shadow-none focus:bg-transparent [&>svg]:h-3 [&>svg]:w-3">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -101,7 +101,7 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
                 )}
               </div>
               <Select value={item.priority || "normal"} onValueChange={(value) => onPatch(item, { priority: value })}>
-                <SelectTrigger className={`h-7 w-[6.5rem] shrink-0 border-0 bg-white/[0.035] px-2 py-0 text-2xs shadow-none focus:bg-white/[0.045] [&>svg]:h-3 [&>svg]:w-3 ${priority.tone}`}>
+                <SelectTrigger aria-label="Prioridade da tarefa" className={`h-7 w-[6.5rem] shrink-0 border-0 bg-white/[0.035] px-2 py-0 text-2xs shadow-none focus:bg-white/[0.045] [&>svg]:h-3 [&>svg]:w-3 ${priority.tone}`}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -150,7 +150,7 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
             )}
 
             <div className="mt-2 grid gap-1.5 border-t border-white/[0.05] pt-2 sm:grid-cols-[minmax(0,0.85fr)_minmax(0,1.6fr)] sm:gap-0">
-              <label className={`flex h-8 items-center gap-2 text-2xs ${overdue ? "text-primary" : soon ? "text-amber-300" : "text-white/58"}`}>
+              <label className={`flex h-8 items-center gap-2 text-2xs ${overdue ? "text-red-300" : soon ? "text-amber-300" : "text-white/58"}`}>
                 <CalendarDays size={15} className="text-white/50" />
                 <span>{item.due_date ? dueLabel(item.due_date) : "Sem prazo"}</span>
                 <input type="date" value={item.due_date || ""} onChange={(e) => onPatch(item, { due_date: e.target.value || null })} className="w-5 bg-transparent text-transparent outline-none [color-scheme:dark]" aria-label={`Prazo de ${item.text}`} />

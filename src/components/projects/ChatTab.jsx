@@ -242,7 +242,7 @@ export default function ChatTab({ project }) {
 
       <div className="flex-1 space-y-1 overflow-y-auto px-3 py-4 sm:px-4">
         {loading ? (
-          <div className="grid h-full place-items-center"><Loader2 className="animate-spin text-primary" /></div>
+          <div className="grid h-full place-items-center"><Loader2 className="animate-spin text-red-300" /></div>
         ) : messages.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
             <span className="grid h-12 w-12 place-items-center rounded-md border border-white/[0.07] bg-white/[0.03]">
@@ -273,7 +273,7 @@ export default function ChatTab({ project }) {
                   </p>
                 )}
                 <div className={`${first ? "mt-1" : ""} whitespace-pre-wrap break-words rounded-lg ${bubble}`}>
-                  {renderText(message.text, tokens, mine ? "font-semibold text-white" : "font-semibold text-primary")}
+                  {renderText(message.text, tokens, mine ? "font-semibold text-white" : "font-semibold text-red-300")}
                 </div>
               </div>
               {mine && (last ? <ChatAvatar name={me?.full_name || "Voce"} photoUrl={me?.photo_url} size={28} /> : <span className="w-7" />)}
@@ -315,7 +315,7 @@ export default function ChatTab({ project }) {
         >
           <AtSign size={16} />
         </button>
-        <button disabled={sending || !text.trim()} className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-primary text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-45">
+        <button aria-label="Enviar mensagem" disabled={sending || !text.trim()} className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-primary text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-45">
           {sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
         </button>
       </form>

@@ -57,7 +57,7 @@ function TaskMeta({ task, project, cargos }) {
         <span className={`dz-pill h-7 ${priority.tone}`}>{priority.label}</span>
       )}
       {task.due_date && (
-        <span className={`dz-pill h-7 ${overdue ? "text-primary" : soon ? "text-amber-300" : "text-muted-foreground"}`}>
+        <span className={`dz-pill h-7 ${overdue ? "text-red-300" : soon ? "text-amber-300" : "text-muted-foreground"}`}>
           {dueLabel(task.due_date)}
         </span>
       )}
@@ -174,7 +174,7 @@ export default function MyTasks() {
   const overdueCount = tasks.filter((task) => isOverdue(task.due_date, task.completed)).length;
 
   if (loading) {
-    return <div className="grid min-h-[50vh] place-items-center"><Loader2 className="animate-spin text-primary" /></div>;
+    return <div className="grid min-h-[50vh] place-items-center"><Loader2 className="animate-spin text-red-300" /></div>;
   }
 
   if (error) {
@@ -196,7 +196,7 @@ export default function MyTasks() {
           </div>
           <div className="dz-card-soft px-3 py-2">
             <p className="text-2xs uppercase tracking-[0.16em] text-muted-foreground">Atrasos</p>
-            <p className="mt-1 text-lg font-bold text-primary">{overdueCount}</p>
+            <p className="mt-1 text-lg font-bold text-red-300">{overdueCount}</p>
           </div>
           <div className="dz-card-soft px-3 py-2">
             <p className="text-2xs uppercase tracking-[0.16em] text-muted-foreground">Feitas</p>

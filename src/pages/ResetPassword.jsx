@@ -41,7 +41,7 @@ export default function ResetPassword() {
         title="Link inválido"
         subtitle="Este link está incompleto ou expirou"
         footer={
-          <Link to="/forgot-password" className="text-primary font-medium hover:underline">
+          <Link to="/forgot-password" className="text-red-300 font-medium hover:underline">
             Solicitar novo link
           </Link>
         }

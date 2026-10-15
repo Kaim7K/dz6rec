@@ -19,11 +19,11 @@ export default function Player() {
         </div>
         <div className="flex min-w-0 flex-col items-center gap-1.5 sm:flex-1">
           <div className="flex items-center gap-3 sm:gap-4">
-            <button onClick={() => p.setShuffle(!p.shuffle)} className={p.shuffle ? "text-primary" : "text-muted-foreground hover:text-white"}><Shuffle size={16} /></button>
+            <button onClick={() => p.setShuffle(!p.shuffle)} className={p.shuffle ? "text-red-300" : "text-muted-foreground hover:text-white"}><Shuffle size={16} /></button>
             <button onClick={p.prev} className="text-white/65 hover:text-white"><SkipBack size={18} fill="currentColor" /></button>
             <button onClick={p.togglePlay} className="grid h-9 w-9 place-items-center rounded-full bg-primary text-primary-foreground transition-transform hover:scale-105">{p.isPlaying ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" className="ml-0.5" />}</button>
             <button onClick={p.next} className="text-white/65 hover:text-white"><SkipForward size={18} fill="currentColor" /></button>
-            <button onClick={() => p.setRepeat(!p.repeat)} className={p.repeat ? "text-primary" : "text-muted-foreground hover:text-white"}>{p.repeat ? <Repeat1 size={16} /> : <Repeat size={16} />}</button>
+            <button onClick={() => p.setRepeat(!p.repeat)} className={p.repeat ? "text-red-300" : "text-muted-foreground hover:text-white"}>{p.repeat ? <Repeat1 size={16} /> : <Repeat size={16} />}</button>
           </div>
           <div className="hidden w-full max-w-md items-center gap-2 sm:flex">
             <span className="w-9 text-right text-2xs tabular-nums text-muted-foreground">{fmt(p.progress)}</span>

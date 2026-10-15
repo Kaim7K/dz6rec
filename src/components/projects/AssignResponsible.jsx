@@ -41,7 +41,7 @@ export default function AssignResponsible({ item, users, cargos = [], onAssign, 
       })}
       {selectedUsers.length < MAX_RESPONSIBLES && (
         <Select value={undefined} onValueChange={change}>
-          <SelectTrigger className="h-7 w-auto min-w-[7.5rem] max-w-full gap-2 rounded-md border-white/[0.08] bg-white/[0.04] px-2 text-2xs text-white/70 hover:border-white/[0.14] hover:bg-white/[0.055] hover:text-white">
+          <SelectTrigger aria-label="Atribuir responsável" className="h-7 w-auto min-w-[7.5rem] max-w-full gap-2 rounded-md border-white/[0.08] bg-white/[0.04] px-2 text-2xs text-white/70 hover:border-white/[0.14] hover:bg-white/[0.055] hover:text-white">
             <span className="flex min-w-0 items-center gap-2">
               {selectedCargo && !selectedUsers.length ? (
                 <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: cargoColor(selectedCargo.name, cargos) || "#888" }} />

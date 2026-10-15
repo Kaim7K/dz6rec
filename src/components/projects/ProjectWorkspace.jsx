@@ -23,7 +23,7 @@ function projectHealth(items) {
   const overdue = open.filter((item) => isOverdue(item.due_date)).length;
   const soon = open.filter((item) => isDueSoon(item.due_date)).length;
   const unassigned = open.filter((item) => !item.responsible_id && !item.responsible_name).length;
-  if (overdue) return { label: "Atrasado", tone: "text-primary", Icon: AlertTriangle, detail: `${overdue} prazo(s) vencido(s)` };
+  if (overdue) return { label: "Atrasado", tone: "text-red-300", Icon: AlertTriangle, detail: `${overdue} prazo(s) vencido(s)` };
   if (soon || unassigned) return { label: "Em risco", tone: "text-amber-300", Icon: Clock3, detail: soon ? `${soon} prazo(s) próximos` : `${unassigned} tarefa(s) sem responsável` };
   return { label: "Em dia", tone: "text-emerald-300", Icon: CheckCircle2, detail: "Sem bloqueios críticos" };
 }
@@ -56,7 +56,7 @@ function Workflow({ sections, items }) {
               <div className="h-1 overflow-hidden rounded-full bg-white/[0.06]">
                 <div className={`h-full rounded-full ${overdue ? "bg-primary" : "bg-white/62"}`} style={{ width: `${pct}%` }} />
               </div>
-              <span className={`text-xs tabular-nums ${overdue ? "text-primary" : "text-muted-foreground"}`}>{pct}%</span>
+              <span className={`text-xs tabular-nums ${overdue ? "text-red-300" : "text-muted-foreground"}`}>{pct}%</span>
             </div>
           );
         })}
@@ -162,7 +162,7 @@ export default function ProjectWorkspace({ project, sections, items, files, onCh
             <div className="min-w-0">
               <h2 className="break-words text-xl font-bold text-white">{nextAction.title}</h2>
               <p className="mt-1 break-words text-sm text-white/62">{nextAction.text}</p>
-              <p className={`mt-2 text-xs ${nextAction.tone === "danger" ? "text-primary" : nextAction.tone === "warn" ? "text-amber-300" : "text-muted-foreground"}`}>{nextAction.detail}</p>
+              <p className={`mt-2 text-xs ${nextAction.tone === "danger" ? "text-red-300" : nextAction.tone === "warn" ? "text-amber-300" : "text-muted-foreground"}`}>{nextAction.detail}</p>
             </div>
             <a href={nextAction.href} className="inline-flex h-9 items-center gap-2 rounded-md bg-white/[0.055] px-3 text-sm font-bold text-white/78 hover:bg-white/[0.085]">
               {nextAction.action} <ArrowRight size={14} />

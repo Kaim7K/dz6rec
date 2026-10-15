@@ -23,6 +23,7 @@ export default function DeleteProjectButton({ project, onDeleted, className, chi
             event.stopPropagation();
           }}
           aria-label={`Excluir ${project.name}`}
+          title="Excluir projeto"
           className={cn("inline-flex items-center justify-center gap-2 rounded-md text-white/65 transition-colors hover:bg-red-500/10 hover:text-red-300", className)}
         >
           {children || <Trash2 size={14} />}

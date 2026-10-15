@@ -35,7 +35,7 @@ const DialogContent = React.forwardRef(({ className, children, ...props }, ref) 
         className
       )}
       {...props}>
-      <div className="dz-dialog-scroll grid min-h-0 min-w-0 gap-5 overflow-y-auto overscroll-contain p-5 sm:p-6">{children}</div>
+      <div className="dz-dialog-scroll grid min-h-0 min-w-0 grid-cols-[minmax(0,1fr)] gap-5 overflow-y-auto overscroll-contain p-5 sm:p-6">{children}</div>
       <DialogPrimitive.Close
         className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-md text-white/50 transition-colors hover:bg-white/[0.055] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none">
         <X className="h-4 w-4" />

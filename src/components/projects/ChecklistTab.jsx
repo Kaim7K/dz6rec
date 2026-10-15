@@ -342,7 +342,7 @@ export default function ChecklistTab({ project }) {
 
               <div className="mb-3">
                 <Select value={categoryResponsibleIds[category.key] || undefined} onValueChange={(userId) => assignCategoryResponsible(category, userId)}>
-                  <SelectTrigger className="h-8 w-full border-white/[0.075] bg-white/[0.035] text-xs text-white/62">
+                  <SelectTrigger aria-label={`Responsável por ${category.label}`} className="h-8 w-full border-white/[0.075] bg-white/[0.035] text-xs text-white/62">
                     <SelectValue placeholder={`Responsavel para ${category.label}`} />
                   </SelectTrigger>
                   <SelectContent className="max-h-64">

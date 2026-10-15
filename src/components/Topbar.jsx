@@ -23,8 +23,9 @@ function LocalMockSwitcher() {
 
   return (
     <div className="hidden items-center gap-2 rounded-md border border-white/[0.08] bg-white/[0.035] px-2 py-1 xl:flex">
-      <span className="text-2xs font-semibold uppercase tracking-[0.14em] text-primary">Sim</span>
+      <span className="text-2xs font-semibold uppercase tracking-[0.14em] text-red-300">Sim</span>
       <select
+        aria-label="Perfil de simulação"
         value={current}
         onChange={changeProfile}
         className="h-8 max-w-56 rounded-md border border-white/[0.08] bg-background px-2 text-xs text-white outline-none"

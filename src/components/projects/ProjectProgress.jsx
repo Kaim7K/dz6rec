@@ -14,7 +14,7 @@ export default function ProjectProgress({ items, sections, className }) {
   const prog = computeProgress(items, sections);
 
   return (
-    <div className={cn("w-full rounded-md border border-white/[0.045] bg-black/16 p-3 xl:p-3.5", className)}>
+    <div className={cn("dz-project-progress w-full min-w-0 rounded-md border border-white/[0.045] bg-black/16 p-3 xl:p-3.5", className)}>
       <div className="flex items-center justify-between">
         <span className="inline-flex items-center gap-2 text-xs font-bold text-white xl:text-sm">
           Progresso geral
@@ -27,7 +27,7 @@ export default function ProjectProgress({ items, sections, className }) {
         <div className="h-full rounded-full bg-primary transition-all duration-500" style={{ width: `${prog.total.pct}%` }} />
       </div>
 
-      <div className="mt-3 grid gap-2.5 sm:grid-cols-2 xl:mt-4 xl:grid-cols-3 xl:gap-3">
+      <div className="dz-project-progress-categories mt-3 grid gap-2.5 xl:mt-4 xl:gap-3">
         {CATEGORIES.map((category) => {
           const p = prog[category.key];
           const Icon = ICONS[category.key] || Music2;

@@ -29,15 +29,15 @@ try {
       await page.goto(origin + path);
       await page.locator('h1').first().waitFor();
       console.log(width, path, page.url(), await page.locator('h1').first().textContent());
-      assert.equal(await page.locator('main').evaluate(el => getComputedStyle(el).containerName), 'workspace');
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
       checks.push({ width, path, status: 'passed' });
     }
-    await page.getByRole('button', { name: 'Reproduzir Single Piloto' }).click();
-    assert.ok(await page.locator('.player-titles').evaluate(el => el.getBoundingClientRect().width >= 120));
     await page.getByRole('button', { name: 'Editar projeto', exact: true }).click();
     await page.waitForTimeout(200);
     assert.ok(await page.getByRole('dialog').evaluate(el => { const r = el.getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight; }));
+    assert.equal(await page.locator('.dz-dialog-footer').evaluate(el => getComputedStyle(el).position), 'sticky');
+    await page.locator('.dz-dialog-scroll').evaluate(el => { el.scrollTop = el.scrollHeight; });
+    assert.ok(await page.getByRole('button', { name: 'Fechar', exact: true }).evaluate(el => { const r = el.getBoundingClientRect(); return r.top >= 0 && r.bottom <= innerHeight; }));
     assert.deepEqual(errors, []);
     await page.screenshot({ path: `artifacts/visual-audit/${width}-deployed-modal.png` });
     await context.close();

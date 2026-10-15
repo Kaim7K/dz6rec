@@ -48,7 +48,7 @@ export default function Register() {
           Ja tem uma conta?{" "}
           <Link
             to={"/login" + (safeReturnTo() !== "/" ? "?returnTo=" + encodeURIComponent(safeReturnTo()) : "")}
-            className="text-primary font-medium hover:underline"
+            className="text-red-300 font-medium hover:underline"
           >
             Entrar
           </Link>
