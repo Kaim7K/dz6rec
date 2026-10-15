@@ -33,8 +33,8 @@ export default function TrackList({ project, tracks, onChanged, progressPct = 0 
             <Music2 size={20} />
           </span>
           <div>
-            <h3 className="text-base font-semibold text-white">Faixas</h3>
-            <p className="text-sm text-muted-foreground">{list.length} {list.length === 1 ? "faixa" : "faixas"} neste projeto</p>
+            <h3 className="text-base font-bold text-white">Faixas</h3>
+            <p className="text-sm text-white/45">{list.length} {list.length === 1 ? "faixa" : "faixas"} neste projeto</p>
           </div>
         </div>
         <button onClick={() => setOpen(true)} className="dz-ghost-button h-9"><Plus size={15} />Adicionar faixa</button>
@@ -45,8 +45,8 @@ export default function TrackList({ project, tracks, onChanged, progressPct = 0 
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId="tracks">
             {(provided) => (
-              <div ref={provided.innerRef} {...provided.droppableProps} className="min-w-0 rounded-lg border border-white/[0.07] bg-black/15">
-                <div className="hidden grid-cols-[3.5rem_minmax(0,1fr)_4rem_8rem_minmax(7rem,10rem)_2.5rem] border-b border-white/[0.065] bg-white/[0.025] px-4 py-3 text-2xs font-semibold uppercase tracking-[0.12em] text-muted-foreground xl:grid">
+              <div ref={provided.innerRef} {...provided.droppableProps} className="min-w-0 overflow-hidden rounded-lg border border-white/[0.07] bg-black/15">
+                <div className="hidden grid-cols-[3rem_1fr_6rem_9rem_18rem_2rem] border-b border-white/[0.065] bg-white/[0.025] px-4 py-3 text-2xs font-bold uppercase tracking-[0.12em] text-white/42 lg:grid">
                   <span>#</span>
                   <span>Título</span>
                   <span>Duração</span>

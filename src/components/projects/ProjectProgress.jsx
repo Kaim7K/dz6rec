@@ -16,11 +16,11 @@ export default function ProjectProgress({ items, sections, className }) {
   return (
     <div className={cn("w-full rounded-md border border-white/[0.045] bg-black/16 p-3 xl:p-3.5", className)}>
       <div className="flex items-center justify-between">
-        <span className="inline-flex items-center gap-2 text-xs font-semibold text-white xl:text-sm">
+        <span className="inline-flex items-center gap-2 text-xs font-bold text-white xl:text-sm">
           Progresso geral
-          <Info size={12} className="text-muted-foreground" />
+          <Info size={12} className="text-white/38" />
         </span>
-        <span className="text-sm font-semibold tabular-nums text-white xl:text-base">{prog.total.pct}%</span>
+        <span className="text-sm font-bold tabular-nums text-white xl:text-base">{prog.total.pct}%</span>
       </div>
 
       <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-white/[0.07] xl:mt-3">
@@ -38,7 +38,7 @@ export default function ProjectProgress({ items, sections, className }) {
               <div className="min-w-0 flex-1">
                 <div className="mb-1.5 flex items-center justify-between gap-2">
                   <span className="min-w-0 truncate text-[0.72rem] font-medium text-white/60 xl:text-xs">{category.label}</span>
-                  <span className="text-[0.72rem] font-semibold tabular-nums text-white/82 xl:text-xs">{p.pct}%</span>
+                  <span className="text-[0.72rem] font-bold tabular-nums text-white/82 xl:text-xs">{p.pct}%</span>
                 </div>
                 <div className="h-1 w-full overflow-hidden rounded-full bg-white/[0.07]">
                   <div className="h-full rounded-full transition-all duration-500" style={{ width: `${p.pct}%`, backgroundColor: category.color }} />

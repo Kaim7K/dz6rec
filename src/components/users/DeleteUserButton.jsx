@@ -14,7 +14,7 @@ export default function DeleteUserButton({ user, onDeleted }) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <button type="button" aria-label="Excluir usuário" className="dz-icon-button hover:bg-red-500/10 hover:text-red-300">
+        <button type="button" aria-label="Excluir usuário" className="rounded-full p-2 text-stage-muted transition-colors hover:bg-red-50 hover:text-red-600">
           <Trash2 size={16} />
         </button>
       </AlertDialogTrigger>

@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { apiClient } from "@/api/appClient";
 import { sanitizeReturnTo } from "@/lib/authReturnTo";
-import AuthLayout from "@/components/AuthLayout";
 
 export default function GoogleAuthCallback() {
   const [error, setError] = useState("");
@@ -23,11 +22,11 @@ export default function GoogleAuthCallback() {
   }, []);
 
   return (
-    <AuthLayout title={error ? "Não foi possível entrar" : "Concluindo login"} subtitle="Acesso à equipe DZ6" footer={null}>
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
       {error ? (
         <div className="text-center">
-          <p role="alert" className="dz-form-error mb-4">{error}</p>
-          <Link to="/login" className="text-red-300 font-medium hover:underline">Voltar para o login</Link>
+          <p className="text-destructive mb-4">{error}</p>
+          <Link to="/login" className="text-primary font-medium hover:underline">Voltar para o login</Link>
         </div>
       ) : (
         <div className="flex items-center gap-3 text-muted-foreground">
@@ -35,6 +34,6 @@ export default function GoogleAuthCallback() {
           Concluindo login...
         </div>
       )}
-    </AuthLayout>
+    </div>
   );
 }

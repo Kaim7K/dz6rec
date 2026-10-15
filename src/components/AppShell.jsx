@@ -39,10 +39,9 @@ export default function AppShell() {
     <PlayerProvider>
       <div className="min-h-screen bg-background text-foreground">
         <Sidebar open={menuOpen} onClose={() => setMenuOpen(false)} />
-        <div className="min-w-0 lg:pl-60">
+        <div className="min-w-0 lg:pl-[17rem]">
           <Topbar onMenu={() => setMenuOpen(true)} />
-          <a href="#main-content" className="sr-only fixed left-4 top-4 z-[100] rounded-md bg-primary px-4 py-3 text-white focus:not-sr-only">Pular para o conteúdo</a>
-          <main id="main-content" tabIndex={-1} className="relative mx-auto min-h-[calc(100vh-4rem)] max-w-[1600px] px-4 py-6 pb-28 sm:px-6 lg:px-8 lg:py-8 lg:pb-32 xl:px-10">
+          <main className="relative mx-auto min-h-[calc(100vh-4rem)] max-w-[1600px] overflow-x-hidden px-4 py-5 pb-28 sm:px-5 lg:px-7 lg:py-7 lg:pb-32 xl:px-9">
             <Outlet />
           </main>
         </div>

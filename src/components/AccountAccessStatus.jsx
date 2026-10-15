@@ -12,7 +12,7 @@ export default function AccountAccessStatus({ user }) {
         <div className="grid h-14 w-14 place-items-center rounded-full bg-primary/12 text-primary ring-1 ring-primary/20">
           <Icon size={24} />
         </div>
-        <h1 className="mt-5 font-display text-2xl font-semibold tracking-tight">
+        <h1 className="mt-5 font-display text-2xl font-bold tracking-tight">
           {pending ? "Cadastro aguardando aprovação" : "Acesso desativado"}
         </h1>
         <p className="mt-3 text-sm leading-6 text-white/55">
@@ -22,7 +22,7 @@ export default function AccountAccessStatus({ user }) {
         </p>
         <div className="mt-5 w-full rounded-lg border border-white/[0.08] bg-white/[0.035] px-4 py-3 text-left shadow-soft">
           <p className="text-sm font-semibold text-white">{user?.full_name || "Conta DZ6"}</p>
-          <p className="mt-1 truncate text-xs text-muted-foreground">{user?.email}</p>
+          <p className="mt-1 truncate text-xs text-white/42">{user?.email}</p>
         </div>
         <button
           type="button"

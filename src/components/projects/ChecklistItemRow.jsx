@@ -33,10 +33,10 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
 
   if (depth > 0) {
     return (
-      <div className="group ml-5 flex items-center gap-2 py-0.5 text-xs">
-        <Checkbox aria-label={`${item.completed ? "Reabrir" : "Concluir"} tarefa: ${item.text}`} checked={item.completed} onCheckedChange={() => onToggle(item)} className="h-4 w-4 rounded-full border-white/45 data-[state=checked]:border-primary data-[state=checked]:bg-primary" />
-        <span className={`min-w-0 flex-1 ${item.completed ? "line-through text-muted-foreground" : "text-white/52"}`}>{item.text}</span>
-        <button type="button" onClick={() => onDelete(item)} aria-label={`Excluir ${item.text}`} className="rounded p-1 text-muted-foreground opacity-100 transition-colors hover:bg-red-500/10 hover:text-red-300 group-hover:opacity-100">
+      <div className="group ml-8 flex items-center gap-2 py-0.5 text-xs">
+        <Checkbox checked={item.completed} onCheckedChange={() => onToggle(item)} className="h-4 w-4 rounded-full border-white/45 data-[state=checked]:border-primary data-[state=checked]:bg-primary" />
+        <span className={`min-w-0 flex-1 ${item.completed ? "line-through text-white/35" : "text-white/52"}`}>{item.text}</span>
+        <button type="button" onClick={() => onDelete(item)} aria-label={`Excluir ${item.text}`} className="rounded p-1 text-white/20 opacity-0 transition-colors hover:bg-red-500/10 hover:text-red-300 group-hover:opacity-100">
           <Trash2 size={12} />
         </button>
       </div>
@@ -49,14 +49,14 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
       {...(provided?.draggableProps || {})}
       className={`overflow-hidden rounded-md border border-white/[0.075] bg-[#171414] shadow-[inset_0_1px_0_rgba(255,255,255,0.035)] ${isDragging ? "border-primary/35 bg-white/[0.055] shadow-2xl" : ""}`}
     >
-      <div className="p-3">
-        <div className="flex items-start gap-2">
-          <button type="button" {...(provided?.dragHandleProps || {})} className="shrink-0 cursor-grab touch-none rounded p-0.5 text-muted-foreground transition-colors hover:bg-white/[0.045] hover:text-white/65 active:cursor-grabbing" aria-label={`Mover ${item.text}`}>
+      <div className="p-2.5">
+        <div className="flex items-center gap-2">
+          <button type="button" {...(provided?.dragHandleProps || {})} className="shrink-0 cursor-grab touch-none rounded p-0.5 text-white/30 transition-colors hover:bg-white/[0.045] hover:text-white/65 active:cursor-grabbing" aria-label={`Mover ${item.text}`}>
             <GripVertical size={15} />
           </button>
-          <Checkbox aria-label={`${item.completed ? "Reabrir" : "Concluir"} tarefa: ${item.text}`} checked={item.completed} onCheckedChange={() => onToggle(item)} className="h-4 w-4 rounded-[4px] border-white/60 data-[state=checked]:border-primary data-[state=checked]:bg-primary" />
-          <div className="min-w-0 flex-1 pt-1">
-            <p className={`break-words text-sm font-medium leading-5 ${item.completed ? "line-through text-muted-foreground" : "text-white/88"}`}>{item.text}</p>
+          <Checkbox checked={item.completed} onCheckedChange={() => onToggle(item)} className="h-4 w-4 rounded-[4px] border-white/60 data-[state=checked]:border-primary data-[state=checked]:bg-primary" />
+          <div className="min-w-0 flex-1">
+            <p className={`text-sm font-medium leading-5 ${item.completed ? "line-through text-white/38" : "text-white/88"}`}>{item.text}</p>
           </div>
           {responsibleUsers.length > 0 && (
             <div className="flex shrink-0 -space-x-1.5">
@@ -68,10 +68,10 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
             </div>
           )}
 
-          <button type="button" onClick={() => onDelete(item)} className="grid h-9 w-9 shrink-0 place-items-center rounded-md bg-white/[0.02] text-muted-foreground transition-colors hover:bg-red-500/10 hover:text-red-300" aria-label={`Excluir ${item.text}`}>
+          <button type="button" onClick={() => onDelete(item)} className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-white/[0.02] text-white/26 transition-colors hover:bg-red-500/10 hover:text-red-300" aria-label={`Excluir ${item.text}`}>
             <Trash2 size={13} />
           </button>
-          <button type="button" onClick={() => setExpanded((value) => !value)} className="grid h-9 w-9 shrink-0 place-items-center rounded-md bg-white/[0.03] text-muted-foreground transition-colors hover:bg-white/[0.055] hover:text-white" aria-label={expanded ? "Recolher tarefa" : "Expandir tarefa"}>
+          <button type="button" onClick={() => setExpanded((value) => !value)} className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-white/[0.03] text-white/42 transition-colors hover:bg-white/[0.055] hover:text-white" aria-label={expanded ? "Recolher tarefa" : "Expandir tarefa"}>
             <ChevronDown size={14} className={`transition-transform ${expanded ? "rotate-180" : ""}`} />
           </button>
         </div>
@@ -81,9 +81,9 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
               <div className="flex min-w-0 flex-wrap items-center gap-2">
                 <div className="flex h-7 items-center gap-1.5 rounded-md bg-white/[0.035] pl-2 text-2xs text-white/50">
-                  <span className="text-muted-foreground">Tipo</span>
+                  <span className="text-white/30">Tipo</span>
                   <Select value={detailMode} onValueChange={(value) => onPatch(item, { detail_mode: value })}>
-                    <SelectTrigger aria-label="Formato da tarefa" className="h-7 w-[7.75rem] border-0 bg-transparent px-1.5 py-0 text-2xs shadow-none focus:bg-transparent [&>svg]:h-3 [&>svg]:w-3">
+                    <SelectTrigger className="h-7 w-[7.75rem] border-0 bg-transparent px-1.5 py-0 text-2xs shadow-none focus:bg-transparent [&>svg]:h-3 [&>svg]:w-3">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -94,14 +94,14 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
                 {canUseSubtasks(detailMode) && (
                   <button
                     onClick={() => setAdding(true)}
-                    className="h-7 rounded-md bg-white/[0.025] px-2 text-2xs text-muted-foreground transition-colors hover:bg-white/[0.05] hover:text-white/65"
+                    className="h-7 rounded-md bg-white/[0.025] px-2 text-2xs text-white/35 transition-colors hover:bg-white/[0.05] hover:text-white/65"
                   >
                     + Subtarefa
                   </button>
                 )}
               </div>
               <Select value={item.priority || "normal"} onValueChange={(value) => onPatch(item, { priority: value })}>
-                <SelectTrigger aria-label="Prioridade da tarefa" className={`h-7 w-[6.5rem] shrink-0 border-0 bg-white/[0.035] px-2 py-0 text-2xs shadow-none focus:bg-white/[0.045] [&>svg]:h-3 [&>svg]:w-3 ${priority.tone}`}>
+                <SelectTrigger className={`h-7 w-[6.5rem] shrink-0 border-0 bg-white/[0.035] px-2 py-0 text-2xs shadow-none focus:bg-white/[0.045] [&>svg]:h-3 [&>svg]:w-3 ${priority.tone}`}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -126,8 +126,8 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
                     }}
                     className="ml-8 flex items-center gap-2 py-0.5"
                   >
-                    <Circle size={13} className="text-muted-foreground" />
-                    <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Subtarefa..." className="min-w-0 flex-1 bg-transparent text-xs text-white/70 outline-none placeholder:text-muted-foreground" autoFocus />
+                    <Circle size={13} className="text-white/35" />
+                    <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Subtarefa..." className="min-w-0 flex-1 bg-transparent text-xs text-white/70 outline-none placeholder:text-white/25" autoFocus />
                   </form>
                 )}
               </div>
@@ -135,7 +135,7 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
 
             {canUseNotes(detailMode) && (
               <label className="mt-2 block rounded-md border border-white/[0.055] bg-black/10 p-2 focus-within:border-primary/35">
-                <span className="mb-1.5 flex items-center gap-1.5 text-2xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                <span className="mb-1.5 flex items-center gap-1.5 text-2xs font-medium uppercase tracking-[0.14em] text-white/32">
                   <MessageSquareText size={13} /> Observacao
                 </span>
                 <textarea
@@ -144,13 +144,13 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
                   onBlur={() => onPatch(item, { observation: observation.trim() })}
                   rows={3}
                   placeholder="Adicione um contexto, link, criterio de aprovacao ou briefing desta tarefa..."
-                  className="min-h-16 w-full resize-y bg-transparent text-sm leading-5 text-white/72 outline-none placeholder:text-muted-foreground"
+                  className="min-h-16 w-full resize-y bg-transparent text-sm leading-5 text-white/72 outline-none placeholder:text-white/25"
                 />
               </label>
             )}
 
             <div className="mt-2 grid gap-1.5 border-t border-white/[0.05] pt-2 sm:grid-cols-[minmax(0,0.85fr)_minmax(0,1.6fr)] sm:gap-0">
-              <label className={`flex h-8 items-center gap-2 text-2xs ${overdue ? "text-red-300" : soon ? "text-amber-300" : "text-white/58"}`}>
+              <label className={`flex h-8 items-center gap-2 text-2xs ${overdue ? "text-primary" : soon ? "text-amber-300" : "text-white/58"}`}>
                 <CalendarDays size={15} className="text-white/50" />
                 <span>{item.due_date ? dueLabel(item.due_date) : "Sem prazo"}</span>
                 <input type="date" value={item.due_date || ""} onChange={(e) => onPatch(item, { due_date: e.target.value || null })} className="w-5 bg-transparent text-transparent outline-none [color-scheme:dark]" aria-label={`Prazo de ${item.text}`} />

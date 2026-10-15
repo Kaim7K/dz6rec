@@ -10,7 +10,7 @@ await mkdir(output, { recursive: true });
 const browser = await chromium.launch({ headless: true });
 const results = [];
 const image = await readFile("src/assets/dz6-profile.png");
-const widths = process.env.AUDIT_WIDTHS ? process.env.AUDIT_WIDTHS.split(",").map(Number) : [360, 390, 768, 1440];
+const widths = process.env.AUDIT_WIDTHS ? process.env.AUDIT_WIDTHS.split(",").map(Number) : [360, 390, 768, 938, 1024, 1280, 1440];
 
 try {
   for (const width of widths) {
@@ -40,6 +40,17 @@ try {
           if (!element.checkVisibility()) continue;
           const rect = element.getBoundingClientRect();
           if (rect.width > 2 && (rect.left < -1 || rect.right > width + 1)) found.push(`${element.tagName} outside viewport: ${element.getAttribute("aria-label") || element.textContent.trim().slice(0, 35)}`);
+        }
+        const titles = document.querySelector('.player-titles');
+        if (titles && titles.getBoundingClientRect().width < 120) found.push('player title squeezed below 120px');
+        const progress = document.querySelector('.project-hero > .project-progress');
+        if (progress && Math.abs(progress.getBoundingClientRect().width - progress.parentElement.getBoundingClientRect().width) > 2) found.push('project progress does not span the header');
+        for (const row of document.querySelectorAll('.track-row')) {
+          const status = row.querySelector('.track-status').getBoundingClientRect();
+          if (row.parentElement.clientWidth >= 560 && status.top > row.getBoundingClientRect().top + 40) found.push('track status wraps despite available space');
+        }
+        for (const cell of document.querySelectorAll('.track-heading > span')) {
+          if (cell.checkVisibility() && cell.scrollWidth > cell.clientWidth + 1) found.push('track heading label overflows its column');
         }
         return [...new Set(found)];
       });
@@ -177,6 +188,26 @@ try {
       await page.getByRole("button", { name: "Gerenciar Cargos", exact: true }).first().click();
     });
     await page.getByRole("button", { name: "Cancelar", exact: true }).click();
+    await page.evaluate((original) => {
+      const store = JSON.parse(original);
+      const long = 'NomeExtensoSemEspacos'.repeat(5);
+      store.Project[0].name = long;
+      store.Project[0].description = 'Planejamento de lançamento com descrição extensa para validar que o conteúdo se adapta sem cortes. '.repeat(4);
+      store.Artist[0].name = long;
+      store.User[1].full_name = long;
+      store.User[1].email = `${long}@example.test`;
+      store.ChecklistItem[0].text = long;
+      store.ChecklistItem[0].responsible_ids = store.User.map(user => user.id);
+      localStorage.setItem('dz6_mock_store_v1', JSON.stringify(store));
+    }, originalStore);
+    for (const [name, route] of [['long-project', '/projetos/project-1'], ['long-artists', '/artistas'], ['long-users', '/usuarios']]) {
+      await scenario(name, () => visit(route));
+    }
+    await scenario('long-checklist', async () => {
+      await visit('/projetos/project-1');
+      await page.getByRole('tab', { name: 'Tarefas', exact: true }).click();
+      await page.getByRole('button', { name: 'Expandir tarefa' }).first().click();
+    });
     for (const status of ["pendente", "inativo"]) {
       await scenario(`account-${status}`, async () => {
         await page.evaluate(({ originalStore, status }) => {

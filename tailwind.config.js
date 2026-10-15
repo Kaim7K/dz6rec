@@ -7,8 +7,8 @@ module.exports = {
   		opacity: Object.fromEntries(Array.from({ length: 101 }, (_, i) => [i, `${i / 100}`])),
   		borderRadius: {
   			lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
+  			md: 'calc(var(--radius) - 3px)',
+  			sm: 'calc(var(--radius) - 6px)',
   			xl: 'calc(var(--radius) + 4px)',
   			'2xl': 'calc(var(--radius) + 10px)',
   			'sl': '8px'
@@ -53,7 +53,7 @@ module.exports = {
 				border: 'rgba(255,255,255,0.08)',
 				ink: '#F7F7F7',
 				muted: '#9CA3AF',
-        accent: '#C20000',
+				accent: '#DC0000',
 				'accent-soft': 'rgba(220,0,0,0.14)',
 				warn: '#F59E0B',
 				'warn-soft': 'rgba(245,158,11,0.12)'
@@ -85,19 +85,19 @@ module.exports = {
   			inter: ['var(--font-inter)']
   		},
   		fontSize: {
-          '2xs': ['0.75rem', { lineHeight: '1.125rem' }],
-          xs: ['0.8125rem', { lineHeight: '1.25rem' }],
-          sm: ['0.875rem', { lineHeight: '1.375rem' }],
-          base: ['1rem', { lineHeight: '1.5rem' }],
-          lg: ['1.125rem', { lineHeight: '1.625rem' }],
-          xl: ['1.25rem', { lineHeight: '1.75rem' }],
-          '2xl': ['1.75rem', { lineHeight: '2.125rem' }],
-          '3xl': ['2rem', { lineHeight: '2.375rem' }],
-          '4xl': ['2.5rem', { lineHeight: '2.875rem' }],
-          title: ['1.5rem', { lineHeight: '2rem' }],
-          section: ['1.125rem', { lineHeight: '1.625rem' }],
-          body: ['0.875rem', { lineHeight: '1.375rem' }],
-          micro: ['0.75rem', { lineHeight: '1.125rem' }],
+  			'2xs': ['clamp(0.69rem, 0.67rem + 0.08vw, 0.76rem)', { lineHeight: '1rem' }],
+  			xs: ['clamp(0.76rem, 0.74rem + 0.1vw, 0.84rem)', { lineHeight: '1.1rem' }],
+  			sm: ['clamp(0.84rem, 0.81rem + 0.13vw, 0.94rem)', { lineHeight: '1.35rem' }],
+  			base: ['clamp(0.94rem, 0.9rem + 0.18vw, 1.06rem)', { lineHeight: '1.55rem' }],
+  			lg: ['clamp(1.06rem, 1rem + 0.25vw, 1.25rem)', { lineHeight: '1.65rem' }],
+  			xl: ['clamp(1.22rem, 1.13rem + 0.4vw, 1.6rem)', { lineHeight: '1.95rem' }],
+  			'2xl': ['clamp(1.5rem, 1.3rem + 0.85vw, 2.15rem)', { lineHeight: '2.2rem' }],
+  			'3xl': ['clamp(1.85rem, 1.5rem + 1.6vw, 2.95rem)', { lineHeight: '2.95rem' }],
+  			'4xl': ['clamp(2.3rem, 1.7rem + 2.8vw, 4rem)', { lineHeight: '1.04' }],
+  			'title': ['1.5rem', { lineHeight: '2rem' }],
+  			'section': ['1.125rem', { lineHeight: '1.65rem' }],
+  			'body': ['0.875rem', { lineHeight: '1.35rem' }],
+  			'micro': ['0.75rem', { lineHeight: '1.05rem' }]
   		},
   		boxShadow: {
   			soft: '0 1px 0 rgba(255,255,255,0.035), 0 14px 34px -24px rgba(0,0,0,0.95)',

@@ -39,23 +39,23 @@ export default function TemplateEditorDialog({ template, cargos, onClose, onSave
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
         <DialogHeader><DialogTitle>Editar template — {template.name}</DialogTitle></DialogHeader>
-        <p className="text-sm text-muted-foreground">Ajuste seções, tarefas e subtarefas. Projetos já criados não são alterados.</p>
+        <p className="text-sm text-white/40">Ajuste seções, tarefas e subtarefas. Projetos já criados não são alterados.</p>
         <div className="space-y-4">
           {sections.map((s) => {
             const sItems = sectionItems(s.id);
             return (
               <div key={s.id} className="rounded-lg border border-white/[0.075] bg-white/[0.035] p-4">
                 <div className="mb-3 flex flex-wrap items-center gap-2">
-                  <input aria-label="Nome da seção" defaultValue={s.name} onBlur={(e) => { if (e.target.value !== s.name) renameSection(s, e.target.value); }} className="min-w-0 max-w-full rounded-md border border-transparent bg-white/[0.045] px-2.5 py-1 text-sm font-medium outline-none transition-colors focus:border-primary/45" />
+                  <input defaultValue={s.name} onBlur={(e) => { if (e.target.value !== s.name) renameSection(s, e.target.value); }} className="rounded-md border border-transparent bg-white/[0.045] px-2.5 py-1 text-sm font-medium outline-none transition-colors focus:border-primary/45" />
                   <CargoBadge cargo={s.cargo} cargos={cargos} />
                   <Select value={s.cargo || undefined} onValueChange={(v) => setSectionCargo(s, v === NONE ? null : v)}>
-                    <SelectTrigger aria-label="Cargo da seção" className="h-7 w-auto min-w-[5rem] border-white/[0.08] bg-white/[0.04] px-2 text-2xs text-muted-foreground"><SelectValue placeholder="cargo" /></SelectTrigger>
+                    <SelectTrigger className="h-7 w-auto min-w-[5rem] border-white/[0.08] bg-white/[0.04] px-2 text-2xs text-white/45"><SelectValue placeholder="cargo" /></SelectTrigger>
                     <SelectContent>
-                      {s.cargo && <SelectItem value={NONE} className="text-muted-foreground">— Limpar —</SelectItem>}
+                      {s.cargo && <SelectItem value={NONE} className="text-white/45">— Limpar —</SelectItem>}
                       {cargos.map((c) => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}
                     </SelectContent>
                   </Select>
-                  <button aria-label={`Excluir seção ${s.name}`} onClick={() => delSection(s)} className="ml-auto rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-white/5 hover:text-red-400"><Trash2 size={15} /></button>
+                  <button onClick={() => delSection(s)} className="ml-auto rounded-lg p-1.5 text-white/30 transition-colors hover:bg-white/5 hover:text-red-400"><Trash2 size={15} /></button>
                 </div>
                 <div className="space-y-1">
                   {sItems.filter((i) => !i.parent_id).map((item) => (
@@ -63,14 +63,14 @@ export default function TemplateEditorDialog({ template, cargos, onClose, onSave
                   ))}
                 </div>
                 <form onSubmit={(e) => { e.preventDefault(); const f = e.target; addItem(s.id, f.text.value); f.reset(); }} className="mt-2 flex items-center gap-2">
-                  <Plus size={14} className="text-muted-foreground" />
-                  <input aria-label="Nova tarefa do template" name="text" placeholder="Adicionar tarefa..." className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground" />
+                  <Plus size={14} className="text-white/30" />
+                  <input name="text" placeholder="Adicionar tarefa..." className="flex-1 bg-transparent text-sm outline-none placeholder:text-white/30" />
                 </form>
               </div>
             );
           })}
-          <form onSubmit={addSection} className="grid min-w-0 gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
-            <input value={newSection} onChange={(e) => setNewSection(e.target.value)} aria-label="Nome da nova seção do template" placeholder="Nova seção..." className="dz-input w-full" />
+          <form onSubmit={addSection} className="flex items-center gap-2">
+            <input value={newSection} onChange={(e) => setNewSection(e.target.value)} placeholder="Nova seção..." className="dz-input flex-1 px-4 py-2.5" />
             <button className="dz-primary-button h-10 px-4">Adicionar</button>
           </form>
         </div>

@@ -2,7 +2,7 @@ import React from "react";
 import { AlertTriangle } from "lucide-react";
 import { ActiveCargoChip, AddableCargoChip, OrphanCargoChip } from "@/components/users/cargoChips";
 
-const SectionTitle = ({ children }) => <h3 className="text-sm font-semibold text-stage-ink">{children}</h3>;
+const SectionTitle = ({ children }) => <h3 className="font-jakarta text-section font-bold text-stage-ink">{children}</h3>;
 const EmptyHint = ({ children }) => <p className="text-body text-stage-muted">{children}</p>;
 
 export default function UserCargosEditor({ value = [], onChange, catalog = [], layout = "modal" }) {
@@ -16,7 +16,7 @@ export default function UserCargosEditor({ value = [], onChange, catalog = [], l
 
   if (layout === "sheet") {
     return (
-      <div className="space-y-5">
+      <div className="space-y-6">
         <div className="space-y-2.5">
           <SectionTitle>Cargos Atuais</SectionTitle>
           {registered.length === 0 ? <EmptyHint>Nenhum cargo atribuído.</EmptyHint> : (

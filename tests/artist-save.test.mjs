@@ -10,7 +10,7 @@ import ts from "typescript";
 function renderForm(filename, { editing, upload, save }) {
   const state = editing
     ? [{ name: "Artista", handle: "", bio: "" }, { name: "foto.jpg" }, false, ""]
-    : [[], true, { name: "Artista", handle: "", bio: "" }, { name: "foto.jpg" }, false, "", null, true, ""];
+    : [[], true, { name: "Artista", handle: "", bio: "" }, { name: "foto.jpg" }, false, "", null];
   let cursor = 0;
   let closed = false;
   const react = {

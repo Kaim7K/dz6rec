@@ -31,13 +31,13 @@ export default function ForgotPassword() {
       title="Redefinir senha"
       subtitle="Enviaremos um link para o seu e-mail"
       footer={
-        <Link to="/login" className="text-red-300 font-medium hover:underline">
+        <Link to="/login" className="text-primary font-medium hover:underline">
           <ArrowLeft className="w-3 h-3 inline mr-1" />Voltar para entrar
         </Link>
       }
     >
       {sent ? (
-        <p role="status" className="text-sm text-foreground text-center">
+        <p className="text-sm text-foreground text-center">
           Se existir uma conta com esse e-mail, você receberá o link em breve.
         </p>
       ) : (
@@ -51,15 +51,15 @@ export default function ForgotPassword() {
                 type="email"
                 autoComplete="email"
                 autoFocus
-                placeholder="usuario@gravadora.com"
+                placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="h-11 pl-10"
+                className="pl-10 h-12"
                 required
               />
             </div>
           </div>
-          <Button type="submit" className="w-full h-11 font-medium" disabled={loading}>
+          <Button type="submit" className="w-full h-12 font-medium" disabled={loading}>
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />

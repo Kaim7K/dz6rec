@@ -1,4 +1,3 @@
-import PageSkeleton from "@/components/PageSkeleton";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { apiClient } from "@/api/appClient";
@@ -13,7 +12,7 @@ function Panel({ title, action = "Ver todos", children }) {
     <section className="dz-card min-h-[14.4rem] p-4 sm:p-5">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="dz-panel-title">{title}</h2>
-        <Link to="/projetos" className="inline-flex items-center gap-2 text-xs font-medium text-muted-foreground transition-colors hover:text-white">
+        <Link to="/projetos" className="inline-flex items-center gap-2 text-xs font-medium text-white/45 transition-colors hover:text-white">
           {action} <ArrowRight size={13} />
         </Link>
       </div>
@@ -47,10 +46,10 @@ function ActionRow({ task, project, index }) {
     <Link to={task.project_id ? `/projetos/${task.project_id}` : "/minhas-tarefas"} className="dz-list-row flex items-center gap-3 py-2.5">
       <ActionIcon index={index} />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-white/88">{task.text}</p>
-        <p className="mt-1 truncate text-xs text-muted-foreground">{project?.name || "Projeto"} - {project?.main_artist_name || "DZ6"}</p>
+        <p className="truncate text-sm font-bold text-white/88">{task.text}</p>
+        <p className="mt-1 truncate text-xs text-white/42">{project?.name || "Projeto"} - {project?.main_artist_name || "DZ6"}</p>
       </div>
-      <span className={`hidden rounded-md px-2.5 py-1 text-xs font-semibold sm:inline-flex ${warn ? "bg-yellow-500/15 text-yellow-300" : "bg-white/[0.04] text-white/62"}`}>{status}</span>
+      <span className={`hidden rounded-md px-2.5 py-1 text-xs font-bold sm:inline-flex ${warn ? "bg-yellow-500/15 text-yellow-300" : "bg-white/[0.04] text-white/62"}`}>{status}</span>
     </Link>
   );
 }
@@ -61,8 +60,8 @@ function ProjectRow({ project }) {
     <Link to={`/projetos/${project.id}`} className="dz-list-row flex items-center gap-3 py-2.5">
       <MiniCover project={project} />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-white/88">{project.name}</p>
-        <p className="mt-1 truncate text-xs text-muted-foreground">{project.main_artist_name || "Sem artista"}</p>
+        <p className="truncate text-sm font-bold text-white/88">{project.name}</p>
+        <p className="mt-1 truncate text-xs text-white/42">{project.main_artist_name || "Sem artista"}</p>
       </div>
       <span className={`hidden rounded-md px-2.5 py-1 text-xs font-medium sm:inline-flex ${tone.bg} ${tone.text}`}>{STATUS[project.status] || project.status}</span>
     </Link>
@@ -110,13 +109,13 @@ export default function Home() {
   if (error) {
     return (
       <div className="dz-card max-w-lg p-5">
-        <h1 className="font-display text-2xl font-semibold text-white">Não foi possível carregar o painel</h1>
+        <h1 className="font-display text-2xl font-bold text-white">Não foi possível carregar o painel</h1>
         <p className="mt-2 text-sm text-white/50">{error}</p>
       </div>
     );
   }
 
-  if (!data) return <PageSkeleton />;
+  if (!data) return <p className="text-sm text-white/40">Carregando...</p>;
 
   const metrics = [
     { label: "Projetos ativos", value: data.active, icon: FolderKanban },
@@ -125,18 +124,16 @@ export default function Home() {
   ];
 
   return (
-    <div className="dz-page">
-      <header className="dz-page-head"><div><p className="dz-kicker">Gravadora</p><h1 className="dz-page-title">Visão geral</h1><p className="dz-page-subtitle">Projetos, entregas e próximos passos da equipe.</p></div></header>
+    <div className="space-y-5">
       <FeaturedProject project={data.featured} progress={data.byProject[data.featured?.id]} />
       <MetricStrip metrics={metrics} />
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+      <div className="grid gap-4 lg:grid-cols-[1fr_0.96fr]">
         <Panel title="Próximas ações">
           <div>
             {data.pendingItems.slice(0, 3).map((task, index) => (
               <ActionRow key={task.id} task={task} project={data.projectMap[task.project_id]} index={index} />
             ))}
-            {data.pendingItems.length === 0 && <p className="py-8 text-center text-sm text-muted-foreground">Tudo em dia. Nenhuma ação pendente.</p>}
           </div>
         </Panel>
 
@@ -145,7 +142,6 @@ export default function Home() {
             {data.projects.filter((project) => project.id !== data.featured?.id).slice(0, 4).map((project) => (
               <ProjectRow key={project.id} project={project} />
             ))}
-            {data.projects.filter((project) => project.id !== data.featured?.id).length === 0 && <p className="py-8 text-center text-sm text-muted-foreground">Nenhum outro projeto por aqui.</p>}
           </div>
         </Panel>
       </div>

@@ -14,7 +14,7 @@ function UserSummary({ user }) {
         {user.photo_url ? <img src={user.photo_url} alt="" className="h-full w-full object-cover" /> : (user.full_name || user.email || "U")[0].toUpperCase()}
       </span>
       <div className="min-w-0">
-        <p className="truncate font-display text-section font-semibold text-stage-ink">{user.full_name || "Usuário"}</p>
+        <p className="truncate font-jakarta text-section font-bold text-stage-ink">{user.full_name || "Usuário"}</p>
         <p className="truncate text-micro text-stage-muted">{user.email}{user.handle ? ` · @${user.handle}` : ""}</p>
       </div>
     </div>
@@ -25,22 +25,14 @@ export default function ManageCargosDialog({ user, catalog, onClose, onSaved }) 
   const isMobile = useIsMobile();
   const [value, setValue] = useState(() => cargoList(user.cargo));
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const save = async () => {
     if (loading) return;
     setLoading(true);
-    setError("");
-    try {
     await apiClient.entities.User.update(user.id, { cargo: value });
-
+    setLoading(false);
     onSaved();
     onClose();
-    } catch (err) {
-      setError(err.message || "Não foi possível salvar. Tente novamente.");
-    } finally {
-      setLoading(false);
-    }
   };
 
   const actions = (
@@ -50,19 +42,19 @@ export default function ManageCargosDialog({ user, catalog, onClose, onSaved }) 
     </div>
   );
 
-  const editor = <>{error && <p role="alert" className="dz-form-error mb-4">{error}</p>}<UserCargosEditor value={value} onChange={setValue} catalog={catalog} layout={isMobile ? "sheet" : "modal"} /></>;
+  const editor = <UserCargosEditor value={value} onChange={setValue} catalog={catalog} layout={isMobile ? "sheet" : "modal"} />;
 
   if (isMobile) return (
     <Drawer open onOpenChange={(o) => !o && onClose()}>
-      <DrawerContent aria-describedby={undefined} className="max-h-[88dvh] overflow-hidden border-stage-border bg-stage-card text-stage-ink">
+      <DrawerContent className="max-h-[88vh] border-stage-border bg-stage-card text-stage-ink">
         <div className="border-b border-stage-border px-4 pb-3 pt-1">
-          <DrawerTitle className="font-display text-section font-semibold text-stage-ink">Editar Cargos</DrawerTitle>
+          <DrawerTitle className="font-jakarta text-section font-bold text-stage-ink">Editar Cargos</DrawerTitle>
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
+        <div className="flex-1 overflow-y-auto px-4 py-4">
           <UserSummary user={user} />
           <div className="mt-5">{editor}</div>
         </div>
-        <div className="border-t border-stage-border bg-stage-card p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">{actions}</div>
+        <div className="border-t border-stage-border bg-stage-card p-4">{actions}</div>
       </DrawerContent>
     </Drawer>
   );
@@ -71,7 +63,7 @@ export default function ManageCargosDialog({ user, catalog, onClose, onSaved }) 
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="max-w-[600px] border-stage-border bg-stage-card text-stage-ink">
         <DialogHeader>
-          <DialogTitle className="font-display text-lg font-semibold text-stage-ink">Editar Cargos</DialogTitle>
+          <DialogTitle className="font-jakarta text-title font-bold text-stage-ink">Editar Cargos</DialogTitle>
           <DialogDescription className="text-body text-stage-muted">Adicione ou remova os cargos deste usuário. Cargos descontinuados também podem ser removidos aqui.</DialogDescription>
         </DialogHeader>
         <div className="max-h-[52vh] overflow-y-auto pr-1">

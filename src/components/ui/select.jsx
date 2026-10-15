@@ -4,8 +4,6 @@ import * as React from "react"
 import * as SelectPrimitive from "@radix-ui/react-select"
 import { Check, ChevronDown, ChevronUp } from "lucide-react"
 
-import { useField } from "@/components/ui/field-context"
-
 import { cn } from "@/lib/utils"
 
 const Select = SelectPrimitive.Root
@@ -14,21 +12,11 @@ const SelectGroup = SelectPrimitive.Group
 
 const SelectValue = SelectPrimitive.Value
 
-const SelectTrigger = React.forwardRef(
-/**
- * @param {React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>} props
- * @param {React.ForwardedRef<React.ElementRef<typeof SelectPrimitive.Trigger>>} ref
- */
-({ className, children, ...props }, ref) => {
-  const field = useField();
-  return (
+const SelectTrigger = React.forwardRef(({ className, children, ...props }, ref) => (
   <SelectPrimitive.Trigger
-    id={props.id || field.id}
-    aria-describedby={props["aria-describedby"] || field.descriptionId}
-    aria-invalid={props["aria-invalid"] || !!field.error}
     ref={ref}
     className={cn(
-      "flex h-11 sm:h-10 min-w-0 w-full items-center justify-between gap-2 whitespace-nowrap rounded-md border border-white/[0.12] bg-white/[0.03] px-3 py-2 text-sm text-white shadow-sm ring-offset-background data-[placeholder]:text-white/50 focus:border-white/35 focus:outline-none focus:ring-2 focus:ring-primary/25 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:min-w-0 [&>span]:truncate",
+      "flex h-10 min-w-0 w-full items-center justify-between gap-2 whitespace-nowrap rounded-md border border-white/[0.095] bg-white/[0.035] px-3 py-2 text-sm text-white shadow-sm ring-offset-background data-[placeholder]:text-white/36 focus:border-primary/50 focus:bg-white/[0.055] focus:outline-none focus:ring-0 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:min-w-0 [&>span]:truncate",
       className
     )}
     {...props}>
@@ -37,8 +25,7 @@ const SelectTrigger = React.forwardRef(
       <ChevronDown className="h-4 w-4 opacity-50" />
     </SelectPrimitive.Icon>
   </SelectPrimitive.Trigger>
-);
-})
+))
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName
 
 const SelectScrollUpButton = React.forwardRef(({ className, ...props }, ref) => (
@@ -67,7 +54,7 @@ const SelectContent = React.forwardRef(({ className, children, position = "poppe
     <SelectPrimitive.Content
       ref={ref}
       className={cn(
-        "relative z-50 max-h-[min(24rem,calc(100svh-2rem))] min-w-[8rem] max-w-[calc(100vw-1rem)] overflow-hidden rounded-lg border border-white/[0.095] bg-popover text-popover-foreground shadow-elev data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        "relative z-50 max-h-[min(24rem,calc(100svh-2rem))] min-w-[8rem] max-w-[calc(100vw-1rem)] overflow-hidden rounded-lg border border-white/[0.095] bg-[#171414] text-popover-foreground shadow-elev data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         position === "popper" &&
           "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
         className
@@ -98,7 +85,7 @@ const SelectItem = React.forwardRef(({ className, children, ...props }, ref) => 
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex w-full cursor-default select-none items-center rounded-md min-h-9 py-2 pl-3 pr-8 text-sm leading-5 text-white/78 outline-none focus:bg-white/[0.075] focus:text-white data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>span:last-child]:min-w-0 [&>span:last-child]:truncate",
+      "relative flex w-full cursor-default select-none items-center rounded-md py-1.5 pl-2 pr-8 text-sm leading-5 text-white/78 outline-none focus:bg-white/[0.075] focus:text-white data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>span:last-child]:min-w-0 [&>span:last-child]:truncate",
       className
     )}
     {...props}>

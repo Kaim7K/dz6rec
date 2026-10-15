@@ -1,10 +1,9 @@
-import PageSkeleton from "@/components/PageSkeleton";
-import FormField from "@/components/ui/form-field";
 import React, { useEffect, useState } from "react";
 import { apiClient } from "@/api/appClient";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { uploadFile } from "@/lib/music";
 import FileField from "@/components/ui/file-field";
@@ -19,9 +18,7 @@ export default function Artists() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [editing, setEditing] = useState(null);
-  const [loaded, setLoaded] = useState(false);
-  const [loadError, setLoadError] = useState("");
-  const load = () => apiClient.entities.Artist.list().then(setArtists).catch((err) => setLoadError(err.message || "Não foi possível carregar os artistas.")).finally(() => setLoaded(true));
+  const load = () => apiClient.entities.Artist.list().then(setArtists);
   useEffect(() => { load(); }, []);
   const submit = async (e) => {
     e.preventDefault();
@@ -37,8 +34,6 @@ export default function Artists() {
       setLoading(false);
     }
   };
-  if (!loaded) return <PageSkeleton cards />;
-  if (loadError) return <div role="alert" className="dz-form-error">{loadError}</div>;
   return (
     <div className="dz-page">
       <div className="dz-page-head">
@@ -53,23 +48,23 @@ export default function Artists() {
         <div className="dz-empty">Nenhum artista cadastrado.</div>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{artists.map((a) => (
-          <div key={a.id} className="dz-card group overflow-hidden p-3 transition-colors duration-300 hover:border-white/[0.14] hover:bg-[#171414]">
-            <div className="aspect-square w-full overflow-hidden rounded-md border border-white/[0.07] bg-black">{a.photo_url ? <img src={a.photo_url} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" alt="" /> : <div className="grid h-full place-items-center bg-white/[0.02]"><Mic2 className="text-muted-foreground" size={28} /></div>}</div>
+          <div key={a.id} className="group min-w-0 overflow-hidden rounded-lg border border-white/[0.08] bg-[#111010] p-2.5 shadow-soft transition-colors duration-300 hover:border-white/[0.14] hover:bg-[#171414]">
+            <div className="aspect-square w-full overflow-hidden rounded-md border border-white/[0.07] bg-black">{a.photo_url ? <img src={a.photo_url} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" alt="" /> : <div className="grid h-full place-items-center bg-white/[0.02]"><Mic2 className="text-white/18" size={28} /></div>}</div>
             <div className="flex items-center justify-between gap-3 px-1 pb-1 pt-4">
-              <div><p className="font-medium text-white">{a.name}</p><p className="text-xs text-muted-foreground">{a.handle ? `@${a.handle}` : "—"}</p></div>
+              <div><p className="font-medium text-white">{a.name}</p><p className="text-xs text-white/40">{a.handle ? `@${a.handle}` : "—"}</p></div>
               <button onClick={() => setEditing(a)} aria-label={`Editar ${a.name}`} className="dz-icon-button h-8 w-8"><Pencil size={15} /></button>
             </div>
           </div>
         ))}</div>
       )}
-      <Dialog open={open} onOpenChange={(nextOpen) => { if (!loading) setOpen(nextOpen); }}><DialogContent className="max-w-[480px]"><DialogHeader><DialogTitle>Novo artista</DialogTitle><DialogDescription>Adicione um novo nome ao catálogo da gravadora.</DialogDescription></DialogHeader>
-        <form onSubmit={submit} className="min-w-0 space-y-5">
-          {error && <div role="alert" className="dz-form-error">{error}</div>}
-          <fieldset disabled={loading} className="min-w-0 space-y-5">
-          <FormField label="Nome"><Input required value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="Nome do artista" /></FormField>
-          <FormField label="@usuário"><Input value={form.handle} onChange={(e) => setForm((f) => ({ ...f, handle: e.target.value }))} placeholder="handle" /></FormField>
-          <FormField label="Foto"><FileField value={photo} onChange={setPhoto} accept="image/*" hint="Retrato do artista" /></FormField>
-          <FormField label="Bio"><Textarea value={form.bio} onChange={(e) => setForm((f) => ({ ...f, bio: e.target.value }))} rows={3} placeholder="Breve descrição" /></FormField>
+      <Dialog open={open} onOpenChange={(nextOpen) => { if (!loading) setOpen(nextOpen); }}><DialogContent className="max-w-md"><DialogHeader><DialogTitle>Novo artista</DialogTitle></DialogHeader>
+        <form onSubmit={submit} className="min-w-0 space-y-4">
+          {error && <div role="alert" className="rounded-md border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</div>}
+          <fieldset disabled={loading} className="min-w-0 space-y-4">
+          <div className="space-y-1.5"><Label>Nome</Label><Input required value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="Nome do artista" /></div>
+          <div className="space-y-1.5"><Label>@usuário</Label><Input value={form.handle} onChange={(e) => setForm((f) => ({ ...f, handle: e.target.value }))} placeholder="handle" /></div>
+          <div className="space-y-1.5"><Label>Foto</Label><FileField value={photo} onChange={setPhoto} accept="image/*" hint="Retrato do artista" /></div>
+          <div className="space-y-1.5"><Label>Bio</Label><Textarea value={form.bio} onChange={(e) => setForm((f) => ({ ...f, bio: e.target.value }))} rows={3} placeholder="Breve descrição" /></div>
           </fieldset>
           <DialogFooter><Button type="button" variant="ghost" onClick={() => setOpen(false)} disabled={loading} className="text-white/55">Cancelar</Button><Button type="submit" disabled={loading} className="bg-primary text-primary-foreground">{loading ? "Criando..." : "Criar artista"}</Button></DialogFooter>
         </form>

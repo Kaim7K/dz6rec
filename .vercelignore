@@ -1,0 +1,13 @@
+.git
+.vercel
+node_modules
+dist
+artifacts
+test-results
+.env
+.env.*
+docs
+tests
+scripts
+AGENTS.md
+CLAUDE.md

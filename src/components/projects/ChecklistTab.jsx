@@ -319,7 +319,7 @@ export default function ChecklistTab({ project }) {
         </button>
       </div>
       <DragDropContext onDragEnd={onDragEnd}>
-        <div className="grid gap-4 xl:grid-cols-3">
+        <div className="grid gap-4 2xl:grid-cols-3">
           {CATEGORIES.map((category) => {
           const categorySections = sections.filter((section) => sectionCategory(section) === category.key);
           const categoryItems = categoryParentItems(categorySections);
@@ -330,19 +330,19 @@ export default function ChecklistTab({ project }) {
             <section key={category.key} className="min-h-[22rem] min-w-0 rounded-lg border border-white/[0.08] bg-[#111010] p-3.5 shadow-soft sm:p-4">
               <div className="mb-3 grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
                 <div className="min-w-0">
-                  <p className="truncate text-xl font-semibold leading-none text-white">{category.label}</p>
+                  <p className="truncate text-xl font-bold leading-none text-white">{category.label}</p>
                   <p className="mt-2 text-xs text-white/50">{done}/{categoryItems.length} concluídas</p>
                 </div>
                 <div className="flex min-w-0 max-w-[11rem] flex-wrap items-center justify-end gap-2 sm:max-w-[14rem] 2xl:max-w-[10.5rem]">
                   {firstSection?.cargo && <CargoBadge cargo={firstSection.cargo} cargos={cargos} className="h-8 max-w-full px-3 text-xs" />}
                   <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: category.color }} />
-                  <button onClick={() => firstSection && setNoteSection(firstSection)} className="grid h-9 w-9 shrink-0 place-items-center rounded-md text-muted-foreground transition-colors hover:bg-white/[0.04] hover:text-white" aria-label="Notas da seção"><MoreHorizontal size={17} /></button>
+                  <button onClick={() => firstSection && setNoteSection(firstSection)} className="grid h-7 w-7 shrink-0 place-items-center rounded-md text-white/45 transition-colors hover:bg-white/[0.04] hover:text-white" aria-label="Notas da seção"><MoreHorizontal size={17} /></button>
                 </div>
               </div>
 
               <div className="mb-3">
                 <Select value={categoryResponsibleIds[category.key] || undefined} onValueChange={(userId) => assignCategoryResponsible(category, userId)}>
-                  <SelectTrigger aria-label={`Responsável por ${category.label}`} className="h-10 w-full border-white/[0.075] bg-white/[0.035] text-xs text-white/62">
+                  <SelectTrigger className="h-8 w-full border-white/[0.075] bg-white/[0.035] text-xs text-white/62">
                     <SelectValue placeholder={`Responsavel para ${category.label}`} />
                   </SelectTrigger>
                   <SelectContent className="max-h-64">
@@ -373,15 +373,15 @@ export default function ChecklistTab({ project }) {
                 </Droppable>
 
                 {categorySections.length === 0 && (
-                  <p className="rounded-md border border-dashed border-white/[0.08] px-3 py-3 text-sm text-muted-foreground">Nenhuma seção nesta operação.</p>
+                  <p className="rounded-md border border-dashed border-white/[0.08] px-3 py-3 text-sm text-white/35">Nenhuma seção nesta operação.</p>
                 )}
 
                 <form onSubmit={(e) => { e.preventDefault(); const f = e.currentTarget; addCategoryItems(category, f.text.value); f.reset(); }} className="grid min-h-[4.5rem] grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-md border border-dashed border-white/[0.12] bg-black/10 px-3 py-2.5 transition-colors focus-within:border-primary/45 focus-within:bg-white/[0.025] sm:grid-cols-[2rem_minmax(0,1fr)_auto]">
                   <span className="grid h-8 w-8 place-items-center rounded-md bg-white/[0.045] text-white/60">
                     <Plus size={16} />
                   </span>
-                  <textarea aria-label={`Adicionar tarefas de ${category.label}`} name="text" rows={2} placeholder={"Adicionar tarefas...\nUma tarefa por linha"} className="min-h-10 min-w-0 resize-none bg-transparent py-0.5 text-sm leading-5 text-white/82 outline-none placeholder:text-muted-foreground" />
-                  <button type="submit" className="col-span-2 h-8 rounded-md border border-white/[0.08] px-3 text-xs font-semibold text-white/62 transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-white sm:col-span-1">
+                  <textarea name="text" rows={2} placeholder={"Adicionar tarefas...\nUma tarefa por linha"} className="min-h-10 min-w-0 resize-none bg-transparent py-0.5 text-sm leading-5 text-white/82 outline-none placeholder:text-white/40" />
+                  <button type="submit" className="col-span-2 h-8 rounded-md border border-white/[0.08] px-3 text-xs font-bold text-white/62 transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-white sm:col-span-1">
                     Adicionar
                   </button>
                 </form>
@@ -393,11 +393,11 @@ export default function ChecklistTab({ project }) {
       </DragDropContext>
 
       <form onSubmit={addSection} className="grid gap-3 sm:grid-cols-[1fr_auto] sm:gap-4">
-          <div className="flex h-11 items-center gap-3 rounded-lg border border-white/[0.085] bg-white/[0.032] px-5">
+          <div className="flex h-14 items-center gap-4 rounded-lg border border-white/[0.085] bg-white/[0.032] px-5">
           <Plus size={22} className="text-white/70" />
-          <input value={newSection} onChange={(e) => setNewSection(e.target.value)} aria-label="Nome da nova seção" placeholder="Nova seção..." className="min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground" />
+          <input value={newSection} onChange={(e) => setNewSection(e.target.value)} placeholder="Nova seção..." className="min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-white/42" />
         </div>
-        <button className="dz-primary-button">Adicionar</button>
+        <button className="h-12 rounded-md bg-primary px-7 text-base font-bold text-primary-foreground transition-colors hover:bg-primary/90 sm:h-14">Adicionar</button>
       </form>
 
       {noteSection && <NotesDialog section={noteSection} onClose={() => setNoteSection(null)} />}
@@ -407,8 +407,8 @@ export default function ChecklistTab({ project }) {
           {templateMessage && <p className="rounded-md border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-200">{templateMessage}</p>}
           <form onSubmit={saveAsTemplate} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="checklist-template-name">Nome do template</Label>
-              <Input id="checklist-template-name" value={templateName} onChange={(e) => setTemplateName(e.target.value)} placeholder="Ex. Lançamento completo" autoFocus />
+              <Label>Nome do template</Label>
+              <Input value={templateName} onChange={(e) => setTemplateName(e.target.value)} placeholder="Ex. Lançamento completo" autoFocus />
             </div>
             <DialogFooter>
               <Button type="button" variant="ghost" onClick={() => setTemplateOpen(false)} disabled={templateSaving} className="text-white/55">Cancelar</Button>
