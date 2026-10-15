@@ -12,38 +12,49 @@ export default function EditArtistDialog({ artist, open, onClose, onSaved }) {
   const [form, setForm] = useState({ name: "", handle: "", bio: "" });
   const [photo, setPhoto] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (artist) setForm({ name: artist.name || "", handle: artist.handle || "", bio: artist.bio || "" });
     setPhoto(null);
+    setError("");
   }, [artist, open]);
 
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
   const submit = async (e) => {
     e.preventDefault();
+    if (loading) return;
     setLoading(true);
-    const data = { ...form };
-    if (photo) data.photo_url = await uploadFile(photo);
-    await apiClient.entities.Artist.update(artist.id, data);
-    setLoading(false);
-    onSaved();
-    onClose();
+    setError("");
+    try {
+      const data = { ...form, ...(photo ? { photo_url: await uploadFile(photo) } : {}) };
+      await apiClient.entities.Artist.update(artist.id, data);
+      onSaved();
+      onClose();
+    } catch (err) {
+      setError(err.message || "Não foi possível salvar o artista. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={(nextOpen) => { if (!loading && !nextOpen) onClose(); }}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Editar artista</DialogTitle>
         </DialogHeader>
         <form onSubmit={submit} className="space-y-4">
+          {error && <div role="alert" className="rounded-md border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</div>}
+          <fieldset disabled={loading} className="space-y-4">
           <div className="space-y-1.5"><Label>Nome</Label><Input required value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Nome do artista" /></div>
           <div className="space-y-1.5"><Label>@usuário</Label><Input value={form.handle} onChange={(e) => set("handle", e.target.value)} placeholder="handle" /></div>
           <div className="space-y-1.5"><Label>Foto</Label><FileField value={photo} onChange={setPhoto} accept="image/*" hint="Retrato do artista" /></div>
           <div className="space-y-1.5"><Label>Bio</Label><Textarea value={form.bio} onChange={(e) => set("bio", e.target.value)} rows={3} placeholder="Breve descrição" /></div>
+          </fieldset>
           <DialogFooter>
-            <Button type="button" variant="ghost" onClick={onClose} className="text-white/55">Cancelar</Button>
+            <Button type="button" variant="ghost" onClick={onClose} disabled={loading} className="text-white/55">Cancelar</Button>
             <Button type="submit" disabled={loading} className="bg-primary text-primary-foreground">{loading ? "Salvando..." : "Salvar"}</Button>
           </DialogFooter>
         </form>

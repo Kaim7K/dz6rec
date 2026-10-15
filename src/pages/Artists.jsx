@@ -16,14 +16,23 @@ export default function Artists() {
   const [form, setForm] = useState({ name: "", handle: "", bio: "" });
   const [photo, setPhoto] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [editing, setEditing] = useState(null);
   const load = () => apiClient.entities.Artist.list().then(setArtists);
   useEffect(() => { load(); }, []);
   const submit = async (e) => {
-    e.preventDefault(); setLoading(true);
-    let photo_url = ""; if (photo) photo_url = await uploadFile(photo);
-    await apiClient.entities.Artist.create({ ...form, photo_url });
-    setLoading(false); setForm({ name: "", handle: "", bio: "" }); setPhoto(null); setOpen(false); load();
+    e.preventDefault();
+    if (loading) return;
+    setLoading(true); setError("");
+    try {
+      const photo_url = photo ? await uploadFile(photo) : "";
+      await apiClient.entities.Artist.create({ ...form, photo_url });
+      setForm({ name: "", handle: "", bio: "" }); setPhoto(null); setOpen(false); load();
+    } catch (err) {
+      setError(err.message || "Não foi possível criar o artista. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
   };
   return (
     <div className="dz-page">
@@ -33,7 +42,7 @@ export default function Artists() {
           <h1 className="dz-page-title">Artistas</h1>
           <p className="dz-page-subtitle">Pessoas, vozes e identidades que movimentam os projetos.</p>
         </div>
-        <button onClick={() => setOpen(true)} className="dz-primary-button"><Plus size={16} />Novo artista</button>
+        <button onClick={() => { setError(""); setOpen(true); }} className="dz-primary-button"><Plus size={16} />Novo artista</button>
       </div>
       {artists.length === 0 ? (
         <div className="dz-empty">Nenhum artista cadastrado.</div>
@@ -48,13 +57,16 @@ export default function Artists() {
           </div>
         ))}</div>
       )}
-      <Dialog open={open} onOpenChange={setOpen}><DialogContent className="max-w-md"><DialogHeader><DialogTitle>Novo artista</DialogTitle></DialogHeader>
+      <Dialog open={open} onOpenChange={(nextOpen) => { if (!loading) setOpen(nextOpen); }}><DialogContent className="max-w-md"><DialogHeader><DialogTitle>Novo artista</DialogTitle></DialogHeader>
         <form onSubmit={submit} className="min-w-0 space-y-4">
+          {error && <div role="alert" className="rounded-md border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</div>}
+          <fieldset disabled={loading} className="min-w-0 space-y-4">
           <div className="space-y-1.5"><Label>Nome</Label><Input required value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="Nome do artista" /></div>
           <div className="space-y-1.5"><Label>@usuário</Label><Input value={form.handle} onChange={(e) => setForm((f) => ({ ...f, handle: e.target.value }))} placeholder="handle" /></div>
           <div className="space-y-1.5"><Label>Foto</Label><FileField value={photo} onChange={setPhoto} accept="image/*" hint="Retrato do artista" /></div>
           <div className="space-y-1.5"><Label>Bio</Label><Textarea value={form.bio} onChange={(e) => setForm((f) => ({ ...f, bio: e.target.value }))} rows={3} placeholder="Breve descrição" /></div>
-          <DialogFooter><Button type="button" variant="ghost" onClick={() => setOpen(false)} className="text-white/55">Cancelar</Button><Button type="submit" disabled={loading} className="bg-primary text-primary-foreground">{loading ? "Criando..." : "Criar artista"}</Button></DialogFooter>
+          </fieldset>
+          <DialogFooter><Button type="button" variant="ghost" onClick={() => setOpen(false)} disabled={loading} className="text-white/55">Cancelar</Button><Button type="submit" disabled={loading} className="bg-primary text-primary-foreground">{loading ? "Criando..." : "Criar artista"}</Button></DialogFooter>
         </form>
       </DialogContent></Dialog>
       <EditArtistDialog artist={editing} open={!!editing} onClose={() => setEditing(null)} onSaved={load} />
