@@ -33,3 +33,6 @@ dist-ssr
 base44/.app.jsonc
 
 .vercel
+
+# Local visual QA screenshots
+artifacts/visual-audit/

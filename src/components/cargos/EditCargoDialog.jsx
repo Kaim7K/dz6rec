@@ -1,8 +1,8 @@
+import FormField from "@/components/ui/form-field";
 import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { apiClient } from "@/api/appClient";
 import { cargoList } from "@/lib/music";
 
@@ -67,10 +67,13 @@ export default function EditCargoDialog({ cargo, onClose, onSaved }) {
   const [name, setName] = useState(cargo.name);
   const [color, setColor] = useState(cargo.color || randomCargoColor());
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const save = async () => {
     if (!name.trim() || loading) return;
     setLoading(true);
+    setError("");
+    try {
     const newName = name.trim();
     await apiClient.entities.Cargo.update(cargo.id, { name: newName, color: normalizeHexColor(color) });
     if (newName !== cargo.name) {
@@ -82,26 +85,32 @@ export default function EditCargoDialog({ cargo, onClose, onSaved }) {
       await apiClient.entities.ChecklistSection.updateMany({ cargo: cargo.name }, { $set: { cargo: newName } }).catch(() => {});
       await apiClient.entities.ChecklistItem.updateMany({ cargo: cargo.name }, { $set: { cargo: newName } }).catch(() => {});
     }
-    setLoading(false);
+
     onSaved();
     onClose();
+    } catch (err) {
+      setError(err.message || "Não foi possível salvar. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <Dialog open onOpenChange={onClose}>
+    <Dialog open onOpenChange={(value) => { if (!loading && !value) onClose(); }}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Editar cargo</DialogTitle>
           <DialogDescription>Altere o nome ou a cor. A alteração se aplica a todos os perfis e tarefas que usam este cargo.</DialogDescription>
         </DialogHeader>
-        <div className="space-y-5">
-          <div className="space-y-1.5"><Label>Nome</Label><Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nome do cargo" /></div>
-          <div className="space-y-1.5"><Label>Cor</Label>
+        {error && <p role="alert" className="dz-form-error">{error}</p>}
+        <fieldset disabled={loading} className="min-w-0 space-y-5">
+          <FormField label="Nome"><Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nome do cargo" /></FormField>
+          <FormField label="Cor">
             <ColorSelect value={color} onChange={setColor} triggerClassName="w-full" />
-          </div>
-        </div>
+          </FormField>
+        </fieldset>
         <DialogFooter>
-          <Button variant="ghost" onClick={onClose} className="text-white/55">Cancelar</Button>
+          <Button variant="ghost" onClick={onClose} disabled={loading} className="text-white/55">Cancelar</Button>
           <Button onClick={save} disabled={loading || !name.trim()} className="bg-primary text-primary-foreground">{loading ? "Salvando..." : "Salvar"}</Button>
         </DialogFooter>
       </DialogContent>

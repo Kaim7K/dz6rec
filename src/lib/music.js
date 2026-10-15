@@ -18,10 +18,10 @@ export const STATUS = {
 export const STATUS_ORDER = ["rascunho", "planejamento", "producao", "revisao", "pre_lancamento", "agendado", "lancado", "pausado", "cancelado", "arquivado"];
 
 export const PRIORITY = {
-  baixa: { label: "Baixa", tone: "text-white/40", dot: "bg-white/30" },
+  baixa: { label: "Baixa", tone: "text-muted-foreground", dot: "bg-white/30" },
   normal: { label: "Normal", tone: "text-white/55", dot: "bg-white/45" },
   alta: { label: "Alta", tone: "text-amber-300", dot: "bg-amber-400" },
-  urgente: { label: "Urgente", tone: "text-primary", dot: "bg-primary" },
+  urgente: { label: "Urgente", tone: "text-red-300", dot: "bg-primary" },
 };
 
 export const PRIORITY_ORDER = ["baixa", "normal", "alta", "urgente"];
@@ -32,12 +32,12 @@ export const STATUS_TONE = {
   planejamento:    { dot: "bg-white/45",    text: "text-white/60",   bg: "bg-white/[0.055]",  border: "border-white/[0.08]" },
   producao:        { dot: "bg-emerald-400", text: "text-emerald-300", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
   revisao:         { dot: "bg-amber-400",   text: "text-amber-300",   bg: "bg-amber-500/10",   border: "border-amber-500/20" },
-  pre_lancamento:  { dot: "bg-primary",     text: "text-primary",     bg: "bg-primary/10",     border: "border-primary/25" },
+  pre_lancamento:  { dot: "bg-primary",     text: "text-red-300",     bg: "bg-primary/10",     border: "border-primary/25" },
   agendado:        { dot: "bg-white/55",    text: "text-white/70",    bg: "bg-white/[0.055]",  border: "border-white/[0.08]" },
-  lancado:         { dot: "bg-primary",     text: "text-primary",     bg: "bg-primary/10",     border: "border-primary/25" },
-  pausado:         { dot: "bg-white/30",    text: "text-white/45",    bg: "bg-white/[0.04]",   border: "border-white/[0.06]" },
+  lancado:         { dot: "bg-primary",     text: "text-red-300",     bg: "bg-primary/10",     border: "border-primary/25" },
+  pausado:         { dot: "bg-white/30",    text: "text-muted-foreground",    bg: "bg-white/[0.04]",   border: "border-white/[0.06]" },
   cancelado:       { dot: "bg-red-400",     text: "text-red-300",     bg: "bg-red-500/10",     border: "border-red-500/20" },
-  arquivado:       { dot: "bg-white/25",    text: "text-white/35",    bg: "bg-white/[0.03]",   border: "border-white/[0.06]" },
+  arquivado:       { dot: "bg-white/25",    text: "text-muted-foreground",    bg: "bg-white/[0.03]",   border: "border-white/[0.06]" },
 };
 
 export const statusBadge = (status) => {

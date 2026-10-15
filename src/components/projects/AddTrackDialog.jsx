@@ -1,15 +1,15 @@
+import FormField from "@/components/ui/form-field";
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import FileField from "@/components/ui/file-field";
 import { apiClient } from "@/api/appClient";
 import { uploadFile, logActivity } from "@/lib/music";
 import { Loader2 } from "lucide-react";
 
-const Field = ({ label, children }) => <div className="space-y-1.5"><Label>{label}</Label>{children}</div>;
+const Field = FormField;
 
 export default function AddTrackDialog({ open, onClose, onCreated, project, trackCount }) {
   const [form, setForm] = useState({ name: "", main_artist_name: project?.main_artist_name || "", featuring: "", version_label: "Demo 01", track_number: trackCount + 1, bpm: "", key: "", isrc: "", notes: "" });
@@ -55,7 +55,8 @@ export default function AddTrackDialog({ open, onClose, onCreated, project, trac
           <DialogDescription>Informe o essencial. Detalhes técnicos podem ser preenchidos depois.</DialogDescription>
         </DialogHeader>
         {error && <div className="rounded-md border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</div>}
-        <form onSubmit={submit} className="space-y-4">
+        <form onSubmit={submit} className="space-y-5">
+          <fieldset disabled={loading} className="min-w-0 space-y-4">
           <Field label="Nome"><Input value={form.name} onChange={(e) => set("name", e.target.value)} placeholder={project?.name || "Ex. Noite Clara"} /></Field>
           <div className="grid gap-3 sm:grid-cols-2">
             <Field label="Artista principal"><Input value={form.main_artist_name} onChange={(e) => set("main_artist_name", e.target.value)} /></Field>
@@ -69,7 +70,7 @@ export default function AddTrackDialog({ open, onClose, onCreated, project, trac
             <FileField value={audio} onChange={(file) => { setAudio(file); setUploadProgress(0); setError(""); }} accept="audio/*" hint="MP3, WAV, FLAC..." />
             {(loading && audio) && (
               <div className="mt-2 space-y-1.5">
-                <div className="flex items-center justify-between text-2xs text-white/45">
+                <div className="flex items-center justify-between text-2xs text-muted-foreground">
                   <span>{uploading ? "Enviando arquivo" : "Finalizando"}</span>
                   <span>{uploadProgress}%</span>
                 </div>
@@ -79,7 +80,7 @@ export default function AddTrackDialog({ open, onClose, onCreated, project, trac
               </div>
             )}
           </Field>
-          <p className="pt-1 text-2xs font-medium uppercase tracking-[0.16em] text-white/30">Detalhes opcionais</p>
+          <p className="pt-1 text-2xs font-medium uppercase tracking-[0.16em] text-muted-foreground">Detalhes opcionais</p>
           <div className="grid gap-3 sm:grid-cols-2">
             <Field label="BPM"><Input type="number" value={form.bpm} onChange={(e) => set("bpm", e.target.value)} /></Field>
             <Field label="Tom"><Input value={form.key} onChange={(e) => set("key", e.target.value)} placeholder="Cm" /></Field>
@@ -88,6 +89,7 @@ export default function AddTrackDialog({ open, onClose, onCreated, project, trac
             <Field label="ISRC"><Input value={form.isrc} onChange={(e) => set("isrc", e.target.value)} /></Field>
           </div>
           <Field label="Observações"><Textarea value={form.notes} onChange={(e) => set("notes", e.target.value)} rows={2} /></Field>
+          </fieldset>
           <DialogFooter><Button type="button" variant="ghost" onClick={onClose} disabled={loading} className="text-white/55">Cancelar</Button><Button type="submit" disabled={loading} className="bg-primary text-primary-foreground">{loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}{uploading ? "Enviando..." : loading ? "Salvando..." : "Adicionar faixa"}</Button></DialogFooter>
         </form>
       </DialogContent>

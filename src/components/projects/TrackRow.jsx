@@ -10,7 +10,7 @@ function Waveform({ pct = 0 }) {
   const active = Math.max(1, Math.round((pct / 100) * bars.length));
 
   return (
-    <div className="flex h-8 items-center gap-0.5">
+    <div className="flex h-8 min-w-0 flex-1 items-center justify-between gap-px overflow-hidden">
       {bars.map((height, index) => (
         <span
           key={`${height}-${index}`}
@@ -67,12 +67,12 @@ export default function TrackRow({ track, project, queue, index, provided, progr
   };
 
   return (
-    <div ref={provided?.innerRef} {...(provided?.draggableProps || {})} className="group grid min-w-0 gap-3 border-b border-white/[0.055] px-3 py-3 transition-colors last:border-b-0 hover:bg-white/[0.025] lg:grid-cols-[3rem_minmax(0,1fr)_6rem_9rem_minmax(12rem,18rem)_2rem] lg:items-center lg:px-4">
-      <div className="flex items-center gap-2 text-sm text-white/45">
-        <button {...(provided?.dragHandleProps || {})} className="hidden shrink-0 cursor-grab touch-none text-white/18 opacity-0 transition group-hover:opacity-100 hover:text-white/55 active:cursor-grabbing lg:block" aria-label="Mover faixa">
+    <div ref={provided?.innerRef} {...(provided?.draggableProps || {})} className="group relative grid min-w-0 grid-cols-[2.5rem_minmax(0,1fr)_2.5rem] gap-3 border-b border-white/[0.055] px-3 py-3 transition-colors last:border-b-0 hover:bg-white/[0.025] lg:grid-cols-[3.5rem_minmax(0,1fr)_2.5rem] xl:grid-cols-[3.5rem_minmax(0,1fr)_4rem_8rem_minmax(7rem,10rem)_2.5rem] items-center xl:px-4">
+      <div className="flex items-center gap-1 text-sm text-muted-foreground">
+        <button {...(provided?.dragHandleProps || {})} className="hidden shrink-0 cursor-grab touch-none text-muted-foreground opacity-0 transition group-hover:opacity-100 hover:text-white/55 active:cursor-grabbing lg:block" aria-label="Mover faixa">
           <GripVertical size={14} />
         </button>
-        <button onClick={play} className="grid h-8 w-8 shrink-0 place-items-center rounded-md text-sm text-white/55 group-hover:bg-white/[0.04] group-hover:text-white">
+        <button onClick={play} aria-label={isCurrent && player.isPlaying ? `Pausar ${track.name}` : `Reproduzir ${track.name}`} className="grid h-10 w-10 shrink-0 lg:h-8 lg:w-8 place-items-center rounded-md text-sm text-white/55 group-hover:bg-white/[0.04] group-hover:text-white">
           {isCurrent && player.isPlaying ? <Pause size={15} fill="currentColor" /> : <><span className="group-hover:hidden tabular-nums">{String(index + 1).padStart(2, "0")}</span><Play size={15} fill="currentColor" className="hidden group-hover:block" /></>}
         </button>
       </div>
@@ -82,23 +82,23 @@ export default function TrackRow({ track, project, queue, index, provided, progr
           {project?.cover_url ? <img src={project.cover_url} alt="" className="h-full w-full object-cover" /> : <img src={dz6ProfileLogo} alt="" className="h-full w-full object-cover opacity-90" />}
         </div>
         <div className="min-w-0">
-          <p className={`truncate text-sm font-bold ${isCurrent ? "text-white" : "text-white/88"}`}>{track.name}</p>
-          <p className="truncate text-xs text-white/42">{[track.main_artist_name || project?.main_artist_name, track.featuring && `feat. ${track.featuring}`].filter(Boolean).join(" · ")}</p>
+          <p className={`truncate text-sm font-semibold ${isCurrent ? "text-white" : "text-white/88"}`}>{track.name}</p>
+          <p className="truncate text-xs text-muted-foreground">{[track.main_artist_name || project?.main_artist_name, track.featuring && `feat. ${track.featuring}`].filter(Boolean).join(" · ")}</p>
         </div>
       </div>
 
-      <span className="hidden text-sm text-white/48 lg:block">{track.duration || track.duration_label || "03:24"}</span>
-      <span className={`inline-flex w-fit items-center gap-2 rounded-md border px-2.5 py-1 text-xs ${tone.bg} ${tone.text} ${tone.border}`}>
+      <span className="hidden text-sm text-muted-foreground xl:block">{track.duration || track.duration_label || "03:24"}</span>
+      <span className={`col-start-2 row-start-2 inline-flex w-fit xl:col-auto xl:row-auto items-center gap-2 rounded-md border px-2.5 py-1 text-xs ${tone.bg} ${tone.text} ${tone.border}`}>
         <span className={`h-1.5 w-1.5 rounded-full ${tone.dot}`} />
         {STATUS[project?.status] || "Status"}
       </span>
-      <div className="hidden items-center gap-3 lg:flex">
+      <div className="hidden min-w-0 items-center gap-2 xl:flex">
         <Waveform pct={progressPct} />
-        <span className="text-sm font-bold tabular-nums text-white/78">{progressPct}%</span>
+        <span className="text-sm font-semibold tabular-nums text-white/78">{progressPct}%</span>
       </div>
 
-      <div className="relative justify-self-end">
-        <button onClick={() => setMenu(!menu)} className="rounded-lg p-1 text-white/40 hover:bg-white/5 hover:text-white"><MoreHorizontal size={16} /></button>
+      <div className="relative col-start-3 row-start-1 justify-self-end xl:col-auto xl:row-auto">
+        <button aria-label={`Opções da faixa ${track.name}`} aria-expanded={menu} onClick={() => setMenu(!menu)} className="dz-icon-button"><MoreHorizontal size={16} /></button>
         {menu && <div className="absolute right-0 z-20 mt-1 w-44 rounded-lg border border-white/[0.08] bg-popover p-1.5 shadow-elev">
           {versions.map((v) => <button key={v.id} onClick={() => switchVersion(v)} className="block w-full rounded-md px-3 py-2 text-left text-xs text-white/70 hover:bg-white/5">{v.name}</button>)}
           {track.audio_url && <button onClick={downloadTrack} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs text-white/70 hover:bg-white/5"><Download size={13} />Baixar áudio</button>}

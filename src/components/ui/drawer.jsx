@@ -1,6 +1,7 @@
 ﻿"use client"
 
 import * as React from "react"
+import { X } from "lucide-react"
 import { Drawer as DrawerPrimitive } from "vaul"
 
 import { cn } from "@/lib/utils"
@@ -22,7 +23,7 @@ const DrawerClose = DrawerPrimitive.Close
 const DrawerOverlay = React.forwardRef(({ className, ...props }, ref) => (
   <DrawerPrimitive.Overlay
     ref={ref}
-    className={cn("fixed inset-0 z-50 bg-black/80", className)}
+    className={cn("fixed inset-0 z-50 bg-black/65 backdrop-blur-[3px]", className)}
     {...props} />
 ))
 DrawerOverlay.displayName = DrawerPrimitive.Overlay.displayName
@@ -33,11 +34,12 @@ const DrawerContent = React.forwardRef(({ className, children, ...props }, ref) 
     <DrawerPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto flex-col rounded-t-[10px] border bg-background",
+        "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto max-h-[calc(100dvh-1rem)] flex-col rounded-t-xl border border-white/[0.12] bg-background",
         className
       )}
       {...props}>
-      <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" />
+      <div className="mx-auto mb-3 mt-3 h-1 w-10 rounded-full bg-muted" />
+      <DrawerPrimitive.Close aria-label="Fechar" className="dz-icon-button absolute right-2 top-4"><X size={16} /></DrawerPrimitive.Close>
       {children}
     </DrawerPrimitive.Content>
   </DrawerPortal>

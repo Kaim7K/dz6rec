@@ -1,8 +1,8 @@
+import FormField from "@/components/ui/form-field";
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiClient } from "@/api/appClient";
 import { PERMISSAO, cargoList, uploadFile } from "@/lib/music";
@@ -10,7 +10,8 @@ import FileField from "@/components/ui/file-field";
 import UserCargosEditor from "@/components/users/UserCargosEditor";
 import { X } from "lucide-react";
 
-const Field = ({ label, children }) => <div className="space-y-1.5"><Label className="text-stage-ink">{label}</Label>{children}</div>;
+const Field = FormField;
+
 const selectCls = "border-stage-border bg-stage-card text-stage-ink";
 const contentCls = "border-stage-border bg-stage-card text-stage-ink";
 
@@ -22,24 +23,33 @@ export default function EditUserDialog({ user, cargos, onClose, onSaved }) {
   const [photo, setPhoto] = useState(null);
   const [removePhoto, setRemovePhoto] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const save = async () => {
     setLoading(true);
+    setError("");
+    try {
     const data = { cargo: cargosArr, permissao, status, handle };
     if (photo) data.photo_url = await uploadFile(photo);
     else if (removePhoto) data.photo_url = "";
     await apiClient.entities.User.update(user.id, data);
-    setLoading(false);
+
     onSaved();
     onClose();
+    } catch (err) {
+      setError(err.message || "Não foi possível salvar. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
   };
   return (
-    <Dialog open onOpenChange={onClose}>
+    <Dialog open onOpenChange={(value) => { if (!loading && !value) onClose(); }}>
       <DialogContent className="max-w-md border-stage-border bg-stage-card text-stage-ink">
         <DialogHeader>
-          <DialogTitle className="font-jakarta text-title font-bold text-stage-ink">Editar usuário</DialogTitle>
+          <DialogTitle className="font-display text-lg font-semibold text-stage-ink">Editar usuário</DialogTitle>
           <DialogDescription className="text-body text-stage-muted">Defina cargos, permissão e status. Um usuário pode ter vários cargos.</DialogDescription>
         </DialogHeader>
-        <div className="space-y-5">
+        {error && <p role="alert" className="dz-form-error">{error}</p>}
+        <fieldset disabled={loading} className="min-w-0 space-y-5">
           <Field label="Cargos">
             <UserCargosEditor value={cargosArr} onChange={setCargosArr} catalog={cargos} />
           </Field>
@@ -60,9 +70,9 @@ export default function EditUserDialog({ user, cargos, onClose, onSaved }) {
             ) : null}
             <FileField light value={photo} onChange={setPhoto} accept="image/*" hint="Exibida no chat e na listagem" />
           </Field>
-        </div>
+        </fieldset>
         <DialogFooter>
-          <Button variant="ghost" onClick={onClose} className="text-stage-muted hover:bg-stage-surface hover:text-stage-ink">Cancelar</Button>
+          <Button variant="ghost" onClick={onClose} disabled={loading} className="text-stage-muted hover:bg-stage-surface hover:text-stage-ink">Cancelar</Button>
           <Button onClick={save} disabled={loading} className="bg-stage-accent text-white hover:bg-stage-accent/90">{loading ? "Salvando..." : "Salvar"}</Button>
         </DialogFooter>
       </DialogContent>

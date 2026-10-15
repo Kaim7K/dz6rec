@@ -14,7 +14,7 @@ export default function ChatAvatar({ name, photoUrl, size = 32, className }) {
   return (
     <span
       className={cn("grid shrink-0 select-none place-items-center overflow-hidden rounded-full font-semibold", className)}
-      style={{ width: size, height: size, fontSize: Math.max(9, size * 0.36), background: `${color}2e`, color }}
+      style={{ width: size, height: size, fontSize: Math.max(9, size * 0.36), background: `${color}2e`, color: "#f5f5f5" }}
     >
       {photoUrl ? <img src={photoUrl} alt="" className="h-full w-full object-cover" /> : initialsOf(name)}
     </span>

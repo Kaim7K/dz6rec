@@ -1,3 +1,4 @@
+import PageSkeleton from "@/components/PageSkeleton";
 import React, { useEffect, useState } from "react";
 import { apiClient } from "@/api/appClient";
 import { Plus, Disc3 } from "lucide-react";
@@ -14,15 +15,20 @@ export default function Projects() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [statusFilter, setStatusFilter] = useState("todos");
+  const [loaded, setLoaded] = useState(false);
+  const [loadError, setLoadError] = useState("");
   const load = () => {
     Promise.all([apiClient.entities.Project.list("-created_date"), apiClient.entities.Artist.list(), apiClient.entities.ChecklistTemplate.list(), apiClient.entities.ChecklistItem.list()]).then(([p, a, t, items]) => {
       setProjects(p); setArtists(a); setTemplates(t);
       const m = {};
       items.forEach((i) => { if (!i.project_id) return; m[i.project_id] = m[i.project_id] || { d: 0, t: 0 }; m[i.project_id].t++; if (i.completed) m[i.project_id].d++; });
       setByP(m);
-    });
+    }).catch((err) => setLoadError(err.message || "Não foi possível carregar os projetos.")).finally(() => setLoaded(true));
   };
   useEffect(() => { load(); }, []);
+
+  if (!loaded) return <PageSkeleton cards />;
+  if (loadError) return <div role="alert" className="dz-form-error">{loadError}</div>;
 
   const statusOptions = ["todos", ...Array.from(new Set(projects.map((p) => p.status).filter(Boolean)))];
   const visibleProjects = statusFilter === "todos" ? projects : projects.filter((p) => p.status === statusFilter);
@@ -48,8 +54,9 @@ export default function Projects() {
           {statusOptions.map((status) => (
             <button
               key={status}
+              aria-pressed={statusFilter === status}
               onClick={() => setStatusFilter(status)}
-              className={`rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${statusFilter === status ? "border-primary/30 bg-primary/12 text-white" : "border-white/[0.06] bg-white/[0.02] text-white/48 hover:border-white/[0.12] hover:bg-white/[0.045] hover:text-white/75"}`}
+              className={`rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${statusFilter === status ? "border-primary/30 bg-primary/12 text-white" : "border-white/[0.06] bg-white/[0.02] text-muted-foreground hover:border-white/[0.12] hover:bg-white/[0.045] hover:text-white/75"}`}
             >
               {status === "todos" ? "Todos" : STATUS[status] || status}
             </button>
@@ -60,11 +67,11 @@ export default function Projects() {
       {projects.length === 0 ? (
         <div className="dz-empty">
           <div className="grid h-14 w-14 place-items-center rounded-full bg-white/[0.04] ring-1 ring-white/[0.06]">
-            <Disc3 size={22} className="text-white/30" />
+            <Disc3 size={22} className="text-muted-foreground" />
           </div>
           <div>
             <p className="font-display text-lg font-semibold text-white/70">Nenhum projeto ainda</p>
-            <p className="mt-1 text-sm text-white/35">Crie o primeiro single, EP ou álbum da gravadora.</p>
+            <p className="mt-1 text-sm text-muted-foreground">Crie o primeiro single, EP ou álbum da gravadora.</p>
           </div>
           <button onClick={() => setOpen(true)} className="dz-primary-button mt-2">
             <Plus size={16} /> Novo projeto
@@ -72,6 +79,7 @@ export default function Projects() {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+          {visibleProjects.length === 0 && <div className="dz-empty sm:col-span-2 lg:col-span-3">Nenhum projeto neste status.</div>}
           {visibleProjects.map((p) => <ProjectCard key={p.id} project={p} progress={byP[p.id]} onEdit={setEditing} onDeleted={load} />)}
         </div>
       )}

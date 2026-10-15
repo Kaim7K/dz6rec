@@ -288,7 +288,9 @@ async function handleUsers(req, res, action, sql) {
 async function handleEntities(req, res, parts, sql) {
   const entity = parts[1];
   const entityId = parts[2];
-  const action = parts[3];
+  // Collection actions occupy the same URL segment as an individual record ID:
+  // /api/entities/Notification/bulk, /api/entities/ChecklistItem/many.
+  const action = ["bulk", "many"].includes(entityId) ? entityId : parts[3];
   if (!entity) return send(res, 400, { error: "Entity is required" });
 
   if (entity === "User") {

@@ -28,7 +28,7 @@ export default function ResetPassword() {
       await apiClient.auth.resetPassword({ resetToken, newPassword });
       window.location.href = "/login";
     } catch (err) {
-      setError(err.message || "Failed to reset password");
+      setError(err.message || "Não foi possível redefinir a senha.");
     } finally {
       setLoading(false);
     }
@@ -41,7 +41,7 @@ export default function ResetPassword() {
         title="Link inválido"
         subtitle="Este link está incompleto ou expirou"
         footer={
-          <Link to="/forgot-password" className="text-primary font-medium hover:underline">
+          <Link to="/forgot-password" className="text-red-300 font-medium hover:underline">
             Solicitar novo link
           </Link>
         }
@@ -60,7 +60,7 @@ export default function ResetPassword() {
       subtitle="Defina sua nova senha abaixo"
     >
       {error && (
-        <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
+        <div role="alert" className="mb-4 dz-form-error">
           {error}
         </div>
       )}
@@ -77,7 +77,7 @@ export default function ResetPassword() {
               placeholder="••••••••"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="pl-10 h-12"
+              className="h-11 pl-10"
               required
             />
           </div>
@@ -93,12 +93,12 @@ export default function ResetPassword() {
               placeholder="••••••••"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="pl-10 h-12"
+              className="h-11 pl-10"
               required
             />
           </div>
         </div>
-        <Button type="submit" className="w-full h-12 font-medium" disabled={loading}>
+        <Button type="submit" className="w-full h-11 font-medium" disabled={loading}>
           {loading ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
