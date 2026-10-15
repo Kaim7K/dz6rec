@@ -1,3 +1,5 @@
+import { prepareReview, protectedReviewPatch } from "../lib/reviews.js";
+
 const STORE_KEY = "dz6_mock_store_v1";
 const PROFILE_KEY = "dz6_mock_profile_id";
 
@@ -169,6 +171,22 @@ export async function mockRequest(path, options = {}) {
   const method = (options.method || "GET").toUpperCase();
   const url = new URL(path, window.location.origin);
   const parts = url.pathname.replace(/^\/api\/?/, "").split("/").filter(Boolean);
+  if (parts[0] === "reviews") {
+    const body = JSON.parse(options.body || "{}");
+    const store = getMockStore();
+    const artifact = store[body.entity]?.find(row => row.id === body.record_id);
+    if (!artifact) throw Object.assign(new Error("Arquivo não encontrado."), { status: 404 });
+    const actor = getCurrentUser();
+    const patch = prepareReview({ entity: body.entity, artifact, action: body.action, reviewer: store.User.find(user => user.id === body.reviewer_id), actor, comment: body.comment, expectedRequestId: body.review_request_id, now: new Date().toISOString(), requestId: nextId("review") });
+    const projectId = body.entity === "TrackVersion" ? store.Track.find(track => track.id === artifact.track_id)?.project_id : artifact.project_id;
+    Object.assign(artifact, patch);
+    const verb = { request: "Revisão solicitada", approve: "Arquivo aprovado", request_changes: "Ajustes solicitados" }[body.action];
+    store.ActivityLog.push({ id: nextId("ActivityLog"), project_id: projectId, text: `${verb}: ${artifact.name}${patch.review_comment ? ` — ${patch.review_comment}` : ""}`, user_name: actor.full_name || actor.email, artifact_entity: body.entity, artifact_id: artifact.id, review_action: body.action, review_status: patch.review_status, review_comment: patch.review_comment, created_date: new Date().toISOString() });
+    const recipient = body.action === "request" ? body.reviewer_id : artifact.review_requested_by;
+    if (recipient && recipient !== actor.id) store.Notification.push({ id: nextId("Notification"), user_id: recipient, project_id: projectId, text: `${verb}: ${artifact.name}`, link: `/projetos/${projectId}?tab=${body.entity === "TrackVersion" ? "faixas" : "operacao"}&review=${body.entity}&record=${encodeURIComponent(artifact.id)}`, read: false, created_date: new Date().toISOString() });
+    saveMockStore(store);
+    return clone(artifact);
+  }
 
   if (parts[0] === "auth") {
     if (parts[1] === "me") {
@@ -233,6 +251,8 @@ export async function mockRequest(path, options = {}) {
   }
 
   const body = options.body instanceof FormData ? {} : JSON.parse(options.body || "{}");
+  const patches = body.items || [body.patch || body];
+  if (patches.some(patch => protectedReviewPatch(entity, patch, method === "POST"))) throw Object.assign(new Error("Use o fluxo de revisão para alterar aprovações."), { status: 403 });
 
   if (method === "POST") {
     if (id === "bulk" || action === "bulk") {
@@ -248,6 +268,18 @@ export async function mockRequest(path, options = {}) {
   }
 
   if (method === "PATCH") {
+    if (id === "bulk" || action === "bulk") {
+      const updated = [];
+      for (const item of body.items || []) {
+        const patch = item.$set || item;
+        const index = store[entity].findIndex(record => record.id === item.id);
+        if (index < 0) continue;
+        store[entity][index] = { ...store[entity][index], ...patch, updated_date: new Date().toISOString() };
+        updated.push(store[entity][index]);
+      }
+      saveMockStore(store);
+      return clone(updated);
+    }
     if (id === "many") {
       const patch = body.patch?.$set || body.patch || {};
       store[entity] = store[entity].map((item) => (matchesWhere(item, body.where) ? { ...item, ...patch } : item));

@@ -3,6 +3,8 @@ import { put } from "@vercel/blob";
 import { handleUpload as handleBlobUpload } from "@vercel/blob/client";
 import formidable from "formidable";
 import { ensureDatabase, getSql } from "./_db.js";
+import { handleReview } from "./_reviews.js";
+import { protectedReviewPatch } from "../src/lib/reviews.js";
 import {
   currentUser,
   id,
@@ -292,6 +294,9 @@ async function handleEntities(req, res, parts, sql) {
   // /api/entities/Notification/bulk, /api/entities/ChecklistItem/many.
   const action = ["bulk", "many"].includes(entityId) ? entityId : parts[3];
   if (!entity) return send(res, 400, { error: "Entity is required" });
+  const checkReviewFields = (data, creating = false) => {
+    if (protectedReviewPatch(entity, data, creating)) throw Object.assign(new Error("Use o fluxo de revisão para alterar aprovações."), { status: 403 });
+  };
 
   if (entity === "User") {
     const actor = await currentUser(req, sql);
@@ -330,6 +335,7 @@ async function handleEntities(req, res, parts, sql) {
 
   if (req.method === "POST" && action === "bulk") {
     const { items = [] } = await readJson(req);
+    items.forEach(item => checkReviewFields(item, true));
     const created = [];
     for (const item of items) {
       const recId = id(entity.toLowerCase());
@@ -345,6 +351,7 @@ async function handleEntities(req, res, parts, sql) {
 
   if (req.method === "POST" && !entityId) {
     const data = await readJson(req);
+    checkReviewFields(data, true);
     const recId = id(entity.toLowerCase());
     const rows = await sql`
       INSERT INTO app_records (id, entity, data)
@@ -356,6 +363,7 @@ async function handleEntities(req, res, parts, sql) {
 
   if (req.method === "PATCH" && action === "bulk") {
     const { items = [] } = await readJson(req);
+    items.forEach(item => checkReviewFields(item));
     const updated = [];
     for (const item of items) {
       const { id: itemId, ...data } = item;
@@ -372,6 +380,7 @@ async function handleEntities(req, res, parts, sql) {
 
   if (req.method === "PATCH" && action === "many") {
     const { where = {}, patch = {} } = await readJson(req);
+    checkReviewFields(patch);
     const rows = await sql`SELECT * FROM app_records WHERE entity = ${entity}`;
     const changes = normalizePatch(patch);
     const updated = [];
@@ -389,6 +398,7 @@ async function handleEntities(req, res, parts, sql) {
 
   if (req.method === "PATCH" && entityId) {
     const data = await readJson(req);
+    checkReviewFields(data);
     const rows = await sql`
       UPDATE app_records
       SET data = data || ${JSON.stringify(data)}::jsonb, updated_date = now()
@@ -510,11 +520,12 @@ export default async function handler(req, res) {
     const user = await currentUser(req, sql);
     if (!user) return send(res, 401, { error: "Authentication required" });
     if (user.status !== "ativo") return send(res, 403, { error: "Seu acesso ainda nao foi aprovado" });
+    if (parts[0] === "reviews" && parts.length === 1) return await handleReview(req, res, sql, user);
     if (parts[0] === "users") return handleUsers(req, res, parts[1], sql);
-    if (parts[0] === "entities") return handleEntities(req, res, parts, sql);
+    if (parts[0] === "entities") return await handleEntities(req, res, parts, sql);
     return send(res, 404, { error: "Not found" });
   } catch (error) {
-    console.error(error);
-    return send(res, 500, { error: error.message || "Internal server error" });
+    if (![400, 403, 404, 409].includes(error.status)) console.error(error);
+    return send(res, [400, 403, 404, 409].includes(error.status) ? error.status : 500, { error: error.message || "Internal server error" });
   }
 }

@@ -81,7 +81,7 @@ export function taskScore(task) {
   return (5 - priority) * 10000000000000 + due;
 }
 
-export function nextProjectAction(project, items = [], files = []) {
+export function nextProjectAction(project, items = [], files = [], reviews = []) {
   const open = items.filter((item) => !item.completed);
   const overdue = open.filter((item) => isOverdue(item.due_date)).sort((a, b) => taskScore(a) - taskScore(b));
   if (overdue.length) {
@@ -97,6 +97,8 @@ export function nextProjectAction(project, items = [], files = []) {
     };
   }
 
+  const review = reviews.find(entry => entry.artifact.review_status === "revisao");
+  if (review) return { tone: "warn", title: "Revisar arquivo", text: review.artifact.name, detail: `Revisor: ${review.artifact.reviewer_name || "Não definido"}`, action: "Abrir revisão", target: "review", review };
   const unassigned = open.find((item) => !taskHasResponsible(item));
   if (unassigned) {
     return {

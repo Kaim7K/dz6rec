@@ -83,11 +83,11 @@ export default function Topbar({ onMenu }) {
   const profileLabel = cargoList(me?.cargo)[0] || PERMISSAO[me?.permissao] || "Equipe DZ6";
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 min-w-0 items-center gap-2 border-b border-white/[0.075] bg-[#090808]/92 px-3 shadow-[0_18px_40px_-34px_rgba(0,0,0,0.95)] backdrop-blur-xl sm:gap-3 sm:px-5 lg:px-7">
+    <header className="sticky top-0 z-30 flex h-16 min-w-0 items-center gap-2 border-b border-white/[0.075] bg-[#0b0a0a]/95 px-3 backdrop-blur-sm sm:gap-3 sm:px-5 lg:px-7">
       <button onClick={onMenu} className="dz-icon-button lg:hidden" aria-label="Abrir menu"><Menu size={20} /></button>
       <div className="relative min-w-0 max-w-xl flex-1 sm:max-w-2xl">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
-        <input aria-label="Buscar no painel" value={query} onChange={(e) => setQuery(e.target.value)} className="h-10 w-full rounded-lg border border-white/[0.085] bg-white/[0.038] pl-11 pr-3 text-sm text-white shadow-soft outline-none placeholder:text-white/36 focus:border-primary/45 focus:bg-white/[0.055] sm:pr-16" placeholder="Buscar no painel..." />
+        <input aria-label="Buscar no painel" value={query} onChange={(e) => setQuery(e.target.value)} className="h-10 w-full rounded-md border border-white/[0.085] bg-white/[0.038] pl-11 pr-3 text-sm text-white outline-none placeholder:text-white/36 focus:border-primary/45 focus:bg-white/[0.055] sm:pr-16" placeholder="Buscar no painel..." />
         <span className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 rounded-md border border-white/[0.1] bg-black/20 px-2 py-1 text-2xs font-semibold text-muted-foreground sm:block">⌘ K</span>
         {results.length > 0 && <div className="absolute inset-x-0 top-12 max-h-[min(22rem,calc(100svh-5rem))] overflow-y-auto rounded-lg border border-white/[0.08] bg-popover p-1.5 shadow-elev">{results.map((i) => <Link key={i.to} to={i.to} onClick={() => setQuery("")} className="block rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5 hover:text-white">{i.label}</Link>)}</div>}
       </div>

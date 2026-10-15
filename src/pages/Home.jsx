@@ -9,7 +9,7 @@ import { isOverdue, STATUS, STATUS_TONE, taskScore } from "@/lib/music";
 
 function Panel({ title, action = "Ver todos", children }) {
   return (
-    <section className="dz-card min-w-0 min-h-[14.4rem] p-4 sm:p-5">
+    <section className="dz-card min-w-0 p-4 sm:p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <h2 className="dz-panel-title">{title}</h2>
         <Link to="/projetos" className="inline-flex items-center gap-2 text-xs font-medium text-muted-foreground transition-colors hover:text-white">
@@ -33,8 +33,8 @@ function ActionIcon({ index }) {
   const icons = [Image, UsersRound, Megaphone, Music2];
   const Icon = icons[index % icons.length];
   return (
-    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md border border-white/[0.06] bg-white/[0.035] text-white/64">
-      <Icon size={20} />
+    <span className="grid h-9 w-7 shrink-0 place-items-center text-white/64">
+      <Icon size={17} />
     </span>
   );
 }
@@ -43,13 +43,13 @@ function ActionRow({ task, project, index }) {
   const status = /capa|aprovar|aprovação|revisar|validar/i.test(task.text || "") ? "Aguardando aprovação" : "Planejamento";
   const warn = status.includes("aprovação");
   return (
-    <Link to={task.project_id ? `/projetos/${task.project_id}` : "/minhas-tarefas"} className="dz-list-row flex items-center gap-3 py-2.5">
+    <Link to={task.project_id ? `/projetos/${task.project_id}?tab=checklist&task=${encodeURIComponent(task.id)}` : "/minhas-tarefas"} className="dz-list-row flex items-center gap-3 py-2.5">
       <ActionIcon index={index} />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-bold text-white/88">{task.text}</p>
+        <p className="truncate text-sm font-medium text-white/88">{task.text}</p>
         <p className="mt-1 truncate text-xs text-muted-foreground">{project?.name || "Projeto"} - {project?.main_artist_name || "DZ6"}</p>
       </div>
-      <span className={`hidden rounded-md px-2.5 py-1 text-xs font-bold sm:inline-flex ${warn ? "bg-yellow-500/15 text-yellow-300" : "bg-white/[0.04] text-white/62"}`}>{status}</span>
+      <span className={`hidden text-xs font-medium sm:inline-flex ${warn ? "text-yellow-300" : "text-white/62"}`}>{status}</span>
     </Link>
   );
 }
@@ -60,10 +60,10 @@ function ProjectRow({ project }) {
     <Link to={`/projetos/${project.id}`} className="dz-list-row flex items-center gap-3 py-2.5">
       <MiniCover project={project} />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-bold text-white/88">{project.name}</p>
+        <p className="truncate text-sm font-medium text-white/88">{project.name}</p>
         <p className="mt-1 truncate text-xs text-muted-foreground">{project.main_artist_name || "Sem artista"}</p>
       </div>
-      <span className={`hidden rounded-md px-2.5 py-1 text-xs font-medium sm:inline-flex ${tone.bg} ${tone.text}`}>{STATUS[project.status] || project.status}</span>
+      <span className={`hidden items-center gap-2 text-xs font-medium sm:inline-flex ${tone.text}`}><span className={`h-1.5 w-1.5 rounded-full ${tone.dot}`} />{STATUS[project.status] || project.status}</span>
     </Link>
   );
 }

@@ -11,20 +11,20 @@ const COLUMNS = [
   {
     key: "pendente",
     label: "Pendente",
-    description: "Ainda precisa comecar",
+    description: "Ainda não iniciadas",
     Icon: Clock3,
     tone: "text-white/55",
   },
   {
     key: "em_progresso",
     label: "Em progresso",
-    description: "O que esta em andamento",
+    description: "Entregas em andamento",
     Icon: PlayCircle,
     tone: "text-amber-300",
   },
   {
     key: "concluido",
-    label: "Concluido",
+    label: "Concluído",
     description: "Finalizadas em projetos ativos",
     Icon: CheckCircle2,
     tone: "text-emerald-300",
@@ -43,21 +43,21 @@ function TaskMeta({ task, project, cargos }) {
   const soon = isDueSoon(task.due_date, task.completed);
 
   return (
-    <div className="mt-2 flex flex-wrap items-center gap-1.5">
+    <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
       {project?.name && (
-        <Link to={`/projetos/${project.id}`} className="dz-pill h-7 max-w-full hover:border-white/[0.14] hover:text-white">
+        <Link to={`/projetos/${project.id}?tab=checklist&task=${encodeURIComponent(task.id)}`} className="inline-flex h-7 max-w-full items-center gap-1.5 text-xs text-white/75 hover:text-white">
           <span className="truncate">{project.name}</span>
           <ExternalLink size={12} />
         </Link>
       )}
       {project?.status && (
-        <span className="dz-pill h-7 text-muted-foreground">{STATUS[project.status] || project.status}</span>
+        <span className="inline-flex h-7 items-center text-xs text-muted-foreground">{STATUS[project.status] || project.status}</span>
       )}
       {priority && (
-        <span className={`dz-pill h-7 ${priority.tone}`}>{priority.label}</span>
+        <span className={`inline-flex h-7 items-center text-xs ${priority.tone}`}>{priority.label}</span>
       )}
       {task.due_date && (
-        <span className={`dz-pill h-7 ${overdue ? "text-red-300" : soon ? "text-amber-300" : "text-muted-foreground"}`}>
+        <span className={`inline-flex h-7 items-center text-xs ${overdue ? "text-red-300" : soon ? "text-amber-300" : "text-muted-foreground"}`}>
           {dueLabel(task.due_date)}
         </span>
       )}
@@ -71,10 +71,10 @@ function TaskCard({ task, project, cargos, users, provided, isDragging }) {
   const overdue = isOverdue(task.due_date, task.completed);
   const responsibleUsers = taskResponsibleIds(task).map((id) => users.find((user) => user.id === id)).filter(Boolean);
   const responsibleLabel = taskResponsibleNames(task).join(", ");
-  const stageTone = stage === "concluido" ? "border-emerald-400/25 bg-emerald-500/[0.055]" : stage === "em_progresso" ? "border-amber-400/25 bg-amber-500/[0.055]" : overdue ? "border-primary/35 bg-primary/[0.055]" : "border-white/[0.08] bg-[#151212]";
+  const stageTone = overdue ? "border-primary/25 bg-[var(--surface-2)]" : "border-white/[0.08] bg-[var(--surface-2)]";
 
   return (
-    <article ref={provided.innerRef} {...provided.draggableProps} className={`min-w-0 rounded-md border p-2.5 shadow-soft transition-colors hover:border-white/[0.14] ${stageTone} ${isDragging ? "border-primary/50 bg-white/[0.075] shadow-elev" : ""}`}>
+    <article ref={provided.innerRef} {...provided.draggableProps} className={`min-w-0 rounded-md border p-3 transition-colors hover:border-white/[0.14] ${stageTone} ${isDragging ? "border-primary/50 bg-white/[0.075] shadow-elev" : ""}`}>
       <div className="flex items-start gap-2.5">
         <button type="button" {...provided.dragHandleProps} className="mt-0.5 shrink-0 cursor-grab rounded p-0.5 text-muted-foreground hover:bg-white/[0.05] hover:text-white/70 active:cursor-grabbing" aria-label={`Mover ${task.text}`}>
           <GripVertical size={14} />
@@ -187,20 +187,20 @@ export default function MyTasks() {
         <div>
           <p className="dz-kicker">Foco pessoal</p>
           <h1 className="dz-page-title">Minhas tarefas</h1>
-          <p className="dz-page-subtitle">Kanban das suas atribuicoes em projetos ativos. Projetos lancados saem daqui sem apagar a tarefa do projeto.</p>
+          <p className="dz-page-subtitle">Organize suas entregas e acompanhe os prazos de cada projeto.</p>
         </div>
-        <div className="grid w-full max-w-sm shrink-0 grid-cols-3 gap-2">
-          <div className="dz-card-soft px-3 py-2">
-            <p className="text-2xs uppercase tracking-[0.16em] text-muted-foreground">Ativas</p>
-            <p className="mt-1 text-lg font-bold text-white">{activeCount}</p>
+        <div className="grid w-full max-w-sm shrink-0 grid-cols-3 divide-x divide-white/[0.07]">
+          <div className="px-3 py-2">
+            <p className="text-xs text-muted-foreground">Ativas</p>
+            <p className="mt-1 text-lg font-semibold text-white">{activeCount}</p>
           </div>
-          <div className="dz-card-soft px-3 py-2">
-            <p className="text-2xs uppercase tracking-[0.16em] text-muted-foreground">Atrasos</p>
-            <p className="mt-1 text-lg font-bold text-red-300">{overdueCount}</p>
+          <div className="px-3 py-2">
+            <p className="text-xs text-muted-foreground">Atrasos</p>
+            <p className="mt-1 text-lg font-semibold text-red-300">{overdueCount}</p>
           </div>
-          <div className="dz-card-soft px-3 py-2">
-            <p className="text-2xs uppercase tracking-[0.16em] text-muted-foreground">Feitas</p>
-            <p className="mt-1 text-lg font-bold text-emerald-300">{grouped.concluido.length}</p>
+          <div className="px-3 py-2">
+            <p className="text-xs text-muted-foreground">Feitas</p>
+            <p className="mt-1 text-lg font-semibold text-emerald-300">{grouped.concluido.length}</p>
           </div>
         </div>
       </div>
@@ -217,14 +217,14 @@ export default function MyTasks() {
         <DragDropContext onDragEnd={onDragEnd}>
           <div className="dz-kanban-grid">
             {COLUMNS.map(({ key, label, description, Icon, tone }) => (
-              <section key={key} className="dz-card min-w-0 min-h-[22rem] p-3.5">
+              <section key={key} className="dz-kanban-column dz-card min-w-0 p-3.5">
                 <div className="mb-3 flex items-start justify-between gap-3 px-1">
                   <div className="flex items-center gap-2.5">
-                    <span className={`grid h-9 w-9 place-items-center rounded-md border border-white/[0.07] bg-white/[0.03] ${tone}`}>
+                    <span className={`grid h-9 w-6 shrink-0 place-items-center ${tone}`}>
                       <Icon size={17} />
                     </span>
                     <div>
-                      <h2 className="text-sm font-bold text-white">{label}</h2>
+                      <h2 className="text-sm font-semibold text-white">{label}</h2>
                       <p className="text-2xs text-muted-foreground">{description}</p>
                     </div>
                   </div>
@@ -233,11 +233,11 @@ export default function MyTasks() {
 
                 <Droppable droppableId={key}>
                   {(provided, snapshot) => (
-                    <div ref={provided.innerRef} {...provided.droppableProps} className={`min-h-[12rem] space-y-2 rounded-md transition-colors ${snapshot.isDraggingOver ? "bg-primary/[0.055] ring-1 ring-primary/25" : ""}`}>
+                    <div ref={provided.innerRef} {...provided.droppableProps} className={`dz-kanban-drop space-y-2 rounded-md transition-colors ${snapshot.isDraggingOver ? "bg-primary/[0.055] ring-1 ring-primary/25" : ""}`}>
                       {grouped[key].length === 0 ? (
                         <div className="rounded-lg border border-dashed border-white/[0.08] px-3 py-8 text-center text-sm text-muted-foreground">Arraste tarefas para esta etapa.</div>
                       ) : grouped[key].map((task, index) => (
-                        <Draggable key={task.id} draggableId={task.id} index={index}>
+                        <Draggable key={task.id} draggableId={task.id} index={index} disableInteractiveElementBlocking>
                           {(dragProvided, dragSnapshot) => (
                             <TaskCard task={task} project={projects[task.project_id]} cargos={cargos} users={users} provided={dragProvided} isDragging={dragSnapshot.isDragging} />
                           )}

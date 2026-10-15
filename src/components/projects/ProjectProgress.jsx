@@ -14,7 +14,7 @@ export default function ProjectProgress({ items, sections, className }) {
   const prog = computeProgress(items, sections);
 
   return (
-    <div className={cn("dz-project-progress w-full min-w-0 rounded-md border border-white/[0.045] bg-black/16 p-3 xl:p-3.5", className)}>
+    <div className={cn("dz-project-progress w-full min-w-0 border-t border-white/[0.07] pt-4", className)}>
       <div className="flex items-center justify-between">
         <span className="inline-flex items-center gap-2 text-xs font-bold text-white xl:text-sm">
           Progresso geral

@@ -93,7 +93,7 @@ export default function Users() {
         </div>
       </div>
 
-      <div className="dz-card flex flex-col gap-2.5 p-3.5 sm:flex-row">
+      <div className="flex min-w-0 flex-col gap-2.5 sm:flex-row">
         <div className="relative flex-1">
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-stage-muted" />
           <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar por nome ou e-mail..." className="dz-input w-full pl-9" />
@@ -120,7 +120,7 @@ export default function Users() {
       {msg && <p className="text-body text-stage-muted">{msg}</p>}
 
       <div className="dz-users-table dz-card overflow-hidden">
-        <div className={`grid items-center gap-4 border-b border-white/[0.07] bg-white/[0.035] px-4 py-3 text-micro font-semibold uppercase tracking-wide text-stage-muted ${GRID}`}>
+        <div className={`grid items-center gap-4 border-b border-white/[0.07] px-4 py-3 text-xs font-medium text-stage-muted ${GRID}`}>
           <span>Usuário</span><span>E-mail</span><span>Cargos</span><span className="text-right">Ações</span>
         </div>
         {filtered.map((u) => (

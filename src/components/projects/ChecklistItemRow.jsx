@@ -56,7 +56,7 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
       tabIndex={-1}
       data-task-id={item.id}
       {...(provided?.draggableProps || {})}
-      className={`overflow-hidden rounded-md border border-white/[0.075] bg-[#171414] shadow-[inset_0_1px_0_rgba(255,255,255,0.035)] ${isDragging ? "border-primary/35 bg-white/[0.055] shadow-2xl" : ""}`}
+      className={`overflow-hidden rounded-md border border-white/[0.075] bg-[var(--surface-3)] ${isDragging ? "border-primary/35 bg-white/[0.055] shadow-elev" : ""}`}
     >
       <div className="p-2.5">
         <div className="flex items-center gap-2">
@@ -126,12 +126,10 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
                 ))}
                 {adding && (
                   <form
-                    onSubmit={(e) => {
+                    onSubmit={async e => {
                       e.preventDefault();
                       if (!text.trim()) return;
-                      onAddSub(item, text);
-                      setText("");
-                      setAdding(false);
+                      if (await onAddSub(item, text) !== false) { setText(""); setAdding(false); }
                     }}
                     className="ml-8 flex items-center gap-2 py-0.5"
                   >

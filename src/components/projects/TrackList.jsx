@@ -6,7 +6,7 @@ import { logActivity } from "@/lib/music";
 import TrackRow from "@/components/projects/TrackRow";
 import AddTrackDialog from "@/components/projects/AddTrackDialog";
 
-export default function TrackList({ project, tracks, onChanged, progressPct = 0 }) {
+export default function TrackList({ project, tracks, onChanged, progressPct = 0, defaultReviewerId }) {
   const [open, setOpen] = useState(false);
   const [localOrder, setLocalOrder] = useState(() => tracks.map((t) => t.id));
   useEffect(() => { setLocalOrder(tracks.map((t) => t.id)); }, [tracks]);
@@ -29,12 +29,12 @@ export default function TrackList({ project, tracks, onChanged, progressPct = 0 
     <section className="dz-track-list dz-card min-w-0 p-4 sm:p-5">
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-center gap-3">
-          <span className="grid h-10 w-10 place-items-center rounded-md border border-white/[0.08] bg-white/[0.04] text-red-300">
-            <Music2 size={20} />
+          <span className="text-muted-foreground">
+            <Music2 size={18} />
           </span>
           <div>
-            <h3 className="text-base font-bold text-white">Faixas</h3>
-            <p className="text-sm text-muted-foreground">{list.length} {list.length === 1 ? "faixa" : "faixas"} neste projeto</p>
+            <h3 className="text-sm font-semibold text-white">Faixas</h3>
+            <p className="mt-1 text-xs text-muted-foreground">{list.length} {list.length === 1 ? "faixa" : "faixas"} neste projeto</p>
           </div>
         </div>
         <button onClick={() => setOpen(true)} className="dz-ghost-button h-9"><Plus size={15} />Adicionar faixa</button>
@@ -45,8 +45,8 @@ export default function TrackList({ project, tracks, onChanged, progressPct = 0 
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId="tracks">
             {(provided) => (
-              <div ref={provided.innerRef} {...provided.droppableProps} className="min-w-0 overflow-hidden rounded-lg border border-white/[0.07] bg-black/15">
-                <div className="dz-track-header gap-3 border-b border-white/[0.065] bg-white/[0.025] px-3 py-3 text-2xs font-bold uppercase tracking-[0.12em] text-muted-foreground">
+              <div ref={provided.innerRef} {...provided.droppableProps} className="min-w-0 border-t border-white/[0.07]">
+                <div className="dz-track-header border-b border-white/[0.065] px-3 py-3 text-xs font-medium text-muted-foreground">
                   <span>#</span>
                   <span>Título</span>
                   <span>Duração</span>
@@ -55,8 +55,8 @@ export default function TrackList({ project, tracks, onChanged, progressPct = 0 
                   <span />
                 </div>
                 {list.map((t, i) => (
-                  <Draggable key={t.id} draggableId={t.id} index={i}>
-                    {(prov) => <TrackRow track={t} project={project} queue={list} index={i} provided={prov} progressPct={progressPct} onChanged={onChanged} />}
+                  <Draggable key={t.id} draggableId={t.id} index={i} disableInteractiveElementBlocking>
+                    {(prov) => <TrackRow track={t} project={project} queue={list} index={i} provided={prov} progressPct={progressPct} onChanged={onChanged} defaultReviewerId={defaultReviewerId} />}
                   </Draggable>
                 ))}
                 {provided.placeholder}

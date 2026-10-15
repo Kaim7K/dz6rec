@@ -40,11 +40,9 @@ try {
       });
       assert.equal(bounds.overflow, false, 'no page overflow');
       assert.equal(bounds.childrenFit, true, 'progress categories fit their own container');
-      if (bounds.width >= 896) assert.ok(Math.abs(bounds.cover.bottom - bounds.progress.bottom) < 2, 'cover and progress align at bottom');
-      else {
-        assert.ok(Math.abs(bounds.cover.width - bounds.cover.height) < 2, 'compact cover remains square');
-        assert.ok(bounds.progress.top >= Math.max(bounds.cover.bottom, bounds.summaryBottom), 'progress occupies its own row');
-      }
+      assert.ok(Math.abs(bounds.cover.width - bounds.cover.height) < 2, 'cover remains square at every width');
+      assert.ok(bounds.progress.top >= Math.max(bounds.cover.bottom, bounds.summaryBottom), 'progress occupies its own row below both cover and summary');
+      if (bounds.width >= 672) assert.ok(bounds.cover.width <= 225, 'desktop cover stays compact beside the summary');
     };
     await page.goto(origin + '/projetos/project-1');
     await page.locator('h1').waitFor();

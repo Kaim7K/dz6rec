@@ -23,14 +23,14 @@ function NavItem({ label, to, Icon, onClose }) {
       onClick={onClose}
       className={({ isActive }) =>
         cn(
-          "group relative flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-semibold transition-colors",
+          "group relative flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors",
           isActive ? "bg-white/[0.065] text-white shadow-[inset_3px_0_0_hsl(var(--primary))]" : "text-muted-foreground hover:bg-white/[0.04] hover:text-white/84"
         )
       }
     >
       {({ isActive }) => (
         <>
-          <span className={cn("grid h-7 w-7 shrink-0 place-items-center rounded-md transition-colors", isActive ? "bg-primary text-white shadow-glow" : "text-muted-foreground group-hover:text-white/70")}>
+          <span className={cn("grid h-7 w-7 shrink-0 place-items-center rounded-md transition-colors", isActive ? "text-red-400" : "text-muted-foreground group-hover:text-white/70")}>
             <Icon size={17} />
           </span>
           {label}
@@ -49,38 +49,33 @@ export default function Sidebar({ open, onClose }) {
   return (
     <>
       {open && <button className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm lg:hidden" onClick={onClose} aria-label="Fechar menu" />}
-      <aside className={cn("fixed inset-y-0 left-0 z-50 flex w-[17rem] flex-col border-r border-white/[0.075] bg-[#080707]/96 shadow-[16px_0_48px_-28px_rgba(0,0,0,0.9)] backdrop-blur-xl transition-transform duration-300 lg:translate-x-0", open ? "translate-x-0" : "-translate-x-full")}>
+      <aside className={cn("fixed inset-y-0 left-0 z-50 flex w-[17rem] flex-col border-r border-white/[0.075] bg-[#0b0a0a] transition-transform duration-300 lg:translate-x-0", open ? "translate-x-0" : "-translate-x-full")}>
         <div className="flex h-20 shrink-0 items-center justify-between border-b border-white/[0.06] px-5">
           <div className="flex items-center gap-3">
-            <span className="grid h-12 w-12 place-items-center overflow-hidden rounded-lg border border-white/[0.08] bg-black shadow-soft">
+            <span className="grid h-12 w-12 place-items-center overflow-hidden rounded-lg border border-white/[0.08] bg-black">
               <img src={dz6ProfileLogo} alt="DZ6" className="h-full w-full object-cover" />
             </span>
             <span>
-              <span className="block font-display text-lg font-bold tracking-[0.18em] text-white">DZ6</span>
+              <span className="block font-[Montserrat] text-lg font-bold tracking-[0.18em] text-white">DZ6</span>
               <span className="block text-[0.58rem] font-bold uppercase tracking-[0.28em] text-muted-foreground">Gravadora</span>
             </span>
           </div>
           <button aria-label="Fechar menu" onClick={onClose} className="rounded-md p-1.5 text-muted-foreground hover:bg-white/5 hover:text-white lg:hidden"><X size={18} /></button>
         </div>
         <nav className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4">
-          <p className="px-3 pb-3 pt-1 text-2xs font-bold uppercase tracking-[0.22em] text-muted-foreground">Geral</p>
-          <div className="space-y-1.5">{geral.map((i) => <NavItem key={i.to} {...i} onClose={onClose} />)}</div>
+          <p className="px-3 pb-3 pt-1 text-2xs font-medium uppercase tracking-[0.12em] text-muted-foreground">Geral</p>
+          <div className="space-y-1">{geral.map((i) => <NavItem key={i.to} {...i} onClose={onClose} />)}</div>
           {admin.length > 0 && (
             <>
               <div className="my-5 h-px bg-white/[0.055]" />
-              <p className="px-3 pb-3 text-2xs font-bold uppercase tracking-[0.22em] text-muted-foreground">Administração</p>
-              <div className="space-y-1.5">{admin.map((i) => <NavItem key={i.to} {...i} onClose={onClose} />)}</div>
+              <p className="px-3 pb-3 text-2xs font-medium uppercase tracking-[0.12em] text-muted-foreground">Administração</p>
+              <div className="space-y-1">{admin.map((i) => <NavItem key={i.to} {...i} onClose={onClose} />)}</div>
             </>
           )}
         </nav>
-        <div className="dz-sidebar-promo shrink-0 px-4 py-5">
-          <div className="relative overflow-hidden rounded-lg border border-primary/20 bg-[linear-gradient(145deg,rgba(220,0,0,0.16),rgba(255,255,255,0.035))] px-4 py-5 shadow-soft">
-            <div className="absolute bottom-5 right-0 flex h-10 items-end gap-0.5 opacity-30">
-              {[16, 24, 18, 30, 22, 36, 20, 28, 34, 18, 25, 31].map((height, index) => <span key={index} className="w-0.5 rounded-full bg-primary" style={{ height }} />)}
-            </div>
-            <p className="max-w-28 text-sm font-bold leading-5 text-white">Música conecta pessoas</p>
-            <p className="mt-4 text-2xs font-bold uppercase tracking-[0.18em] text-muted-foreground">DZ6 Gravadora</p>
-          </div>
+        <div className="dz-sidebar-promo shrink-0 border-t border-white/[0.06] px-7 py-5">
+          <p className="text-xs font-medium text-white/65">Música conecta pessoas</p>
+          <p className="mt-1 text-2xs text-muted-foreground">DZ6 Gravadora</p>
         </div>
       </aside>
     </>

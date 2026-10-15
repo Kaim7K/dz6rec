@@ -36,7 +36,7 @@ export default function AssignTaskDialog({ task, project, onClose, onSaved }) {
       await apiClient.entities.ChecklistItem.update(task.id, { responsible_ids: ids, responsible_names: names, responsible_id: ids[0], responsible_name: names[0] });
       const me = await apiClient.auth.me().catch(() => null);
       await logActivity(project.id, `Responsável definido em "${task.text}": ${user.full_name || user.email}`, me?.full_name);
-      await notifyUsers([user.id], { text: `Você foi atribuído à tarefa "${task.text}" em "${project.name}"`, projectId: project.id, link: `/projetos/${project.id}` }, me?.id).catch(() => {});
+      await notifyUsers([user.id], { text: `Você foi atribuído à tarefa "${task.text}" em "${project.name}"`, projectId: project.id, link: `/projetos/${project.id}?tab=checklist&task=${encodeURIComponent(task.id)}` }, me?.id).catch(() => {});
       onSaved();
       onClose();
     } catch (err) { setError(err.message || "Não foi possível atribuir a tarefa."); }

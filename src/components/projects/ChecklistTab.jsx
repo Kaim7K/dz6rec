@@ -12,8 +12,13 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CATEGORIES, cargoList, logActivity, taskResponsibleIds, taskResponsibleNames, usersForCargo } from "@/lib/music";
 import { notifyNextStage, notifyUsers } from "@/lib/notifications";
+import { toast } from "@/components/ui/use-toast";
 
 export default function ChecklistTab({ project, focusTaskId }) {
+  const safe = action => async (...args) => {
+    try { await action(...args); return true; }
+    catch (err) { toast({ variant: "destructive", title: "Não foi possível concluir a ação", description: err.message }); return false; }
+  };
   const [sections, setSections] = useState([]);
   const [items, setItems] = useState([]);
   const [noteSection, setNoteSection] = useState(null);
@@ -134,8 +139,9 @@ export default function ChecklistTab({ project, focusTaskId }) {
     await apiClient.entities.ChecklistItem.update(item.id, { completed: newCompleted });
     const me = await apiClient.auth.me().catch(() => null);
     await logActivity(project.id, `${newCompleted ? "Concluída" : "Reaberta"}: ${item.text}`, me?.full_name);
-    if (newCompleted) await notifyNextStage({ project, sectionId: item.section_id, toggledItemId: item.id, items, sections, users, excludeUserId: me?.id });
+    if (newCompleted) await notifyNextStage({ project, sectionId: item.section_id, toggledItemId: item.id, items, sections, users, excludeUserId: me?.id }).catch(() => {});
     load();
+    toast({ title: newCompleted ? "Tarefa concluída" : "Tarefa reaberta" });
   };
 
   const addSub = async (parent, text) => {
@@ -170,7 +176,7 @@ export default function ChecklistTab({ project, focusTaskId }) {
     await apiClient.entities.ChecklistItem.update(item.id, { responsible_id: user?.id || null, responsible_name: user?.full_name || user?.email || null, cargo: user ? item.cargo || null : null });
     const me = await apiClient.auth.me().catch(() => null);
     await logActivity(project.id, `Responsável definido em "${item.text}": ${user?.full_name || "removido"}`, me?.full_name);
-    if (user && user.id !== me?.id) await notifyUsers([user.id], { text: `Você foi atribuído à tarefa "${item.text}" em "${project.name}"`, projectId: project.id, link: `/projetos/${project.id}` });
+    if (user && user.id !== me?.id) await notifyUsers([user.id], { text: `Você foi atribuído à tarefa "${item.text}" em "${project.name}"`, projectId: project.id, link: `/projetos/${project.id}?tab=checklist&task=${encodeURIComponent(item.id)}` }).catch(() => {});
     load();
   };
 
@@ -178,7 +184,7 @@ export default function ChecklistTab({ project, focusTaskId }) {
     await apiClient.entities.ChecklistItem.update(item.id, { cargo: cargoName || null, responsible_id: cargoName ? item.responsible_id || null : null, responsible_name: cargoName ? item.responsible_name || null : null });
     const me = await apiClient.auth.me().catch(() => null);
     await logActivity(project.id, cargoName ? `Cargo "${cargoName}" atribuído à tarefa "${item.text}"` : `Cargo removido da tarefa "${item.text}"`, me?.full_name);
-    if (cargoName) await notifyUsers(usersForCargo(users, cargoName).map((u) => u.id), { text: `Você foi atribuído à tarefa "${item.text}" (${cargoName}) em "${project.name}"`, projectId: project.id, link: `/projetos/${project.id}` }, me?.id);
+    if (cargoName) await notifyUsers(usersForCargo(users, cargoName).map((u) => u.id), { text: `Você foi atribuído à tarefa "${item.text}" (${cargoName}) em "${project.name}"`, projectId: project.id, link: `/projetos/${project.id}?tab=checklist&task=${encodeURIComponent(item.id)}` }, me?.id).catch(() => {});
     load();
   };
 
@@ -198,7 +204,7 @@ export default function ChecklistTab({ project, focusTaskId }) {
     await apiClient.entities.ChecklistItem.update(item.id, responsiblePatch(nextIds, nextNames, user ? item.cargo || null : null));
     const me = await apiClient.auth.me().catch(() => null);
     await logActivity(project.id, `Responsavel definido em "${item.text}": ${user?.full_name || "removido"}`, me?.full_name);
-    if (user && user.id !== me?.id) await notifyUsers([user.id], { text: `Voce foi atribuido a tarefa "${item.text}" em "${project.name}"`, projectId: project.id, link: `/projetos/${project.id}` });
+    if (user && user.id !== me?.id) await notifyUsers([user.id], { text: `Voce foi atribuido a tarefa "${item.text}" em "${project.name}"`, projectId: project.id, link: `/projetos/${project.id}?tab=checklist&task=${encodeURIComponent(item.id)}` }).catch(() => {});
     load();
   };
 
@@ -220,7 +226,7 @@ export default function ChecklistTab({ project, focusTaskId }) {
     await apiClient.entities.ChecklistItem.update(item.id, responsiblePatch(ids, names, cargoName || null));
     const me = await apiClient.auth.me().catch(() => null);
     await logActivity(project.id, cargoName ? `Cargo "${cargoName}" atribuido a tarefa "${item.text}"` : `Cargo removido da tarefa "${item.text}"`, me?.full_name);
-    if (cargoName) await notifyUsers(usersForCargo(users, cargoName).map((u) => u.id), { text: `Voce foi atribuido a tarefa "${item.text}" (${cargoName}) em "${project.name}"`, projectId: project.id, link: `/projetos/${project.id}` }, me?.id);
+    if (cargoName) await notifyUsers(usersForCargo(users, cargoName).map((u) => u.id), { text: `Voce foi atribuido a tarefa "${item.text}" (${cargoName}) em "${project.name}"`, projectId: project.id, link: `/projetos/${project.id}?tab=checklist&task=${encodeURIComponent(item.id)}` }, me?.id).catch(() => {});
     load();
   };
 
@@ -239,7 +245,7 @@ export default function ChecklistTab({ project, focusTaskId }) {
     await apiClient.entities.ChecklistItem.bulkUpdate(updates);
     const me = await apiClient.auth.me().catch(() => null);
     await logActivity(project.id, `Responsavel aplicado em ${category.label}: ${user.full_name || user.email}`, me?.full_name);
-    if (user.id !== me?.id) await notifyUsers([user.id], { text: `Voce foi atribuido as tarefas de ${category.label} em "${project.name}"`, projectId: project.id, link: `/projetos/${project.id}` }, me?.id);
+    if (user.id !== me?.id) await notifyUsers([user.id], { text: `Voce foi atribuido as tarefas de ${category.label} em "${project.name}"`, projectId: project.id, link: `/projetos/${project.id}?tab=checklist` }, me?.id).catch(() => {});
     load();
   };
 
@@ -341,7 +347,7 @@ export default function ChecklistTab({ project, focusTaskId }) {
               </div>
 
               <div className="mb-3">
-                <Select value={categoryResponsibleIds[category.key] || undefined} onValueChange={(userId) => assignCategoryResponsible(category, userId)}>
+                <Select value={categoryResponsibleIds[category.key] || undefined} onValueChange={userId => { if (userId) safe(assignCategoryResponsible)(category, userId); }}>
                   <SelectTrigger aria-label={`Responsável por ${category.label}`} className="h-8 w-full border-white/[0.075] bg-white/[0.035] text-xs text-white/62">
                     <SelectValue placeholder={`Responsavel para ${category.label}`} />
                   </SelectTrigger>
@@ -362,7 +368,7 @@ export default function ChecklistTab({ project, focusTaskId }) {
                         return (
                           <Draggable key={item.id} draggableId={item.id} index={index}>
                             {(prov, snapshot) => (
-                              <ChecklistItemRow item={item} allItems={sectionItems} depth={0} users={users} cargos={cargos} onToggle={toggle} onAddSub={addSub} onAssign={assign} onUnassign={unassign} onAssignCargo={assignCargo} onPatch={patchItem} onDelete={deleteItem} provided={prov} isDragging={snapshot.isDragging} focused={item.id === focusTaskId || sectionItems.some(child => child.id === focusTaskId && child.parent_id === item.id)} />
+                              <ChecklistItemRow item={item} allItems={sectionItems} depth={0} users={users} cargos={cargos} onToggle={safe(toggle)} onAddSub={safe(addSub)} onAssign={safe(assign)} onUnassign={safe(unassign)} onAssignCargo={safe(assignCargo)} onPatch={safe(patchItem)} onDelete={safe(deleteItem)} provided={prov} isDragging={snapshot.isDragging} focused={item.id === focusTaskId || sectionItems.some(child => child.id === focusTaskId && child.parent_id === item.id)} />
                             )}
                           </Draggable>
                         );
@@ -376,7 +382,7 @@ export default function ChecklistTab({ project, focusTaskId }) {
                   <p className="rounded-md border border-dashed border-white/[0.08] px-3 py-3 text-sm text-muted-foreground">Nenhuma seção nesta operação.</p>
                 )}
 
-                <form onSubmit={(e) => { e.preventDefault(); const f = e.currentTarget; addCategoryItems(category, f.text.value); f.reset(); }} className="grid min-h-[4.5rem] grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-md border border-dashed border-white/[0.12] bg-black/10 px-3 py-2.5 transition-colors focus-within:border-primary/45 focus-within:bg-white/[0.025] sm:grid-cols-[2rem_minmax(0,1fr)_auto]">
+                <form onSubmit={async e => { e.preventDefault(); const form = e.currentTarget; if (await safe(addCategoryItems)(category, form.text.value)) form.reset(); }} className="grid min-h-[4.5rem] grid-cols-[2rem_minmax(0,1fr)] items-center gap-2 rounded-md border border-dashed border-white/[0.12] bg-black/10 px-3 py-2.5 transition-colors focus-within:border-primary/45 focus-within:bg-white/[0.025] sm:grid-cols-[2rem_minmax(0,1fr)_auto]">
                   <span className="grid h-8 w-8 place-items-center rounded-md bg-white/[0.045] text-white/60">
                     <Plus size={16} />
                   </span>
@@ -392,7 +398,7 @@ export default function ChecklistTab({ project, focusTaskId }) {
         </div>
       </DragDropContext>
 
-      <form onSubmit={addSection} className="grid gap-3 sm:grid-cols-[1fr_auto] sm:gap-4">
+      <form onSubmit={safe(addSection)} className="grid gap-3 sm:grid-cols-[1fr_auto] sm:gap-4">
           <div className="flex h-14 items-center gap-4 rounded-lg border border-white/[0.085] bg-white/[0.032] px-5">
           <Plus size={22} className="text-white/70" />
           <input value={newSection} onChange={(e) => setNewSection(e.target.value)} placeholder="Nova seção..." className="min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-white/42" />

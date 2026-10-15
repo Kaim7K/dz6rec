@@ -10,6 +10,8 @@ import FileField from "@/components/ui/file-field";
 import { apiClient } from "@/api/appClient";
 import { TYPE, STATUS, STATUS_ORDER, uploadFile, logActivity } from "@/lib/music";
 import { Loader2 } from "lucide-react";
+import { validateSquareCover } from "@/lib/cover";
+import { toast } from "@/components/ui/use-toast";
 
 
 export default function EditProjectDialog({ project, open, onClose, onSaved, artists = [] }) {
@@ -17,6 +19,7 @@ export default function EditProjectDialog({ project, open, onClose, onSaved, art
   const [cover, setCover] = useState(null);
   const [removeCover, setRemoveCover] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (project) {
@@ -32,33 +35,40 @@ export default function EditProjectDialog({ project, open, onClose, onSaved, art
     }
     setCover(null);
     setRemoveCover(false);
+    setError("");
   }, [project, open]);
 
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
   const submit = async (e) => {
     e.preventDefault();
+    if (loading) return;
     setLoading(true);
+    setError("");
+    try {
     const artist = artists.find((a) => a.id === form.main_artist_id);
     const data = { ...form, main_artist_name: artist ? artist.name : form.main_artist_id ? "" : project.main_artist_name };
-    if (cover) data.cover_url = await uploadFile(cover);
+    if (cover) { await validateSquareCover(cover); data.cover_url = await uploadFile(cover); }
     else if (removeCover) data.cover_url = "";
     await apiClient.entities.Project.update(project.id, data);
     const me = await apiClient.auth.me().catch(() => null);
     await logActivity(project.id, "Projeto atualizado", me?.full_name);
-    setLoading(false);
     onSaved();
+    toast({ title: "Projeto salvo" });
     onClose();
+    } catch (err) { setError(err.message || "Não foi possível salvar. Seus dados foram mantidos para tentar novamente."); }
+    finally { setLoading(false); }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={next => { if (!next && !loading) onClose(); }}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>Editar projeto</DialogTitle>
           <DialogDescription>Ajuste os detalhes do lançamento.</DialogDescription>
         </DialogHeader>
         <form onSubmit={submit} className="space-y-4">
+          {error && <p role="alert" className="rounded-md border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-200">{error}</p>}
           <Field label="Nome do projeto"><Input required value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Ex. Noite Clara" /></Field>
           <div className="dz-form-columns">
             <Field label="Tipo"><Select value={form.type} onValueChange={(v) => set("type", v)}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{Object.entries(TYPE).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}</SelectContent></Select></Field>
@@ -70,11 +80,11 @@ export default function EditProjectDialog({ project, open, onClose, onSaved, art
             <Field label="Lançamento previsto"><DateField value={form.release_date} onChange={(v) => set("release_date", v)} /></Field>
           </div>
           <Field label="Capa">
-            <FileField value={cover} onChange={setCover} disabled={loading} existingUrl={removeCover ? "" : project?.cover_url} existingLabel="Capa atual" onRemoveExisting={() => setRemoveCover(true)} removeLabel="Remover capa" accept="image/*" hint="PNG ou JPG, preferencialmente 1:1" />
+            <FileField value={cover} onChange={setCover} disabled={loading} existingUrl={removeCover ? "" : project?.cover_url} existingLabel="Capa atual" onRemoveExisting={() => setRemoveCover(true)} removeLabel="Remover capa" accept="image/*" hint="PNG ou JPG quadrado (1:1)." />
             {removeCover && !cover && <p role="status" className="text-xs text-white/55">A capa será removida ao salvar.</p>}
           </Field>
           <Field label="Descrição (opcional)"><Textarea value={form.description} onChange={(e) => set("description", e.target.value)} rows={2} placeholder="Breve contexto do projeto" /></Field>
-          <DialogFooter><Button type="button" variant="ghost" onClick={onClose} className="text-white/55">Cancelar</Button><Button type="submit" disabled={loading} className="bg-primary text-primary-foreground">{loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Salvar alterações</Button></DialogFooter>
+          <DialogFooter><Button type="button" variant="ghost" disabled={loading} onClick={onClose} className="text-white/55">Cancelar</Button><Button type="submit" disabled={loading} className="bg-primary text-primary-foreground">{loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Salvar alterações</Button></DialogFooter>
         </form>
       </DialogContent>
     </Dialog>

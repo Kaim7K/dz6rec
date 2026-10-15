@@ -7,6 +7,7 @@
   setMockProfileId,
 } from "@/api/mockData";
 import { uploadFileToBlob } from "./fileUpload";
+import { toast } from "@/components/ui/use-toast";
 
 const TOKEN_KEY = "dz6_access_token";
 const ENTITY_POLL_INTERVAL = 1200;
@@ -93,7 +94,12 @@ async function uploadFileRequest(file, onProgress) {
 
 function entityClient(entity) {
   const write = async (promise) => {
-    const result = await promise;
+    let result;
+    try { result = await promise; }
+    catch (error) {
+      if (typeof document !== "undefined" && !document.querySelector('[role="dialog"], [role="alertdialog"]')) toast({ variant: "destructive", title: "Não foi possível salvar", description: error.message || "Tente novamente. Seus dados não foram confirmados." });
+      throw error;
+    }
     emitEntityChange(entity);
     return result;
   };
@@ -142,6 +148,15 @@ const entityNames = [
 ];
 
 export const apiClient = {
+  reviews: {
+    submit: async data => {
+      const result = await request("/api/reviews", { method: "POST", body: JSON.stringify(data) });
+      emitEntityChange(data.entity);
+      emitEntityChange("ActivityLog");
+      emitEntityChange("Notification");
+      return result;
+    },
+  },
   localMock: {
     enabled: isLocalMockEnabled,
     profiles: getMockProfiles,

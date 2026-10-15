@@ -6,7 +6,7 @@ export default function AuthLayout({ title, subtitle, footer, children }) {
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-8">
       <div className="w-full max-w-md min-w-0">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 grid h-16 w-16 place-items-center overflow-hidden rounded-full border border-white/10 bg-black shadow-glow">
+          <div className="mx-auto mb-4 grid h-16 w-16 place-items-center overflow-hidden rounded-lg border border-white/10 bg-black">
             <img
               src={dz6ProfileLogo}
               alt="DZ6"
@@ -16,7 +16,7 @@ export default function AuthLayout({ title, subtitle, footer, children }) {
           <h1 className="break-words font-display text-2xl font-bold tracking-tight text-white">{title}</h1>
           {subtitle && <p className="mt-2 break-words text-sm text-muted-foreground">{subtitle}</p>}
         </div>
-        <div className="rounded-lg border border-white/[0.075] bg-white/[0.035] p-5 shadow-pop backdrop-blur sm:p-6">
+        <div className="rounded-lg border border-white/[0.075] bg-[var(--surface-2)] p-5 sm:p-6">
           {children}
         </div>
         {footer && (
