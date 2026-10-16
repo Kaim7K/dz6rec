@@ -10,7 +10,7 @@ const formatSize = (bytes) => {
 };
 
 // Upload de arquivo com área de arraste; `light` aplica o tema claro do palco de administração
-export default function FileField({ value, onChange, accept = "image/*", hint = "", light = false, existingUrl = "", existingLabel = "Imagem atual", onRemoveExisting = undefined, removeLabel = "Remover imagem", disabled = false }) {
+export default function FileField({ value, onChange, accept = "image/*", hint = "", light = false, existingUrl = "", existingLabel = "Imagem atual", onRemoveExisting = undefined, removeLabel = "Remover imagem", disabled = false, appearance = "default" }) {
   const field = useField();
   const inputRef = useRef(null);
   const [over, setOver] = useState(false);
@@ -44,10 +44,12 @@ export default function FileField({ value, onChange, accept = "image/*", hint = 
 
   return (
     <div
+      data-appearance={appearance}
+      data-attached={attached ? "true" : "false"}
       onDragOver={(e) => { e.preventDefault(); if (!isDisabled()) setOver(true); }}
       onDragLeave={() => setOver(false)}
       onDrop={(e) => { e.preventDefault(); setOver(false); const f = e.dataTransfer.files?.[0]; if (f && !isDisabled()) onChange(f); }}
-      className={cn("flex w-full min-w-0 items-center gap-1 rounded-lg border px-2 py-2 transition-colors focus-within:border-white/35", !attached && "border-dashed", disabled && "opacity-50", box)}
+      className={cn("dz-file-field relative flex w-full min-w-0 items-center gap-1 rounded-lg border px-2 py-2 transition-colors focus-within:border-white/35", !attached && "border-dashed", disabled && "opacity-50", box)}
     >
       <input ref={inputRef} type="file" accept={accept} disabled={disabled} className="hidden" onChange={(e) => onChange(e.target.files?.[0] || null)} />
       <button id={field?.id} type="button" disabled={disabled} aria-labelledby={field?.labelId} aria-label={field ? undefined : attached ? "Substituir arquivo" : "Selecionar arquivo"} onClick={() => { if (!isDisabled()) inputRef.current?.click(); }} className="flex min-h-14 min-w-0 flex-1 items-center gap-3 rounded-md px-1.5 py-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:cursor-not-allowed">

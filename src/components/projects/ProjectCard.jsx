@@ -20,7 +20,7 @@ export default function ProjectCard({ project, progress, onEdit, onDeleted }) {
           <span className={`h-1.5 w-1.5 rounded-full ${tone.dot}`} />
           <span className={`text-xs font-medium ${tone.text}`}>{STATUS[project.status]}</span>
         </div>
-        <p className="mt-1.5 line-clamp-2 min-h-[2.7rem] break-words font-display text-sm font-medium leading-[1.35rem] text-white">{project.name}</p>
+        <p className="mt-2 line-clamp-2 break-words font-display text-base font-semibold leading-6 tracking-tight text-white">{project.name}</p>
         <p className="mt-0.5 truncate text-xs text-muted-foreground">{project.main_artist_name || "—"} · {TYPE[project.type]}</p>
         <div className="mt-3 flex items-center gap-2.5">
           <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/[0.08]">

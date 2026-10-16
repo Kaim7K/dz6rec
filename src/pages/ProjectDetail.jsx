@@ -1,13 +1,13 @@
 import { STATUS_COLORS, TYPE_COLORS } from "@/lib/choiceColors";
 import React, { useEffect, useState } from "react";
 import PageLoading from "@/components/PageLoading";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import LinkedReview from "@/components/projects/LinkedReview";
 import { toast } from "@/components/ui/use-toast";
 import { apiClient } from "@/api/appClient";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Clock3, ListChecks, MessageCircle, Music2, Pencil, Play, Shuffle, Trash2, Workflow } from "lucide-react";
+import { ChevronRight, Clock3, ListChecks, MessageCircle, Music2, Pencil, Play, Shuffle, Trash2, Workflow } from "lucide-react";
 import { usePlayer } from "@/lib/playerContext";
 import { TYPE, STATUS, STATUS_ORDER, logActivity } from "@/lib/music";
 import { computeProgress } from "@/lib/progress";
@@ -86,8 +86,9 @@ export default function ProjectDetail() {
   ];
   return (
     <div className="min-w-0 space-y-5">
+      <nav aria-label="Localização" className="flex min-w-0 items-center gap-2 text-xs text-muted-foreground"><Link to="/projetos" className="shrink-0 hover:text-white">Projetos</Link><ChevronRight size={13} className="shrink-0" /><span className="truncate text-white/75">{project.name}</span></nav>
       {loadError && <p role="alert" className="rounded-md border border-red-500/20 p-3 text-sm text-red-200">{loadError} <button type="button" onClick={load} className="underline">Tentar novamente</button></p>}
-      <section className="dz-project-header dz-card relative overflow-hidden p-4 sm:p-5 lg:p-6">
+      <section className="dz-project-header relative min-w-0 border-b border-white/[0.08] pb-6">
         <div className="dz-project-hero">
           <div className="dz-project-cover">
             {project.cover_url ? <img src={project.cover_url} className="h-full w-full object-cover" alt="" /> : (

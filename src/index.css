@@ -47,8 +47,8 @@
     --sidebar-border: 0 0% 16%;
     --sidebar-ring: 0 100% 48%;
     --surface-1: #0b0909;
-    --surface-2: #111010;
-    --surface-3: #141313;
+    --surface-2: #0f0e0e;
+    --surface-3: #131212;
     --line-soft: rgba(255,255,255,0.075);
     --line-strong: rgba(255,255,255,0.115);
     --section-gap: 1.25rem;
@@ -205,26 +205,21 @@
   .dz-page-head > :first-child { min-width: 0; flex: 1; }
   .dz-page-head > button { flex-shrink: 0; align-self: flex-start; }
   .dz-featured { container: featured / inline-size; }
-  .dz-featured-grid { display: grid; min-width: 0; gap: 1.25rem; }
-  .dz-featured-cover { max-width: 12rem; }
-  .dz-featured-details { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .dz-featured-details > :last-child { grid-column: 1 / -1; }
-  .dz-featured-details dl { min-width: 0; overflow-wrap: anywhere; }
-  @container featured (min-width: 38rem) {
-    .dz-featured-grid { grid-template-columns: 12rem minmax(0, 1fr); align-items: center; }
-    .dz-featured-details { grid-column: 1 / -1; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .dz-featured-details > :last-child { grid-column: auto; }
-  }
-  @container featured (min-width: 60rem) {
-    .dz-featured-grid { grid-template-columns: 12rem minmax(0, 1fr) minmax(13rem, 17rem); }
-    .dz-featured-details { grid-column: auto; grid-template-columns: 1fr; border-top: 0; border-left: 1px solid var(--line-soft); padding-top: 0; padding-left: 1.5rem; }
+  .dz-featured-grid { display: grid; min-width: 0; gap: 1.5rem; }
+  .dz-featured-cover { max-width: 24rem; margin-inline: auto; }
+  .dz-featured-title { font-size: clamp(1.75rem, 5cqw, 2.75rem); line-height: 1.1; }
+  .dz-featured-summary { width: 100%; max-width: 40rem; justify-content: center; align-self: center; padding-block: 0.25rem; }
+  @container featured (min-width: 36rem) {
+    .dz-featured-grid { grid-template-columns: clamp(15rem, 34cqw, 25rem) minmax(0, 1fr); align-items: center; gap: clamp(1.5rem, 4cqw, 3rem); }
+    .dz-featured-cover { max-width: none; }
+    .dz-featured-summary { padding-block: 0.5rem; }
   }
   @container app-content (min-width: 48rem) {
     .dz-kanban-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .dz-kanban-column { min-height: 22rem; }
     .dz-kanban-drop { min-height: 12rem; }
   }
-  @container app-content (min-width: 60rem) {
+  @container app-content (min-width: 54rem) {
     .dz-users-table { display: block; }
     .dz-users-cards { display: none; }
   }
@@ -280,7 +275,8 @@
     .dz-project-information {
       align-self: stretch;
       justify-content: center;
-      gap: clamp(1.5rem, 3cqw, 2.5rem);
+      padding-block: 0.5rem;
+      gap: 1.75rem;
     }
     .dz-project-title {
       font-size: clamp(2rem, 4.5cqw, 3.25rem);
@@ -332,7 +328,7 @@
   }
 
   .dz-page-head {
-    @apply min-w-0 flex flex-col gap-4 border-b border-white/[0.07] pb-5;
+    @apply min-w-0 flex flex-col gap-4 pb-2;
   }
 
   @container app-content (min-width: 44rem) {
@@ -341,7 +337,7 @@
   }
 
   .dz-page-title {
-    @apply mt-1 max-w-full break-words font-display text-2xl font-semibold tracking-tight text-white sm:text-[1.75rem] sm:leading-9;
+    @apply mt-1 max-w-full break-words font-display text-[1.75rem] font-semibold tracking-tight text-white sm:text-[2rem] sm:leading-10;
   }
 
   .dz-page-subtitle {
@@ -396,6 +392,23 @@
     background: rgba(255,255,255,0.032);
   }
   .dz-dialog form, .dz-dialog fieldset { min-width: 0; }
+  .dz-dialog-header { border-bottom: 1px solid var(--line-soft); padding-bottom: 1.25rem; }
+  .dz-dialog { container: dialog / inline-size; }
+  .dz-dialog input:not([type="checkbox"]), .dz-dialog textarea, .dz-dialog button[role="combobox"] { background-color: #0c0b0b; }
+  .dz-project-form-grid { display: grid; min-width: 0; gap: 1.5rem; padding-bottom: 0.25rem; }
+  .dz-form-section-heading { font-size: 0.6875rem; line-height: 1rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: hsl(var(--muted-foreground)); }
+  .dz-project-form-grid .dz-form-columns { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dz-project-form-aside { border-top: 1px solid var(--line-soft); padding-top: 1.5rem; }
+  .dz-file-field[data-appearance="artwork"] { padding: 0; }
+  .dz-file-field[data-appearance="artwork"] > button:first-of-type { flex-direction: column; justify-content: center; width: 100%; min-height: 11rem; padding: 1rem; text-align: center; gap: 0.75rem; }
+  .dz-file-field[data-appearance="artwork"] > button:first-of-type > span { max-width: 100%; }
+  .dz-file-field[data-appearance="artwork"][data-attached="true"] > button:first-of-type { padding: 0.5rem; }
+  .dz-file-field[data-appearance="artwork"] img { width: 100%; height: auto; aspect-ratio: 1; }
+  .dz-file-field[data-appearance="artwork"] > button:last-child:not(:first-of-type) { position: absolute; top: 0.75rem; right: 0.75rem; background: #111; border: 1px solid var(--line-strong); }
+  @container dialog (min-width: 38rem) {
+    .dz-project-form-grid { grid-template-columns: minmax(0, 1fr) 14rem; gap: 2rem; }
+    .dz-project-form-aside { border-top: 0; border-left: 1px solid var(--line-soft); padding-top: 0; padding-left: 1.5rem; }
+  }
   .dz-choice-trigger[data-accent] {
     border-color: color-mix(in srgb, var(--choice-color) 30%, transparent);
     background-color: color-mix(in srgb, var(--choice-color) 8%, var(--surface-2));

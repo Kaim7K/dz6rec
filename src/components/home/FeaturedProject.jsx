@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, CalendarDays, Music2, UserRound } from "lucide-react";
+import { ArrowUpRight, CalendarDays } from "lucide-react";
 import { STATUS, STATUS_TONE, TYPE } from "@/lib/music";
 import dz6ProfileLogo from "@/assets/dz6-profile.png";
 
@@ -21,56 +21,34 @@ export default function FeaturedProject({ project, progress }) {
     : "Sem data";
 
   return (
-    <section className="dz-featured dz-card relative overflow-hidden p-5 sm:p-6">
+    <section className="dz-featured relative min-w-0">
       <div className="dz-featured-grid">
         <Cover project={project} />
 
-        <div className="flex min-w-0 flex-col justify-between gap-5 py-0.5">
+        <div className="dz-featured-summary flex min-w-0 flex-col gap-6">
           <div className="min-w-0">
+            <p className="dz-kicker mb-5">Em destaque</p>
             <div className="flex flex-wrap items-center gap-2">
               <span className={`h-1.5 w-1.5 rounded-full ${tone.dot}`} />
               <span className={`text-xs font-medium ${tone.text}`}>{STATUS[project.status]}</span>
               <span className="text-xs text-muted-foreground">· {TYPE[project.type]}</span>
             </div>
-            <h2 className="mt-2 break-words font-display text-2xl font-semibold leading-tight tracking-tight text-white sm:text-[1.75rem]">{project.name}</h2>
-            <p className="mt-1.5 text-sm text-white/52 [overflow-wrap:anywhere]">{project.main_artist_name || "Sem artista"}</p>
+            <h2 className="dz-featured-title mt-3 break-words font-display font-semibold tracking-tight text-white">{project.name}</h2>
+            <p className="mt-2 text-base text-white/65 [overflow-wrap:anywhere]">{project.main_artist_name || "Sem artista"}</p>
+            <p className="mt-4 flex items-center gap-2 text-xs text-muted-foreground"><CalendarDays size={14} className="shrink-0" /><span>Lançamento · {releaseDate}</span></p>
           </div>
 
           <div className="space-y-5">
-            <div className="flex items-center gap-5">
-              <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/[0.09]">
+            <div>
+              <div className="mb-2.5 flex items-center justify-between gap-4 text-xs"><span className="text-muted-foreground">Progresso do projeto</span><span className="font-medium tabular-nums text-white">{pct}%</span></div>
+              <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/[0.09]">
                 <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
               </div>
-              <span className="w-10 text-right text-sm font-medium tabular-nums text-white">{pct}%</span>
             </div>
 
             <Link to={`/projetos/${project.id}`} className="dz-primary-button self-start">
-              Abrir projeto <ArrowRight size={16} />
+              Abrir projeto <ArrowUpRight size={16} />
             </Link>
-          </div>
-        </div>
-
-        <div className="dz-featured-details grid min-w-0 content-center gap-5 border-t border-white/[0.055] pt-5">
-          <div className="flex gap-3">
-            <span className="grid h-9 w-6 shrink-0 place-items-center"><UserRound size={17} className="text-muted-foreground" /></span>
-            <dl>
-              <dt className="text-xs text-muted-foreground">Artista</dt>
-              <dd className="mt-1 text-sm font-medium text-white/82">{project.main_artist_name || "Sem artista"}</dd>
-            </dl>
-          </div>
-          <div className="flex gap-3">
-            <span className="grid h-9 w-6 shrink-0 place-items-center"><Music2 size={17} className="text-muted-foreground" /></span>
-            <dl>
-              <dt className="text-xs text-muted-foreground">Tipo</dt>
-              <dd className="mt-1 text-sm font-medium text-white/82">{TYPE[project.type] || project.type}</dd>
-            </dl>
-          </div>
-          <div className="flex gap-3">
-            <span className="grid h-9 w-6 shrink-0 place-items-center"><CalendarDays size={17} className="text-muted-foreground" /></span>
-            <dl>
-              <dt className="text-xs text-muted-foreground">Lançamento</dt>
-              <dd className="mt-1 text-sm font-medium text-white/82">{releaseDate}</dd>
-            </dl>
           </div>
         </div>
       </div>

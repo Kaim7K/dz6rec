@@ -11,7 +11,7 @@ import { isOverdue, STATUS, STATUS_TONE, taskScore } from "@/lib/music";
 
 function Panel({ title, action = "Ver todos", children }) {
   return (
-    <section className="dz-card min-w-0 p-4 sm:p-5">
+    <section className="min-w-0 border-t border-white/[0.08] pt-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <h2 className="dz-panel-title">{title}</h2>
         <Link to="/projetos" className="inline-flex items-center gap-2 text-xs font-medium text-muted-foreground transition-colors hover:text-white">
@@ -121,8 +121,11 @@ export default function Home() {
   ];
 
   return (
-    <div className="space-y-5">
-      <h1 className="sr-only">Visão geral</h1>
+    <div className="dz-page dz-home">
+      <header className="dz-page-head">
+        <div><p className="dz-kicker">Workspace</p><h1 className="dz-page-title">Visão geral</h1><p className="dz-page-subtitle">Projetos, entregas e o próximo passo da gravadora.</p></div>
+        <Link to="/projetos" className="dz-ghost-button">Ver catálogo <ArrowRight size={15} /></Link>
+      </header>
       {data.featured ? <FeaturedProject project={data.featured} progress={data.byProject[data.featured?.id]} /> : <section className="dz-empty"><Disc3 size={24} className="text-muted-foreground" /><h2 className="text-lg font-semibold">Seu catálogo começa aqui</h2><p className="text-sm text-muted-foreground">Crie um projeto para organizar faixas, arquivos e entregas.</p><Link to="/projetos" className="dz-primary-button">Ver projetos<ArrowRight size={15} /></Link></section>}
       <MetricStrip metrics={metrics} />
 
