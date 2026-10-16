@@ -95,6 +95,7 @@ export default function ProjectDetail() {
             )}
           </div>
 
+          <div className="dz-project-information">
           <div className="dz-project-summary flex min-w-0 flex-col">
             <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2 xl:gap-3">
@@ -111,8 +112,8 @@ export default function ProjectDetail() {
                 <SelectContent>{STATUS_ORDER.map((s) => <SelectItem key={s} value={s}>{STATUS[s]}</SelectItem>)}</SelectContent>
               </Select>
             </div>
-            <h1 className="mt-3 break-words font-display text-2xl font-semibold tracking-tight text-white sm:text-[1.75rem] xl:text-[2rem] xl:leading-tight">{project.name}</h1>
-            <p className="mt-1 text-xs text-white/55 [overflow-wrap:anywhere] xl:text-sm">{project.main_artist_name}{project.featuring ? ` feat. ${project.featuring}` : ""}</p>
+            <h1 className="dz-project-title mt-3 break-words font-display font-semibold tracking-tight text-white">{project.name}</h1>
+            <p className="dz-project-artist mt-1 text-white/60 [overflow-wrap:anywhere]">{project.main_artist_name}{project.featuring ? ` feat. ${project.featuring}` : ""}</p>
             <p className="mt-2.5 max-w-2xl text-xs leading-5 text-muted-foreground xl:mt-3 xl:text-sm xl:leading-6">{project.description || "Projeto sem descrição."}</p>
 
             <div className="mt-4 flex flex-wrap items-center gap-2 xl:mt-5">
@@ -131,6 +132,7 @@ export default function ProjectDetail() {
             </div>
           </div>
           <ProjectProgress items={items} sections={sections} className="dz-project-hero-progress" />
+          </div>
         </div>
       </section>
 

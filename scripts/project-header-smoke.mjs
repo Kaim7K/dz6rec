@@ -31,9 +31,10 @@ try {
         const progress = el.querySelector('.dz-project-hero-progress').getBoundingClientRect();
         return {
           width: el.getBoundingClientRect().width,
-          cover: { width: cover.width, height: cover.height, bottom: cover.bottom },
+          cover: { width: cover.width, height: cover.height, top: cover.top, right: cover.right, bottom: cover.bottom },
+          summaryTop: summary.top,
           summaryBottom: summary.bottom,
-          progress: { top: progress.top, bottom: progress.bottom },
+          progress: { left: progress.left, top: progress.top, bottom: progress.bottom },
           overflow: document.documentElement.scrollWidth > innerWidth,
           childrenFit: [...el.querySelectorAll('.dz-project-progress-categories > div')].every(item => item.scrollWidth <= item.clientWidth + 1),
         };
@@ -41,7 +42,12 @@ try {
       assert.equal(bounds.overflow, false, 'no page overflow');
       assert.equal(bounds.childrenFit, true, 'progress categories fit their own container');
       assert.ok(Math.abs(bounds.cover.width - bounds.cover.height) < 2, 'cover remains square at every width');
-      assert.ok(bounds.progress.top >= Math.max(bounds.cover.bottom, bounds.summaryBottom), 'progress occupies its own row below both cover and summary');
+      assert.ok(bounds.progress.top >= bounds.summaryBottom, 'progress follows the project information');
+      if (bounds.width >= 672) {
+        assert.ok(bounds.progress.left > bounds.cover.right, 'desktop progress shares the information column beside the cover');
+        assert.ok(Math.abs((bounds.progress.bottom + bounds.summaryTop) / 2 - (bounds.cover.bottom + bounds.cover.top) / 2) < 2, 'desktop summary and progress form a centered group beside the cover');
+        assert.ok(bounds.progress.top - bounds.summaryBottom <= 41, 'desktop information and progress stay together without a large empty gap');
+      } else assert.ok(bounds.progress.top >= bounds.cover.bottom, 'stacked layout keeps progress after the square cover');
       if (bounds.width >= 672) assert.ok(bounds.cover.width <= 449, 'large cover remains bounded beside the summary');
       if (bounds.width >= 896) assert.ok(bounds.cover.width >= 320, 'cover is a prominent feature on desktop');
     };
@@ -49,6 +55,17 @@ try {
     await page.locator('h1').waitFor();
     await check();
     await page.screenshot({ path: `artifacts/visual-audit/project-header/${width}.png` });
+    await page.evaluate(() => {
+      const store = JSON.parse(localStorage.getItem('dz6_mock_store_v1'));
+      store.Project[0].name = 'Ben\u00e7\u00e3o';
+      store.Project[0].main_artist_name = 'ZW';
+      store.Project[0].description = '';
+      localStorage.setItem('dz6_mock_store_v1', JSON.stringify(store));
+    });
+    await page.reload();
+    await page.locator('h1').waitFor();
+    await check();
+    await page.screenshot({ path: `artifacts/visual-audit/project-header/${width}-short.png` });
     await page.evaluate(() => {
       const store = JSON.parse(localStorage.getItem('dz6_mock_store_v1'));
       store.Project[0].name = 'Um projeto com nome longo para verificar a adaptacao do cabecalho';
@@ -61,7 +78,7 @@ try {
     await page.setViewportSize({ width: width + 17, height: 1000 });
     await check();
     assert.deepEqual(errors, []);
-    console.log(`${width}px: normal content, long content and live resize passed`);
+    console.log(`${width}px: normal content, short title without description, long content and live resize passed`);
     await context.close();
   }
 } finally { await browser.close(); }

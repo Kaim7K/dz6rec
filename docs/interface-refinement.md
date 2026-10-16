@@ -5,7 +5,7 @@ Direção: painel de gravadora sóbrio, compacto e centrado nas capas. A paleta 
 - Inter unifica a tipografia da interface; Montserrat fica na assinatura da marca. Títulos, navegação, metadados e labels têm pesos e hierarquia definidos.
 - Fundos sólidos substituem grades, gradientes e brilhos decorativos. Bordas delimitam superfícies independentes; divisórias organizam seu conteúdo.
 - Métricas formam uma faixa de leitura, sem uma caixa e um ícone colorido para cada número.
-- Capas mantêm proporção 1:1 e tamanho limitado. O progresso fica abaixo da capa e do resumo, separado por uma linha.
+- Capas mantêm proporção 1:1 e destaque grande. No desktop, título, artista, ações e progresso formam um grupo coeso à direita da capa, com título proporcional à imagem e espaçamento limitado entre as informações e o progresso. Em telas estreitas, os blocos ficam empilhados. O cabeçalho é verificado também com nome curto e descrição vazia.
 - Lista de faixas com colunas mais espaçadas, cabeçalhos em caixa normal, título com versão e status com ponto e texto.
 - Catálogos mantêm as imagens estáveis, sem zoom ou camadas decorativas. Ações continuam disponíveis por hover, foco e toque.
 - Kanban usa superfícies neutras, status no indicador e metadados sem uma sequência de badges. Atrasos mantêm sinalização própria.

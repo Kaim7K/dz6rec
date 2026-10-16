@@ -256,18 +256,36 @@
   .dz-project-progress {
     container: project-progress / inline-size;
   }
+  .dz-project-information {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .dz-project-title { font-size: 1.75rem; line-height: 1.15; }
+  .dz-project-artist { font-size: 0.875rem; line-height: 1.5; }
 
   @container project-header (min-width: 42rem) {
     .dz-project-hero {
-      grid-template-columns: clamp(15rem, 38%, 28rem) minmax(0, 1fr);
+      grid-template-columns: clamp(15rem, 36%, 28rem) minmax(0, 1fr);
       align-items: center;
+      column-gap: clamp(1.5rem, 3cqw, 3rem);
     }
     .dz-project-cover {
       max-width: none;
       margin: 0;
     }
-    .dz-project-hero-progress {
-      grid-column: 1 / -1;
+    .dz-project-information {
+      align-self: stretch;
+      justify-content: center;
+      gap: clamp(1.5rem, 3cqw, 2.5rem);
+    }
+    .dz-project-title {
+      font-size: clamp(2rem, 4.5cqw, 3.25rem);
+      line-height: 1.12;
+    }
+    .dz-project-artist {
+      font-size: 1rem;
     }
   }
 
