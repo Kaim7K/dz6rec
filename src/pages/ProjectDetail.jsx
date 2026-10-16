@@ -76,6 +76,7 @@ export default function ProjectDetail() {
   const progress = computeProgress(items, sections);
   const artist = artists.find(row => row.id === project.main_artist_id);
 
+  /** @type {[string, string, import("lucide-react").LucideIcon][]} */
   const tabs = [
     ["faixas", "Faixas", Music2],
     ["checklist", "Tarefas", ListChecks],
@@ -138,8 +139,8 @@ export default function ProjectDetail() {
       </section>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="min-w-0 pt-1">
-        <TabsList className="dz-card h-auto w-full justify-start gap-1 overflow-x-auto overscroll-x-contain bg-[var(--surface-2)] p-1">
-          {tabs.map(([v, label, Icon]) => <TabsTrigger key={v} value={v} className="shrink-0 gap-2 rounded-md border border-transparent bg-transparent px-3 py-2 text-sm font-medium text-muted-foreground transition-colors data-[state=active]:border-primary/30 data-[state=active]:bg-primary/12 data-[state=active]:text-white"><Icon size={16} />{label}</TabsTrigger>)}
+        <TabsList className="dz-project-tabs h-auto w-full justify-start gap-1 overflow-x-auto overscroll-x-contain rounded-none border-b border-white/[0.08] bg-transparent p-0">
+          {tabs.map(([v, label, Icon]) => <TabsTrigger key={v} value={v} className="shrink-0 gap-2 rounded-none border-b-2 border-transparent bg-transparent px-3 py-3 text-sm font-medium text-muted-foreground transition-colors hover:text-white data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-white data-[state=active]:shadow-none"><Icon size={16} />{label}</TabsTrigger>)}
         </TabsList>
         <TabsContent value="operacao" className="mt-5"><ProjectWorkspace project={project} artist={artist} tracks={tracks} sections={sections} items={items} files={files} onChanged={load} onOpenTasks={taskId => { setFocusTaskId(taskId); setActiveTab("checklist"); }} onOpenProject={() => setActiveTab("faixas")} onEditArtist={() => setEditArtistOpen(true)} /></TabsContent>
         <TabsContent value="faixas" className="mt-5">

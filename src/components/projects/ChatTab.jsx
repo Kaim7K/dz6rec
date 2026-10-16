@@ -19,7 +19,7 @@ const sameBlock = (previous, current) =>
   previous &&
   current &&
   previous.user_id === current.user_id &&
-  new Date(current.created_date) - new Date(previous.created_date) < 5 * 60 * 1000;
+  new Date(current.created_date).getTime() - new Date(previous.created_date).getTime() < 5 * 60 * 1000;
 
 const TOKEN_AT_END = /@([\p{L}\p{N} ._/-]*)$/u;
 
@@ -69,7 +69,7 @@ function MentionMenu({ options, onPick }) {
   );
 }
 
-export default function ChatTab({ project, compact = false, draft, onDraftChange, onMessagesLoaded }) {
+export default function ChatTab({ project, compact = false, draft = undefined, onDraftChange = undefined, onMessagesLoaded = undefined }) {
   const [messages, setMessages] = useState([]);
   const [localText, setLocalText] = useState("");
   const text = draft ?? localText;
@@ -111,7 +111,7 @@ export default function ChatTab({ project, compact = false, draft, onDraftChange
 
   const loadMessages = async () => {
     const rows = await apiClient.entities.ProjectMessage.filter({ project_id: project.id });
-    const sorted = rows.sort((a, b) => new Date(a.created_date) - new Date(b.created_date));
+    const sorted = rows.sort((a, b) => new Date(a.created_date).getTime() - new Date(b.created_date).getTime());
     setMessages((current) => {
       const currentKey = current.map((message) => `${message.id}:${message.updated_date || message.created_date}`).join("|");
       const nextKey = sorted.map((message) => `${message.id}:${message.updated_date || message.created_date}`).join("|");
@@ -182,7 +182,7 @@ export default function ChatTab({ project, compact = false, draft, onDraftChange
 
     try {
       const created = await apiClient.entities.ProjectMessage.create({ project_id: project.id, text: content, user_id: user?.id, user_name: name });
-      setMessages((current) => [...current, created].sort((a, b) => new Date(a.created_date) - new Date(b.created_date)));
+      setMessages((current) => [...current, created].sort((a, b) => new Date(a.created_date).getTime() - new Date(b.created_date).getTime()));
       setText("");
       setMentionQuery(null);
 

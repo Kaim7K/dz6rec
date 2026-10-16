@@ -46,6 +46,6 @@ export async function ensureDatabase() {
         updated_date timestamptz NOT NULL DEFAULT now()
       )
     `;
-  })();
+  })().catch(error => { ready = undefined; throw error; });
   return ready;
 }

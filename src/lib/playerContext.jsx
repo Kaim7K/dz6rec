@@ -60,8 +60,8 @@ export function PlayerProvider({ children }) {
     <PlayerContext.Provider value={value}>
       <audio
         ref={audioRef}
-        onTimeUpdate={(e) => setProgress(e.target.currentTime)}
-        onLoadedMetadata={(e) => setDuration(e.target.duration)}
+        onTimeUpdate={(e) => setProgress(e.currentTarget.currentTime)}
+        onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
         onEnded={() => { if (repeat) { audioRef.current.currentTime = 0; audioRef.current.play(); } else next(); }}
       />
       {children}

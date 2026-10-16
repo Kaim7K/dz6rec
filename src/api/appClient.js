@@ -6,11 +6,11 @@
   resetMockStore,
   setMockProfileId,
 } from "@/api/mockData";
-import { uploadFileToBlob } from "./fileUpload";
+import { createEntitySubscriptions } from "./entitySubscriptions";
 import { toast } from "@/components/ui/use-toast";
 
 const TOKEN_KEY = "dz6_access_token";
-const ENTITY_POLL_INTERVAL = 1200;
+const ENTITY_POLL_INTERVAL = 5000;
 const realtimeChannel = typeof BroadcastChannel !== "undefined" ? new BroadcastChannel("dz6-entity-events") : null;
 
 function emitEntityChange(entity) {
@@ -19,47 +19,28 @@ function emitEntityChange(entity) {
   window.dispatchEvent(new CustomEvent("dz6:entity-change", { detail: payload }));
 }
 
-function subscribeEntity(entity, callback, interval = ENTITY_POLL_INTERVAL) {
-  let stopped = false;
-  let timer = null;
-  const notify = () => {
-    if (!stopped && document.visibilityState !== "hidden") callback?.();
-  };
-  const schedule = () => {
-    timer = window.setInterval(notify, interval);
-  };
-  const onLocal = (event) => {
-    if (!event.detail?.entity || event.detail.entity === entity) notify();
-  };
-  const onRemote = (event) => {
-    if (!event.data?.entity || event.data.entity === entity) notify();
-  };
-  const onFocus = () => notify();
-  const onVisibility = () => {
-    if (document.visibilityState === "visible") notify();
-  };
-
-  schedule();
-  window.addEventListener("dz6:entity-change", onLocal);
-  window.addEventListener("focus", onFocus);
-  document.addEventListener("visibilitychange", onVisibility);
-  realtimeChannel?.addEventListener("message", onRemote);
-
-  return () => {
-    stopped = true;
-    if (timer) window.clearInterval(timer);
-    window.removeEventListener("dz6:entity-change", onLocal);
-    window.removeEventListener("focus", onFocus);
-    document.removeEventListener("visibilitychange", onVisibility);
-    realtimeChannel?.removeEventListener("message", onRemote);
-  };
-}
+const subscribeEntity = createEntitySubscriptions({ window, document, channel: realtimeChannel });
 
 function getToken() {
   return localStorage.getItem(TOKEN_KEY);
 }
 
-async function request(path, options = {}) {
+const pendingReads = new Map();
+function request(path, options = {}) {
+  const method = options.method || 'GET';
+  // Share only simultaneous reads, never cache results or share caller-owned signals.
+  if (method === 'GET' && !options.signal && !options.headers) {
+    const key = JSON.stringify([getToken(), path]);
+    if (pendingReads.has(key)) return pendingReads.get(key).then(value => structuredClone(value));
+    const promise = performRequest(path, options); pendingReads.set(key, promise);
+    const clear = () => { if (pendingReads.get(key) === promise) pendingReads.delete(key); };
+    promise.then(clear, clear);
+    return promise;
+  }
+  return performRequest(path, options).then(value => { pendingReads.clear(); return value; });
+}
+
+async function performRequest(path, options = {}) {
   if (isLocalMockEnabled() && path.startsWith("/api/")) {
     return mockRequest(path, options);
   }
@@ -71,12 +52,18 @@ async function request(path, options = {}) {
   const token = getToken();
   if (token) headers.set("Authorization", `Bearer ${token}`);
 
-  const response = await fetch(path, { ...options, headers });
-  const data = await response.json().catch(() => ({}));
+  let response;
+  let data;
+  try {
+    response = await fetch(path, { ...options, headers, signal: options.signal || AbortSignal.timeout(30000) });
+    data = await response.json();
+  } catch (error) {
+    if (error.name === 'TimeoutError' || error.name === 'AbortError' && !options.signal) throw new Error('O servidor demorou para responder. Tente novamente.');
+    if (error instanceof SyntaxError) throw new Error('O servidor retornou uma resposta inválida. Tente novamente.');
+    throw error;
+  }
   if (!response.ok) {
-    const error = new Error(data.error || data.message || "Erro na requisicao");
-    error.status = response.status;
-    error.data = data;
+    const error = Object.assign(new Error(data.error || data.message || "Erro na requisicao"), { status: response.status, data });
     throw error;
   }
   return data;
@@ -84,6 +71,7 @@ async function request(path, options = {}) {
 
 async function uploadFileRequest(file, onProgress) {
   if (!isLocalMockEnabled()) {
+    const { uploadFileToBlob } = await import('./fileUpload');
     return uploadFileToBlob(file, { request, onProgress });
   }
   const form = new FormData();
@@ -125,7 +113,7 @@ function entityClient(entity) {
     updateMany: (where, patch) => write(request(`/api/entities/${entity}/many`, { method: "PATCH", body: JSON.stringify({ where, patch }) })),
     delete: (id) => write(request(`/api/entities/${entity}/${id}`, { method: "DELETE" })),
     deleteMany: (where) => write(request(`/api/entities/${entity}/many`, { method: "DELETE", body: JSON.stringify({ where }) })),
-    subscribe: (callback, options = {}) => subscribeEntity(entity, callback, options.interval),
+    subscribe: (callback, options = {}) => subscribeEntity(entity, callback, options.interval ?? ENTITY_POLL_INTERVAL),
   };
 }
 

@@ -3,7 +3,8 @@
 import { cn } from "@/lib/utils"
 import { useField } from "./field-context"
 
-const Textarea = React.forwardRef(({ className, ...props }, ref) => {
+const Textarea = React.forwardRef(/** @param {React.ComponentPropsWithoutRef<'textarea'>} props @param {React.ForwardedRef<HTMLTextAreaElement>} ref */
+({ className, ...props }, ref) => {
   const field = useField();
   return (
     (<textarea

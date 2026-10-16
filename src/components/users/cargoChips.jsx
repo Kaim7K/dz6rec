@@ -2,7 +2,7 @@ import React from "react";
 import { AlertTriangle, Plus, X } from "lucide-react";
 
 // Chip de cargo ativo — fundo claro do accent, com X para remover
-export function ActiveCargoChip({ name, onRemove, big = false }) {
+export function ActiveCargoChip({ name, onRemove = undefined, big = false }) {
   return (
     <span className={`inline-flex min-w-0 max-w-full items-center gap-1.5 rounded-md border border-white/[0.12] bg-white/[0.045] px-2.5 py-1 text-xs font-medium text-white/85 ${big ? "min-h-11 px-3" : ""}`}>
       <span className="min-w-0 [overflow-wrap:anywhere]">{name}</span>
@@ -16,7 +16,7 @@ export function ActiveCargoChip({ name, onRemove, big = false }) {
 }
 
 // Chip de cargo órfão (não existe mais no catálogo) — âmbar tracejado com alerta
-export function OrphanCargoChip({ name, onRemove, big = false }) {
+export function OrphanCargoChip({ name, onRemove = undefined, big = false }) {
   return (
     <span className={`inline-flex min-w-0 max-w-full flex-wrap items-center gap-1.5 rounded-md border border-dashed border-stage-warn bg-stage-warn-soft px-2.5 py-1 text-body font-medium text-stage-warn ${big ? "min-h-11 px-3" : ""}`}>
       <AlertTriangle size={13} className="shrink-0" />

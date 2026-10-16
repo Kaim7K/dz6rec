@@ -168,7 +168,7 @@ export default function MyTasks() {
     return COLUMNS.reduce((acc, column) => {
       acc[column.key] = tasks.filter((task) => taskStage(task) === column.key);
       return acc;
-    }, {});
+    }, { pendente: [], em_progresso: [], concluido: [] });
   }, [tasks]);
 
   const activeCount = grouped.pendente.length + grouped.em_progresso.length;

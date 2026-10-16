@@ -1,5 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Outlet } from "react-router-dom";
+import React, { Suspense, useEffect, useRef, useState } from "react";
+import PageLoading from "@/components/PageLoading";
+import { Outlet, useLocation } from "react-router-dom";
+import InterfaceBoundary from "@/components/InterfaceBoundary";
 import { apiClient } from "@/api/appClient";
 import Sidebar from "@/components/Sidebar";
 import Topbar from "@/components/Topbar";
@@ -12,6 +14,7 @@ const RELOAD_STORAGE_KEY = "dz6_last_global_reload";
 
 export default function AppShell() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
   const { user } = useAuth();
   const [teamOpen, setTeamOpen] = useState(() => {
     const preference = localStorage.getItem(`dz6_team_sidebar_${user?.id}`);
@@ -45,10 +48,10 @@ export default function AppShell() {
     <PlayerProvider>
       <div className="min-h-screen bg-background text-foreground">
         <Sidebar open={menuOpen} onClose={() => setMenuOpen(false)} />
-        <div className="min-w-0 lg:pl-[17rem]">
+        <div className="min-w-0 lg:pl-60">
           <Topbar onMenu={() => setMenuOpen(true)} />
           <div className="dz-chat-workspace" data-team-open={teamOpen ? 'true' : 'false'}><main className="dz-app-content relative mx-auto min-w-0 min-h-[calc(100vh-4rem)] max-w-[1600px] px-4 py-5 pb-36 sm:px-5 lg:px-7 lg:py-7 lg:pb-36 xl:px-9">
-            <Outlet />
+            <InterfaceBoundary resetKey={location.pathname}><Suspense fallback={<PageLoading />}><Outlet /></Suspense></InterfaceBoundary>
           </main></div>
         </div>
         <Player />

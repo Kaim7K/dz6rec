@@ -3,7 +3,8 @@
 import { cn } from "@/lib/utils"
 import { useField } from "./field-context"
 
-const Input = React.forwardRef(({ className, type, ...props }, ref) => {
+const Input = React.forwardRef(/** @param {React.ComponentPropsWithoutRef<'input'>} props @param {React.ForwardedRef<HTMLInputElement>} ref */
+({ className, type, ...props }, ref) => {
   const field = useField();
   return (
     (<input

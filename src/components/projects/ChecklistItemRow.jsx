@@ -16,7 +16,7 @@ const DETAIL_MODE = {
 const canUseSubtasks = (mode) => mode !== "notes";
 const canUseNotes = (mode) => mode === "notes" || mode === "both";
 
-export default function ChecklistItemRow({ item, allItems, depth, users, cargos, onToggle, onAddSub, onAssign, onUnassign, onAssignCargo, onPatch, onDelete, provided, isDragging = false, focused = false }) {
+export default function ChecklistItemRow({ item, allItems, depth, users, cargos, onToggle, onAddSub, onAssign, onUnassign, onAssignCargo, onPatch, onDelete, provided = undefined, isDragging = false, focused = false }) {
   const rowRef = useRef(null);
   const children = allItems.filter((i) => i.parent_id === item.id);
   const [expanded, setExpanded] = useState(false);

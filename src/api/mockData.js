@@ -331,6 +331,19 @@ export async function mockRequest(path, options = {}) {
   }
 
   if (method === "DELETE") {
+    if (['Project', 'ChecklistTemplate'].includes(entity)) {
+      const targets = new Set(store[entity].filter(item => id === 'many' ? matchesWhere(item, body.where) : item.id === id).map(item => item.id));
+      const sections = new Set((store.ChecklistSection || []).filter(item => targets.has(item[entity === 'Project' ? 'project_id' : 'template_id'])).map(item => item.id));
+      const tracks = new Set(entity === 'Project' ? (store.Track || []).filter(item => targets.has(item.project_id)).map(item => item.id) : []);
+      for (const [kind, rows] of Object.entries(store)) if (Array.isArray(rows)) store[kind] = rows.filter(item => !(
+        kind === entity && targets.has(item.id)
+        || entity === 'Project' && ['Track', 'ChecklistSection', 'ChecklistItem', 'ActivityLog', 'Notification', 'ProjectFile', 'ProjectMessage'].includes(kind) && targets.has(item.project_id)
+        || kind === 'TrackVersion' && tracks.has(item.track_id)
+        || kind === 'ChecklistSection' && sections.has(item.id)
+        || ['ChecklistItem', 'ChecklistNote'].includes(kind) && sections.has(item.section_id)
+      ));
+      saveMockStore(store); return { ok: true };
+    }
     if (id === "many") {
       store[entity] = store[entity].filter((item) => !matchesWhere(item, body.where));
     } else {

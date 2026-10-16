@@ -5,8 +5,9 @@ import { build } from 'esbuild';
 
 const origin = process.env.AUDIT_URL || 'http://127.0.0.1:5173';
 const published = process.env.AUDIT_PUBLISHED === '1' && origin === 'https://dz6rec.vercel.app';
-if (!published && !['localhost', '127.0.0.1'].includes(new URL(origin).hostname)) throw new Error('Synthetic data only.');
-const bundle = published ? await build({ stdin: { contents: 'export { mockRequest } from "./src/api/mockData.js";', resolveDir: process.cwd() }, bundle: true, write: false, format: 'iife', globalName: 'QAMock' }) : null;
+if (!published && origin !== 'http://qa.localhost:4173' && !['localhost', '127.0.0.1'].includes(new URL(origin).hostname)) throw new Error('Synthetic data only.');
+const serverMode = published || origin === 'http://qa.localhost:4173';
+const bundle = serverMode ? await build({ stdin: { contents: 'export { mockRequest } from "./src/api/mockData.js";', resolveDir: process.cwd() }, bundle: true, write: false, format: 'iife', globalName: 'QAMock' }) : null;
 const output = path.resolve(process.env.DESIGN_CAPTURE_DIR || 'artifacts/visual-audit/refinement');
 await mkdir(output, { recursive: true });
 const browser = await chromium.launch();
@@ -14,10 +15,10 @@ const results = [];
 try {
   for (const width of (process.env.DESIGN_WIDTHS || '360,390,768,1024,1440').split(',').map(Number)) {
     const context = await browser.newContext({ viewport: { width, height: Number(process.env.DESIGN_HEIGHT) || (width < 640 ? 844 : 1000) }, reducedMotion: 'reduce' });
-    if (published) await context.addInitScript({ content: bundle.outputFiles[0].text + '\nglobalThis.QAMock = QAMock;' });
+    if (serverMode) await context.addInitScript({ content: bundle.outputFiles[0].text + '\nglobalThis.QAMock = QAMock;' });
     const page = await context.newPage();
     page.setDefaultTimeout(15000);
-    if (published) await page.route('**/api/**', async route => {
+    if (serverMode) await page.route('**/api/**', async route => {
       try {
         const req = route.request();
         const data = await page.evaluate(({ url, method, body }) => QAMock.mockRequest(url, { method, body }), { url: req.url(), method: req.method(), body: req.postData() || undefined });

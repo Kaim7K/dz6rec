@@ -9,7 +9,7 @@ const initialsOf = (name) =>
 const colorOf = (name) =>
   PALETTE[(name || "").split("").reduce((a, c, i) => a + c.charCodeAt(0) * (i + 1), 0) % PALETTE.length];
 
-export default function ChatAvatar({ name, photoUrl, size = 32, className }) {
+export default function ChatAvatar({ name, photoUrl = "", size = 32, className = "" }) {
   const color = colorOf(name);
   return (
     <span

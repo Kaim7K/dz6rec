@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import { handleChat } from './_chat.js';
+import { deleteRecordTrees } from './_delete.js';
 import { put } from "@vercel/blob";
 import { handleUpload as handleBlobUpload } from "@vercel/blob/client";
 import formidable from "formidable";
@@ -413,6 +414,7 @@ async function handleEntities(req, res, parts, sql) {
     const { where = {} } = await readJson(req);
     const rows = await sql`SELECT * FROM app_records WHERE entity = ${entity}`;
     const matches = rows.map(record).filter((item) => filtersMatch(where, item));
+    if (['Project', 'ChecklistTemplate'].includes(entity)) return send(res, 200, await deleteRecordTrees(sql, entity, matches.map(item => item.id)));
     for (const item of matches) {
       await sql`DELETE FROM app_records WHERE entity = ${entity} AND id = ${item.id}`;
     }
@@ -420,6 +422,7 @@ async function handleEntities(req, res, parts, sql) {
   }
 
   if (req.method === "DELETE" && entityId) {
+    if (['Project', 'ChecklistTemplate'].includes(entity)) return send(res, 200, await deleteRecordTrees(sql, entity, [entityId]));
     await sql`DELETE FROM app_records WHERE entity = ${entity} AND id = ${entityId}`;
     return send(res, 200, { ok: true });
   }
@@ -516,14 +519,14 @@ export default async function handler(req, res) {
     await ensureDatabase();
     const sql = getSql();
     const parts = pathParts(req);
-    if (parts[0] === "auth") return handleAuth(req, res, parts[1], parts[2], sql);
-    if (parts[0] === "upload") return handleUpload(req, res, sql);
+    if (parts[0] === "auth") return await handleAuth(req, res, parts[1], parts[2], sql);
+    if (parts[0] === "upload") return await handleUpload(req, res, sql);
     const user = await currentUser(req, sql);
     if (!user) return send(res, 401, { error: "Authentication required" });
     if (user.status !== "ativo") return send(res, 403, { error: "Seu acesso ainda nao foi aprovado" });
     if (parts[0] === "reviews" && parts.length === 1) return await handleReview(req, res, sql, user);
     if (parts[0] === "chat" && parts.length === 2) return await handleChat(req, res, sql, user, parts[1]);
-    if (parts[0] === "users") return handleUsers(req, res, parts[1], sql);
+    if (parts[0] === "users") return await handleUsers(req, res, parts[1], sql);
     if (parts[0] === "entities") return await handleEntities(req, res, parts, sql);
     return send(res, 404, { error: "Not found" });
   } catch (error) {

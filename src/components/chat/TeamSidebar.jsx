@@ -8,7 +8,7 @@ import { Sheet, SheetContent, SheetTitle, SheetDescription } from '@/components/
 import { Button } from '@/components/ui/button';
 
 export function PresenceAvatar({ person, size = 32 }) {
-  return <span aria-hidden="true" className="relative inline-flex shrink-0"><ChatAvatar name={person.full_name || person.email} photoUrl={person.photo_url} size={size} className={person.online ? '' : 'grayscale'} /><span className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-[#111010] ${person.online ? 'bg-emerald-400' : 'bg-zinc-500'}`} /></span>;
+  return <span aria-hidden="true" className="relative inline-flex shrink-0"><ChatAvatar name={person.full_name || person.email} photoUrl={person.photo_url} size={size} className={person.online ? '' : 'grayscale !text-white'} /><span className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-[#111010] ${person.online ? 'bg-emerald-400' : 'bg-zinc-500'}`} /></span>;
 }
 
 function PersonRow({ person, me, cargos, onTalk }) {

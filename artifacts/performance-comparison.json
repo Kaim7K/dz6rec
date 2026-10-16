@@ -1,0 +1,36 @@
+[
+  {
+    "origin": "https://dz6rec.vercel.app",
+    "jsBytes": 956487,
+    "assets": {
+      "/assets/index-OpT5nzE9.js": 956487
+    }
+  },
+  {
+    "origin": "http://qa.localhost:4173",
+    "jsBytes": 477675,
+    "assets": {
+      "/assets/index-ZpqKxMs2.js": 308411,
+      "/assets/AppShell-BxhMCF_a.js": 46925,
+      "/assets/list-todo-9d2CEUEe.js": 944,
+      "/assets/mic-vocal-Dyk4MMxz.js": 527,
+      "/assets/layout-template-Vgu-evA0.js": 458,
+      "/assets/users-DLuuzxqZ.js": 773,
+      "/assets/music-CL_TwkXT.js": 6349,
+      "/assets/ChatAvatar-C1M7BNLN.js": 676,
+      "/assets/loader-circle-BzoQCPHN.js": 316,
+      "/assets/CargoBadge-oxp0Gr8l.js": 1031,
+      "/assets/ChatTab-Fg4Vzn7Y.js": 16096,
+      "/assets/index-CLu_joOf.js": 27448,
+      "/assets/pt-BR-D6XBfnH-.js": 31984,
+      "/assets/shuffle-iBBh7Mep.js": 556,
+      "/assets/index-B_YvAEDT.js": 22325,
+      "/assets/arrow-left-D2-RAc3J.js": 337,
+      "/assets/button-DzZUHL6u.js": 1330,
+      "/assets/external-link-BRZFPk2T.js": 423,
+      "/assets/disc-3-DC7m8R6H.js": 455,
+      "/assets/music-2-DZkTHTmn.js": 1247,
+      "/assets/Home-CyGlGxwF.js": 9064
+    }
+  }
+]

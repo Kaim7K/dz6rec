@@ -10,7 +10,7 @@ import { uploadFile } from "@/lib/music";
 import ArtistUserField from "@/components/artists/ArtistUserField";
 
 export default function EditArtistDialog({ artist, open, onClose, onSaved }) {
-  const [form, setForm] = useState({ name: "", handle: "", bio: "" });
+  const [form, setForm] = useState({ name: "", handle: "", bio: "", user_id: "" });
   const [photo, setPhoto] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");

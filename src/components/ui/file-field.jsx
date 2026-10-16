@@ -10,7 +10,7 @@ const formatSize = (bytes) => {
 };
 
 // Upload de arquivo com área de arraste; `light` aplica o tema claro do palco de administração
-export default function FileField({ value, onChange, accept = "image/*", hint, light = false, existingUrl, existingLabel = "Imagem atual", onRemoveExisting, removeLabel = "Remover imagem", disabled = false }) {
+export default function FileField({ value, onChange, accept = "image/*", hint = "", light = false, existingUrl = "", existingLabel = "Imagem atual", onRemoveExisting = undefined, removeLabel = "Remover imagem", disabled = false }) {
   const field = useField();
   const inputRef = useRef(null);
   const [over, setOver] = useState(false);

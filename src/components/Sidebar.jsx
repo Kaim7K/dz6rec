@@ -9,7 +9,7 @@ const items = [
   { label: "Início", to: "/", Icon: House },
   { label: "Projetos", to: "/projetos", Icon: FolderKanban },
   { label: "Artistas", to: "/artistas", Icon: Mic2 },
-  { label: "Meus trabalhos", to: "/minhas-tarefas", Icon: ListTodo },
+  { label: "Minhas tarefas", to: "/minhas-tarefas", Icon: ListTodo },
   { label: "Templates", to: "/templates", Icon: LayoutTemplate },
   { label: "Usuários", to: "/usuarios", Icon: Users, admin: true },
   { label: "Configurações", to: "/configuracoes", Icon: Settings, admin: true },
@@ -23,7 +23,7 @@ function NavItem({ label, to, Icon, onClose }) {
       onClick={onClose}
       className={({ isActive }) =>
         cn(
-          "group relative flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors",
+          "group relative flex items-center gap-2.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
           isActive ? "bg-white/[0.065] text-white shadow-[inset_3px_0_0_hsl(var(--primary))]" : "text-muted-foreground hover:bg-white/[0.04] hover:text-white/84"
         )
       }
@@ -49,10 +49,10 @@ export default function Sidebar({ open, onClose }) {
   return (
     <>
       {open && <button className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm lg:hidden" onClick={onClose} aria-label="Fechar menu" />}
-      <aside className={cn("fixed inset-y-0 left-0 z-50 flex w-[17rem] flex-col border-r border-white/[0.075] bg-[#0b0a0a] transition-transform duration-300 lg:translate-x-0", open ? "translate-x-0" : "-translate-x-full")}>
-        <div className="flex h-20 shrink-0 items-center justify-between border-b border-white/[0.06] px-5">
+      <aside className={cn("fixed inset-y-0 left-0 z-50 flex w-60 flex-col border-r border-white/[0.075] bg-[#0b0a0a] transition-transform duration-200 lg:translate-x-0", open ? "translate-x-0" : "-translate-x-full")}>
+        <div className="flex h-16 shrink-0 items-center justify-between border-b border-white/[0.06] px-5">
           <div className="flex items-center gap-3">
-            <span className="grid h-12 w-12 place-items-center overflow-hidden rounded-lg border border-white/[0.08] bg-black">
+            <span className="grid h-9 w-9 place-items-center overflow-hidden rounded-md border border-white/[0.08] bg-black">
               <img src={dz6ProfileLogo} alt="DZ6" className="h-full w-full object-cover" />
             </span>
             <span>
@@ -74,8 +74,8 @@ export default function Sidebar({ open, onClose }) {
           )}
         </nav>
         <div className="dz-sidebar-promo shrink-0 border-t border-white/[0.06] px-7 py-5">
-          <p className="text-xs font-medium text-white/65">Música conecta pessoas</p>
-          <p className="mt-1 text-2xs text-muted-foreground">DZ6 Gravadora</p>
+          <p className="text-xs font-medium text-white/65">Workspace DZ6</p>
+          <p className="mt-1 text-2xs text-muted-foreground">Gravadora</p>
         </div>
       </aside>
     </>

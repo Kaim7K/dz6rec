@@ -3,7 +3,7 @@ import { Label } from "./label";
 import { FieldContext } from "./field-context";
 import { cn } from "@/lib/utils";
 
-export default function FormField({ label, children, className }) {
+export default function FormField({ label, children, className = "" }) {
   const id = useId();
   const field = { id: `field-${id}`, labelId: `label-${id}`, label };
   return (

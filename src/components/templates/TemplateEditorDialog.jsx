@@ -8,7 +8,7 @@ import TemplateItemEditor from "@/components/projects/TemplateItemEditor";
 
 const NONE = "__none__";
 
-export default function TemplateEditorDialog({ template, cargos, onClose, onSaved }) {
+export default function TemplateEditorDialog({ template, cargos, onClose, onSaved = undefined }) {
   const [sections, setSections] = useState([]);
   const [items, setItems] = useState([]);
   const [newSection, setNewSection] = useState("");
@@ -61,7 +61,7 @@ export default function TemplateEditorDialog({ template, cargos, onClose, onSave
                     <TemplateItemEditor key={item.id} item={item} allItems={sItems} depth={0} cargos={cargos} onAddSub={addSub} onSetCargo={setItemCargo} onPatch={patchItem} onDelete={delItem} />
                   ))}
                 </div>
-                <form onSubmit={(e) => { e.preventDefault(); const f = e.target; addItem(s.id, f.text.value); f.reset(); }} className="mt-2 flex items-center gap-2">
+                <form onSubmit={(e) => { e.preventDefault(); const f = e.currentTarget; addItem(s.id, /** @type {HTMLInputElement} */ (f.elements.namedItem('text')).value); f.reset(); }} className="mt-2 flex items-center gap-2">
                   <Plus size={14} className="shrink-0 text-muted-foreground" />
                   <input name="text" aria-label="Adicionar tarefa à seção" placeholder="Adicionar tarefa..." className="h-9 min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-white/50" />
                 </form>

@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { apiClient } from "@/api/appClient";
+import PageLoading from "@/components/PageLoading";
+import PageError from "@/components/PageError";
+import CatalogTile from "@/components/CatalogTile";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +16,7 @@ import ArtistUserField from "@/components/artists/ArtistUserField";
 import { Mic2, Plus, Pencil } from "lucide-react";
 
 export default function Artists() {
+  const { hash } = useLocation();
   const [artists, setArtists] = useState([]);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ name: "", handle: "", bio: "", user_id: "" });
@@ -19,8 +24,18 @@ export default function Artists() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [editing, setEditing] = useState(null);
-  const load = () => apiClient.entities.Artist.list().then(setArtists);
+  const [fetching, setFetching] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const load = () => {
+    setFetching(true); setLoadError("");
+    return apiClient.entities.Artist.list().then(setArtists).catch(err => setLoadError(err.message || "Não foi possível carregar os artistas.")).finally(() => setFetching(false));
+  };
   useEffect(() => { load(); }, []);
+  useEffect(() => {
+    if (fetching || !hash) return;
+    const node = document.getElementById(hash.slice(1));
+    if (node) { node.scrollIntoView({ block: 'center' }); node.querySelector('button')?.focus({ preventScroll: true }); }
+  }, [fetching, hash]);
   const submit = async (e) => {
     e.preventDefault();
     if (loading) return;
@@ -35,13 +50,15 @@ export default function Artists() {
       setLoading(false);
     }
   };
+  if (fetching) return <PageLoading />;
+  if (loadError) return <PageError message={loadError} onRetry={load} />;
   return (
     <div className="dz-page">
       <div className="dz-page-head">
         <div>
           <p className="dz-kicker">Roster</p>
           <h1 className="dz-page-title">Artistas</h1>
-          <p className="dz-page-subtitle">Pessoas, vozes e identidades que movimentam os projetos.</p>
+          <p className="dz-page-subtitle">{artists.length} {artists.length === 1 ? 'artista no roster' : 'artistas no roster'}</p>
         </div>
         <button onClick={() => { setError(""); setOpen(true); }} className="dz-primary-button"><Plus size={16} />Novo artista</button>
       </div>
@@ -49,13 +66,13 @@ export default function Artists() {
         <div className="dz-empty">Nenhum artista cadastrado.</div>
       ) : (
         <div className="dz-catalog-grid">{artists.map((a) => (
-          <div key={a.id} className="group min-w-0 overflow-hidden rounded-lg border border-white/[0.08] bg-[#111010] p-2.5 transition-colors hover:border-white/[0.16]">
-            <div className="aspect-square w-full overflow-hidden rounded-md border border-white/[0.07] bg-black">{a.photo_url ? <img src={a.photo_url} className="h-full w-full object-cover" alt="" /> : <div className="grid h-full place-items-center bg-white/[0.02]"><Mic2 className="text-white/18" size={28} /></div>}</div>
+          <CatalogTile key={a.id} id={`artist-${a.id}`}>
+            <div className="dz-catalog-artwork">{a.photo_url ? <img src={a.photo_url} className="h-full w-full object-cover" alt="" /> : <div className="grid h-full place-items-center bg-white/[0.02]"><Mic2 className="text-white/30" size={28} /></div>}</div>
             <div className="flex items-center justify-between gap-3 px-1 pb-1 pt-4">
               <div className="min-w-0 flex-1"><p className="break-words font-medium text-white">{a.name}</p><p className="truncate text-xs text-muted-foreground">{a.handle ? `@${a.handle}` : "—"}</p></div>
               <button onClick={() => setEditing(a)} aria-label={`Editar ${a.name}`} className="dz-icon-button h-8 w-8"><Pencil size={15} /></button>
             </div>
-          </div>
+          </CatalogTile>
         ))}</div>
       )}
       <Dialog open={open} onOpenChange={(nextOpen) => { if (!loading) setOpen(nextOpen); }}><DialogContent className="max-w-md"><DialogHeader><DialogTitle>Novo artista</DialogTitle><DialogDescription>Cadastre o perfil do artista.</DialogDescription></DialogHeader>

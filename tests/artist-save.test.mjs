@@ -31,6 +31,7 @@ function renderForm(filename, { editing, upload, save }) {
     exports,
     require: (id) => {
       if (id === "react") return react;
+      if (id === "react-router-dom") return { useLocation: () => ({ hash: '' }) };
       if (id === "@/api/appClient") return { apiClient };
       if (id === "@/lib/music") return { uploadFile: upload };
       return new Proxy({}, { get: (_, name) => name });

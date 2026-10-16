@@ -1,6 +1,7 @@
 ﻿import React from "react";
 import dz6ProfileLogo from "@/assets/dz6-profile.png";
 
+/** @param {{title: string, subtitle?: string, footer?: React.ReactNode, children: React.ReactNode, icon?: import("lucide-react").LucideIcon}} props */
 export default function AuthLayout({ title, subtitle, footer, children }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-8">

@@ -71,7 +71,16 @@ try {
     await pane(page).getByRole('button',{name:'Minimizar chat',exact:true}).click();await page.goto(uiOrigin + '/projetos/project-1');await page.locator('h1').waitFor();await page.getByRole('button',{name:'Reproduzir',exact:true}).click();await page.getByRole('region',{name:'Player de áudio',exact:true}).waitFor();await page.getByRole('button',{name:'Abrir conversas',exact:true}).click();await check(page,width+'-with-player');
     await closeSession(session.context);
   }
-  assert.deepEqual(errors,[]);console.log('Global chat passed against HTTP API + isolated PostgreSQL: two-way private messages, presence, read markers, profile, project integration, drafts, minimized preference, mobile, player and accessibility.');
+  const removal=await openPage('user-admin');const page=removal.page;
+  await page.goto(uiOrigin + '/projetos/project-1');await page.getByRole('heading',{name:'Single Piloto',exact:true}).waitFor();
+  await page.getByRole('button',{name:'Excluir Single Piloto',exact:true}).click();await page.getByRole('alertdialog').getByRole('button',{name:'Excluir',exact:true}).click();await page.getByRole('heading',{name:'Projetos',exact:true}).waitFor();
+  assert.equal((await db.query("SELECT count(*)::int AS n FROM app_records WHERE id='project-1' OR data->>'project_id'='project-1' OR (entity='TrackVersion' AND data->>'track_id'='track-1')")).rows[0].n,0);
+  assert.equal((await db.query("SELECT count(*)::int AS n FROM app_records WHERE entity='Project' AND id='project-2'")).rows[0].n,1);
+  assert.ok((await db.query('SELECT count(*)::int AS n FROM app_chat_messages')).rows[0].n>0,'project removal must preserve private messages');
+  await page.goto(uiOrigin + '/templates');await page.getByRole('button',{name:'Excluir template Lançamento completo',exact:true}).click();await page.getByRole('alertdialog').getByRole('button',{name:'Excluir',exact:true}).click();await page.getByRole('alertdialog').waitFor({state:'hidden'});
+  assert.equal((await db.query("SELECT count(*)::int AS n FROM app_records WHERE entity='ChecklistTemplate'")).rows[0].n,0);
+  await closeSession(removal.context);
+  assert.deepEqual(errors,[]);console.log('Global chat and deletion passed against HTTP API + isolated PostgreSQL: two-way private messages, presence, read markers, profile, project integration, drafts, minimized preference, mobile, player, accessibility and atomic project/template removal.');
 } finally {for (const context of browser.contexts()) await closeSession(context);
   await browser.close();await new Promise(resolve=>server.close(resolve));await db.close();}
 

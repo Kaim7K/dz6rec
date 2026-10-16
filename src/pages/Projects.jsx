@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { apiClient } from "@/api/appClient";
+import PageLoading from "@/components/PageLoading";
+import PageError from "@/components/PageError";
 import { Plus, Disc3 } from "lucide-react";
 import ProjectCard from "@/components/projects/ProjectCard";
 import NewProjectDialog from "@/components/projects/NewProjectDialog";
@@ -15,18 +17,24 @@ export default function Projects() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [statusFilter, setStatusFilter] = useState("todos");
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const load = () => {
-    Promise.all([apiClient.entities.Project.list("-created_date"), apiClient.entities.Artist.list(), apiClient.entities.ChecklistTemplate.list(), apiClient.entities.ChecklistItem.list()]).then(([p, a, t, items]) => {
+    setLoading(true); setLoadError("");
+    return Promise.all([apiClient.entities.Project.list("-created_date"), apiClient.entities.Artist.list(), apiClient.entities.ChecklistTemplate.list(), apiClient.entities.ChecklistItem.list()]).then(([p, a, t, items]) => {
       setProjects(p); setArtists(a); setTemplates(t);
       const m = {};
       items.forEach((i) => { if (!i.project_id) return; m[i.project_id] = m[i.project_id] || { d: 0, t: 0 }; m[i.project_id].t++; if (i.completed) m[i.project_id].d++; });
       setByP(m);
-    });
+    }).catch(err => setLoadError(err.message || "Não foi possível carregar os projetos.")).finally(() => setLoading(false));
   };
   useEffect(() => { load(); }, []);
 
   const statusOptions = ["todos", ...Array.from(new Set(projects.map((p) => p.status).filter(Boolean)))];
   const visibleProjects = statusFilter === "todos" ? projects : projects.filter((p) => p.status === statusFilter);
+
+  if (loading) return <PageLoading />;
+  if (loadError) return <PageError message={loadError} onRetry={load} />;
 
   return (
     <div className="dz-page">
@@ -34,7 +42,7 @@ export default function Projects() {
         <div>
           <p className="dz-kicker">Catálogo</p>
           <h1 className="dz-page-title">Projetos</h1>
-          <p className="dz-page-subtitle">Singles, EPs e álbuns em produção na gravadora.</p>
+          <p className="dz-page-subtitle">{projects.length} {projects.length === 1 ? 'projeto no catálogo' : 'projetos no catálogo'} · Singles, EPs e álbuns</p>
         </div>
         <button
           onClick={() => setOpen(true)}
@@ -75,6 +83,8 @@ export default function Projects() {
             <Plus size={16} /> Novo projeto
           </button>
         </div>
+      ) : visibleProjects.length === 0 ? (
+        <div className="dz-empty"><p>Nenhum projeto com este status.</p><button type="button" className="dz-ghost-button" onClick={() => setStatusFilter("todos")}>Mostrar todos</button></div>
       ) : (
         <div className="dz-catalog-grid">
           {visibleProjects.map((p) => <ProjectCard key={p.id} project={p} progress={byP[p.id]} onEdit={setEditing} onDeleted={load} />)}

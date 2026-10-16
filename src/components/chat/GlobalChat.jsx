@@ -10,6 +10,9 @@ import ChatTab from '@/components/projects/ChatTab';
 import { useChatHub } from './useChatHub';
 import dz6ProfileLogo from '@/assets/dz6-profile.png';
 
+/** @type {[string, string, import("lucide-react").LucideIcon][]} */
+const CONVERSATION_TABS = [['direct', 'Pessoas', Users], ['project', 'Projetos', FolderKanban]];
+
 export default function GlobalChat({ teamOpen, onTeamChange }) {
   const { user } = useAuth(); const player = usePlayer(); const location = useLocation(); const navigate = useNavigate();
   const { data, loading, error, refresh } = useChatHub(user);
@@ -70,7 +73,7 @@ export default function GlobalChat({ teamOpen, onTeamChange }) {
         <button type="button" aria-label="Minimizar chat" onClick={close} className="dz-icon-button h-8 w-8"><Minus size={17} /></button><button type="button" aria-label="Fechar chat" onClick={() => { close(); setThread(null); }} className="dz-icon-button h-8 w-8"><X size={17} /></button>
       </header>
       {!thread ? <>
-        <div className="shrink-0 space-y-3 border-b border-white/[0.07] p-3"><div role="tablist" aria-label="Tipos de conversa" className="grid grid-cols-2 gap-1 rounded-md bg-black/20 p-1">{[['direct', 'Pessoas', Users], ['project', 'Projetos', FolderKanban]].map(([kind, label, Icon]) => <button type="button" key={kind} role="tab" id={`dz-chat-${kind}-tab`} aria-controls="dz-chat-picker" aria-selected={tab === kind} tabIndex={tab === kind ? 0 : -1} onKeyDown={event => {
+        <div className="shrink-0 space-y-3 border-b border-white/[0.07] p-3"><div role="tablist" aria-label="Tipos de conversa" className="grid grid-cols-2 gap-1 rounded-md bg-black/20 p-1">{CONVERSATION_TABS.map(([kind, label, Icon]) => <button type="button" key={kind} role="tab" id={`dz-chat-${kind}-tab`} aria-controls="dz-chat-picker" aria-selected={tab === kind} tabIndex={tab === kind ? 0 : -1} onKeyDown={event => {
           if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
           event.preventDefault();
           const next = event.key === 'Home' ? 'direct' : event.key === 'End' ? 'project' : kind === 'direct' ? 'project' : 'direct';

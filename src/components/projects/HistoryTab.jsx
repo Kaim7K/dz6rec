@@ -3,7 +3,7 @@ import { apiClient } from "@/api/appClient";
 
 export default function HistoryTab({ project }) {
   const [logs, setLogs] = useState([]);
-  useEffect(() => { apiClient.entities.ActivityLog.filter({ project_id: project.id }).then((l) => setLogs(l.sort((a, b) => new Date(b.created_date) - new Date(a.created_date)))); }, [project.id]);
+  useEffect(() => { apiClient.entities.ActivityLog.filter({ project_id: project.id }).then((l) => setLogs(l.sort((a, b) => new Date(b.created_date).getTime() - new Date(a.created_date).getTime()))); }, [project.id]);
   if (!logs.length) return <div className="dz-empty p-6 text-center text-sm">Sem histórico ainda.</div>;
   return (
     <div className="dz-card min-w-0 px-4 py-1 sm:px-5" role="list" aria-label="Histórico do projeto">{logs.map((l) => (

@@ -131,8 +131,10 @@
   .dz-catalog-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
-    gap: 1rem;
+    gap: 1.5rem 1.25rem;
   }
+  .dz-catalog-artwork { position: relative; aspect-ratio: 1; width: 100%; overflow: hidden; border: 1px solid var(--line-soft); border-radius: 8px; background: #0e0d0d; transition: border-color 150ms; }
+  .dz-catalog-tile:is(:hover, :focus-within) .dz-catalog-artwork { border-color: rgba(255,255,255,0.22); }
   .dz-overview-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr));
@@ -217,7 +219,7 @@
     .dz-featured-grid { grid-template-columns: 12rem minmax(0, 1fr) minmax(13rem, 17rem); }
     .dz-featured-details { grid-column: auto; grid-template-columns: 1fr; border-top: 0; border-left: 1px solid var(--line-soft); padding-top: 0; padding-left: 1.5rem; }
   }
-  @container app-content (min-width: 53rem) {
+  @container app-content (min-width: 48rem) {
     .dz-kanban-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .dz-kanban-column { min-height: 22rem; }
     .dz-kanban-drop { min-height: 12rem; }
@@ -456,17 +458,18 @@
 }
 
 /* Persistent communication surfaces: separate from page and modal stacking. */
-.dz-team-sidebar { position: fixed; top: 4rem; right: 0; z-index: 34; display: flex; width: 16rem; min-height: 0; flex-direction: column; border-left: 1px solid var(--line-soft); background: #111010; }
+.dz-team-sidebar { position: fixed; top: 4rem; right: 0; z-index: 34; display: flex; width: 14rem; min-height: 0; flex-direction: column; border-left: 1px solid var(--line-soft); background: #0d0c0c; }
 .dz-team-person { display: flex; width: 100%; min-width: 0; align-items: center; gap: 0.75rem; border-radius: 6px; padding: 0.625rem; transition: background-color 150ms, opacity 150ms; }
 .dz-team-person[data-offline="true"] { opacity: 0.55; }
+.dz-team-person[data-offline="true"] .text-muted-foreground { color: #eee; }
 .dz-team-person[data-offline="true"]:is(:hover, :focus-visible, [data-state="open"]) { opacity: 1; }
 .dz-team-person:hover, .dz-team-person[data-state="open"] { background: rgba(255,255,255,0.055); }
 .dz-chat-toolbar { position: fixed; z-index: 42; right: 1rem; bottom: var(--chat-bottom, 1rem); display: flex; align-items: center; gap: 0.5rem; }
 .dz-chat-toolbar > button { background-color: #171414; }
 .dz-chat-window { position: fixed; right: 1rem; bottom: calc(var(--chat-bottom, 1rem) + 3.25rem); z-index: 45; display: flex; width: min(25rem, calc(100vw - 1.5rem)); height: min(39rem, calc(100dvh - var(--chat-bottom, 1rem) - 8rem)); min-height: 0; max-height: calc(100dvh - var(--chat-bottom, 1rem) - 8rem); flex-direction: column; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 10px; background: #111010; box-shadow: 0 12px 48px rgba(0,0,0,0.55); }
 @media (min-width: 1280px) {
-  .dz-chat-workspace[data-team-open="true"] { padding-right: 16rem; }
-  .dz-global-chat[data-team-open="true"] .dz-chat-toolbar, .dz-global-chat[data-team-open="true"] .dz-chat-window { right: 17rem; }
+  .dz-chat-workspace[data-team-open="true"] { padding-right: 14rem; }
+  .dz-global-chat[data-team-open="true"] .dz-chat-toolbar, .dz-global-chat[data-team-open="true"] .dz-chat-window { right: 15rem; }
 }
 @media (max-height: 560px) {
   .dz-chat-window { top: 4.5rem; bottom: 0.5rem; height: auto; max-height: none; }

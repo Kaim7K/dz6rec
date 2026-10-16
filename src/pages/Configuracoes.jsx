@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import PageLoading from "@/components/PageLoading";
+import PageError from "@/components/PageError";
 import { apiClient } from "@/api/appClient";
 import { Loader2, Pencil, Plus, RefreshCw, ShieldCheck, Shuffle, Trash2 } from "lucide-react";
 import CargoBadge from "@/components/CargoBadge";
@@ -14,14 +15,19 @@ export default function Configuracoes() {
   const [loading, setLoading] = useState(true);
   const [reloadSending, setReloadSending] = useState(false);
   const [reloadMessage, setReloadMessage] = useState("");
+  const [loadError, setLoadError] = useState("");
 
   const load = () => {
-    apiClient.auth.me().then((m) => { setMe(m); setLoading(false); }).catch(() => setLoading(false));
-    apiClient.entities.Cargo.list().then(setCargos).catch(() => {});
+    setLoading(true); setLoadError("");
+    return Promise.all([apiClient.auth.me(), apiClient.entities.Cargo.list()])
+      .then(([m, c]) => { setMe(m); setCargos(c); })
+      .catch(err => setLoadError(err.message || "Não foi possível carregar as configurações."))
+      .finally(() => setLoading(false));
   };
   useEffect(() => { load(); }, []);
 
   if (loading) return <PageLoading />;
+  if (loadError) return <PageError message={loadError} onRetry={load} />;
   if (me?.permissao !== "superadmin") return (
     <div className="dz-card mx-auto max-w-md p-7 text-center">
       <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-white/[0.05]"><ShieldCheck className="text-white/50" /></div>

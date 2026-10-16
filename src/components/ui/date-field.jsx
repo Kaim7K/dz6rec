@@ -10,7 +10,7 @@ import { useField } from "./field-context";
 
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
-export default function DateField({ value, onChange, placeholder = "Selecionar data", disabled }) {
+export default function DateField({ value, onChange, placeholder = "Selecionar data", disabled = false }) {
   const field = useField();
   const [open, setOpen] = useState(false);
   const date = value ? new Date(`${value}T00:00:00`) : undefined;

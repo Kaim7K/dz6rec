@@ -66,7 +66,7 @@ export function dueLabel(date) {
   const due = new Date(date);
   today.setHours(0, 0, 0, 0);
   due.setHours(0, 0, 0, 0);
-  const diff = Math.round((due - today) / 86400000);
+  const diff = Math.round((due.getTime() - today.getTime()) / 86400000);
   if (diff === 0) return "Hoje";
   if (diff === 1) return "Amanhã";
   if (diff === -1) return "Ontem";

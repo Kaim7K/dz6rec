@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import PageLoading from "@/components/PageLoading";
+import PageError from "@/components/PageError";
 import { Link } from "react-router-dom";
 import { apiClient } from "@/api/appClient";
 import FeaturedProject from "@/components/home/FeaturedProject";
 import MetricStrip from "@/components/home/MetricStrip";
 import dz6ProfileLogo from "@/assets/dz6-profile.png";
-import { ArrowRight, Disc3, FolderKanban, Image, ListTodo, Megaphone, Music2, UsersRound } from "lucide-react";
+import { ArrowRight, Disc3, FolderKanban, ListTodo } from "lucide-react";
 import { isOverdue, STATUS, STATUS_TONE, taskScore } from "@/lib/music";
 
 function Panel({ title, action = "Ver todos", children }) {
@@ -30,27 +31,25 @@ function MiniCover({ project }) {
   );
 }
 
-function ActionIcon({ index }) {
-  const icons = [Image, UsersRound, Megaphone, Music2];
-  const Icon = icons[index % icons.length];
+function ActionIcon() {
   return (
     <span className="grid h-9 w-7 shrink-0 place-items-center text-white/64">
-      <Icon size={17} />
+      <ListTodo size={17} />
     </span>
   );
 }
 
-function ActionRow({ task, project, index }) {
-  const status = /capa|aprovar|aprovação|revisar|validar/i.test(task.text || "") ? "Aguardando aprovação" : "Planejamento";
-  const warn = status.includes("aprovação");
+function ActionRow({ task, project }) {
+  const overdue = isOverdue(task.due_date, task.completed);
+  const status = overdue ? "Atrasada" : task.task_status === "em_progresso" ? "Em andamento" : "Pendente";
   return (
     <Link to={task.project_id ? `/projetos/${task.project_id}?tab=checklist&task=${encodeURIComponent(task.id)}` : "/minhas-tarefas"} className="dz-list-row flex items-center gap-3 py-2.5">
-      <ActionIcon index={index} />
+      <ActionIcon />
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium text-white/88">{task.text}</p>
         <p className="mt-1 truncate text-xs text-muted-foreground">{project?.name || "Projeto"} - {project?.main_artist_name || "DZ6"}</p>
       </div>
-      <span className={`hidden text-xs font-medium sm:inline-flex ${warn ? "text-yellow-300" : "text-white/62"}`}>{status}</span>
+      <span className={`hidden text-xs font-medium sm:inline-flex ${overdue ? "text-red-300" : task.task_status === "em_progresso" ? "text-amber-300" : "text-muted-foreground"}`}>{status}</span>
     </Link>
   );
 }
@@ -73,8 +72,9 @@ export default function Home() {
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    Promise.all([
+  const load = () => {
+    setError("");
+    return Promise.all([
       apiClient.entities.Project.list("-created_date"),
       apiClient.entities.ChecklistItem.list(),
     ])
@@ -105,15 +105,11 @@ export default function Home() {
         });
       })
       .catch((err) => setError(err.message || "Não foi possível carregar o painel."));
-  }, []);
+  };
+  useEffect(() => { load(); }, []);
 
   if (error) {
-    return (
-      <div className="dz-card max-w-lg p-5">
-        <h1 className="font-display text-2xl font-bold text-white">Não foi possível carregar o painel</h1>
-        <p className="mt-2 text-sm text-white/50">{error}</p>
-      </div>
-    );
+    return <PageError message={error} onRetry={load} />;
   }
 
   if (!data) return <PageLoading variant="project" />;
@@ -127,20 +123,22 @@ export default function Home() {
   return (
     <div className="space-y-5">
       <h1 className="sr-only">Visão geral</h1>
-      <FeaturedProject project={data.featured} progress={data.byProject[data.featured?.id]} />
+      {data.featured ? <FeaturedProject project={data.featured} progress={data.byProject[data.featured?.id]} /> : <section className="dz-empty"><Disc3 size={24} className="text-muted-foreground" /><h2 className="text-lg font-semibold">Seu catálogo começa aqui</h2><p className="text-sm text-muted-foreground">Crie um projeto para organizar faixas, arquivos e entregas.</p><Link to="/projetos" className="dz-primary-button">Ver projetos<ArrowRight size={15} /></Link></section>}
       <MetricStrip metrics={metrics} />
 
       <div className="dz-overview-grid">
-        <Panel title="Próximas ações">
+        <Panel title="Próximas ações" action="Ver projetos">
           <div>
-            {data.pendingItems.slice(0, 3).map((task, index) => (
-              <ActionRow key={task.id} task={task} project={data.projectMap[task.project_id]} index={index} />
+            {!data.pendingItems.length && <p className="py-6 text-sm text-muted-foreground">Nenhuma tarefa pendente.</p>}
+            {data.pendingItems.slice(0, 3).map((task) => (
+              <ActionRow key={task.id} task={task} project={data.projectMap[task.project_id]} />
             ))}
           </div>
         </Panel>
 
         <Panel title="Outros projetos">
           <div>
+            {!data.projects.some(project => project.id !== data.featured?.id) && <p className="py-6 text-sm text-muted-foreground">Nenhum outro projeto no momento.</p>}
             {data.projects.filter((project) => project.id !== data.featured?.id).slice(0, 4).map((project) => (
               <ProjectRow key={project.id} project={project} />
             ))}

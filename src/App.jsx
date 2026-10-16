@@ -1,3 +1,5 @@
+import { lazy, Suspense } from "react";
+import PageLoading from "@/components/PageLoading";
 ﻿import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
@@ -7,20 +9,20 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import Login from '@/pages/Login';
-import Register from '@/pages/Register';
-import ForgotPassword from '@/pages/ForgotPassword';
-import ResetPassword from '@/pages/ResetPassword';
-import GoogleAuthCallback from '@/pages/GoogleAuthCallback';
-import AppShell from '@/components/AppShell';
-import Home from '@/pages/Home';
-import Projects from '@/pages/Projects';
-import ProjectDetail from '@/pages/ProjectDetail';
-import Artists from '@/pages/Artists';
-import MyTasks from '@/pages/MyTasks';
-import Templates from '@/pages/Templates';
-import Users from '@/pages/Users';
-import Configuracoes from '@/pages/Configuracoes';
+const Login = lazy(() => import('@/pages/Login'));
+const Register = lazy(() => import('@/pages/Register'));
+const ForgotPassword = lazy(() => import('@/pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
+const GoogleAuthCallback = lazy(() => import('@/pages/GoogleAuthCallback'));
+const AppShell = lazy(() => import('@/components/AppShell'));
+const Home = lazy(() => import('@/pages/Home'));
+const Projects = lazy(() => import('@/pages/Projects'));
+const ProjectDetail = lazy(() => import('@/pages/ProjectDetail'));
+const Artists = lazy(() => import('@/pages/Artists'));
+const MyTasks = lazy(() => import('@/pages/MyTasks'));
+const Templates = lazy(() => import('@/pages/Templates'));
+const Users = lazy(() => import('@/pages/Users'));
+const Configuracoes = lazy(() => import('@/pages/Configuracoes'));
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -78,7 +80,7 @@ function App() {
       <QueryClientProvider client={queryClientInstance}>
         <Router>
           <ScrollToTop />
-          <AuthenticatedApp />
+          <Suspense fallback={<main className="mx-auto w-full max-w-5xl p-5"><PageLoading /></main>}><AuthenticatedApp /></Suspense>
         </Router>
         <Toaster />
       </QueryClientProvider>

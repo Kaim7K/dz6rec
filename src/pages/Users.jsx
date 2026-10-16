@@ -1,6 +1,7 @@
 import { cargoColor } from "@/components/CargoBadge";
 import React, { useEffect, useMemo, useState } from "react";
 import PageLoading from "@/components/PageLoading";
+import PageError from "@/components/PageError";
 import { apiClient } from "@/api/appClient";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import EditUserDialog from "@/components/users/EditUserDialog";
@@ -26,15 +27,17 @@ export default function Users() {
   const [msg, setMsg] = useState("");
   const [editUser, setEditUser] = useState(null);
   const [cargoUser, setCargoUser] = useState(null);
+  const [loadError, setLoadError] = useState("");
 
   const load = () => {
-    setLoading(true);
+    setLoading(true); setLoadError("");
     Promise.all([apiClient.auth.me(), apiClient.entities.User.list(), apiClient.entities.Cargo.list()])
       .then(([m, u, c]) => {
         setMe(m);
         setUsers(u);
         setCargos(c);
       })
+      .catch(err => setLoadError(err.message || "Não foi possível carregar os usuários."))
       .finally(() => setLoading(false));
   };
   useEffect(() => { load(); }, []);
@@ -57,6 +60,7 @@ export default function Users() {
   }, [users, search, filterCargo]);
 
   if (loading) return <PageLoading />;
+  if (loadError) return <PageError message={loadError} onRetry={load} />;
   if (me?.permissao !== "superadmin") return (
     <div className="dz-card mx-auto max-w-md p-7 text-center">
       <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-stage-accent-soft"><ShieldCheck className="text-stage-accent" /></div>
@@ -171,7 +175,7 @@ export default function Users() {
                 {chipsFor(u, list.slice(0, 3))}
                 {list.length > 3 && <span className="text-micro text-stage-muted">+{list.length - 3}</span>}
               </div>
-              <button onClick={() => setCargoUser(u)} className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-sl bg-stage-accent text-body font-semibold text-white transition-colors hover:bg-stage-accent/90">
+              <button onClick={() => setCargoUser(u)} className="dz-ghost-button mt-3 h-10 w-full text-xs">
                 <UsersIcon size={15} />Gerenciar Cargos
               </button>
               {u.status === "pendente" && <button onClick={() => approve(u)} className="mt-2 flex h-11 w-full items-center justify-center gap-2 rounded-sl bg-emerald-600 text-body font-semibold text-white transition-colors hover:bg-emerald-700"><Check size={15} />Aprovar acesso</button>}
