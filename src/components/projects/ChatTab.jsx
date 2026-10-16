@@ -218,7 +218,7 @@ export default function ChatTab({ project }) {
   });
 
   return (
-    <div className="dz-card flex h-[min(38rem,calc(100svh-11rem))] min-h-[28rem] flex-col overflow-hidden">
+    <div className="dz-card flex h-[min(38rem,calc(100svh-9rem))] min-h-[min(22rem,70svh)] flex-col overflow-hidden">
       <div className="flex items-center justify-between gap-3 border-b border-white/[0.06] px-4 py-3">
         <div className="flex min-w-0 items-center gap-3">
           {participants.length > 0 ? (
@@ -233,14 +233,14 @@ export default function ChatTab({ project }) {
             </span>
           )}
           <div className="min-w-0">
-            <p className="text-sm font-bold text-white">Conversa do projeto</p>
+            <p className="text-sm font-semibold text-white">Conversa do projeto</p>
             <p className="truncate text-2xs text-muted-foreground">Use @ para mencionar pessoas ou cargos.</p>
           </div>
         </div>
         <span className="dz-pill h-7">{messages.length}</span>
       </div>
 
-      <div className="flex-1 space-y-1 overflow-y-auto px-3 py-4 sm:px-4">
+      <div className="min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain px-3 py-4 sm:px-4">
         {loading ? (
           <div className="grid h-full place-items-center"><Loader2 className="animate-spin text-red-300" /></div>
         ) : messages.length === 0 ? (
@@ -252,14 +252,14 @@ export default function ChatTab({ project }) {
           </div>
         ) : rows.map((row) => {
           if (row.type === "day") {
-            return <div key={row.key} className="flex justify-center py-3"><span className="dz-pill h-7 text-muted-foreground">{row.label}</span></div>;
+            return <div key={row.key} className="flex items-center justify-center gap-3 py-4"><span className="h-px flex-1 bg-white/[0.06]" /><span className="text-xs text-muted-foreground">{row.label}</span><span className="h-px flex-1 bg-white/[0.06]" /></div>;
           }
 
           const { message, date, mine, first, last, sender } = row;
           const name = sender.full_name || sender.email || "Equipe";
           const tokens = tokensByMessage[message.id] || [];
           const bubble = mine
-            ? `bg-primary px-3.5 py-2 text-sm leading-6 text-primary-foreground ${last ? "rounded-br-md" : ""}`
+            ? `border border-red-500/15 bg-[#241414] px-3.5 py-2 text-sm leading-6 text-white/90 ${last ? "rounded-br-md" : ""}`
             : `border border-white/[0.06] bg-white/[0.045] px-3.5 py-2 text-sm leading-6 text-white/85 ${last ? "rounded-bl-md" : ""}`;
 
           return (
@@ -267,12 +267,12 @@ export default function ChatTab({ project }) {
               {!mine && (first ? <ChatAvatar name={name} photoUrl={sender.photo_url} size={28} /> : <span className="w-7" />)}
               <div className={`flex min-w-0 max-w-[88%] flex-col ${mine ? "items-end" : "items-start"} sm:max-w-[74%]`}>
                 {first && (
-                  <p className="px-1 text-2xs">
+                  <p className="max-w-full px-1 text-2xs [overflow-wrap:anywhere]">
                     <span className="font-medium text-white/80">{mine ? "Voce" : name}</span>
                     <span className="text-muted-foreground"> · {format(date, "HH:mm")}</span>
                   </p>
                 )}
-                <div className={`${first ? "mt-1" : ""} whitespace-pre-wrap break-words rounded-lg ${bubble}`}>
+                <div className={`${first ? "mt-1" : ""} max-w-full whitespace-pre-wrap [overflow-wrap:anywhere] rounded-lg ${bubble}`}>
                   {renderText(message.text, tokens, mine ? "font-semibold text-white" : "font-semibold text-red-300")}
                 </div>
               </div>
@@ -283,7 +283,7 @@ export default function ChatTab({ project }) {
         <div ref={endRef} />
       </div>
 
-      {error && <p className="mx-3 mb-2 rounded-md border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</p>}
+      {error && <p role="alert" className="mx-3 mb-2 rounded-md border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</p>}
 
       <form onSubmit={send} className="relative flex items-end gap-2 border-t border-white/[0.06] p-3">
         {mentionQuery !== null && mentionOptions.length > 0 && <MentionMenu options={mentionOptions} onPick={pickMention} />}
@@ -305,6 +305,7 @@ export default function ChatTab({ project }) {
             }
           }}
           placeholder="Escreva uma mensagem..."
+          aria-label="Mensagem para o projeto"
           className="max-h-32 min-h-10 min-w-0 flex-1 resize-none rounded-md border border-white/[0.07] bg-white/[0.03] px-3.5 py-2.5 text-sm leading-5 text-white outline-none placeholder:text-white/32 focus:border-primary/40 focus:bg-white/[0.045]"
         />
         <button

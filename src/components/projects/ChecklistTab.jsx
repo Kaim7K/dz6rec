@@ -333,10 +333,10 @@ export default function ChecklistTab({ project, focusTaskId }) {
           const firstSection = categorySections[0];
 
           return (
-            <section key={category.key} className="min-h-[22rem] min-w-0 rounded-lg border border-white/[0.08] bg-[#111010] p-3.5 shadow-soft sm:p-4">
+            <section key={category.key} className="dz-checklist-column dz-card p-3.5 sm:p-4">
               <div className="mb-3 grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
                 <div className="min-w-0">
-                  <p className="truncate text-xl font-bold leading-none text-white">{category.label}</p>
+                  <p className="dz-module-title text-white">{category.label}</p>
                   <p className="mt-2 text-xs text-white/50">{done}/{categoryItems.length} concluídas</p>
                 </div>
                 <div className="flex min-w-0 max-w-[11rem] flex-wrap items-center justify-end gap-2 sm:max-w-[14rem] 2xl:max-w-[10.5rem]">
@@ -387,7 +387,7 @@ export default function ChecklistTab({ project, focusTaskId }) {
                     <Plus size={16} />
                   </span>
                   <textarea aria-label={`Adicionar tarefas de ${category.label}`} name="text" rows={2} placeholder={"Adicionar tarefas...\nUma tarefa por linha"} className="min-h-10 min-w-0 resize-none bg-transparent py-0.5 text-sm leading-5 text-white/82 outline-none placeholder:text-white/40" />
-                  <button type="submit" className="col-span-2 h-8 rounded-md border border-white/[0.08] px-3 text-xs font-bold text-white/62 transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-white sm:col-span-1">
+                  <button type="submit" className="col-span-2 h-9 rounded-md border border-white/[0.08] px-3 text-xs font-medium text-white/75 transition-colors hover:border-white/20 hover:bg-white/[0.04] hover:text-white sm:col-span-1">
                     Adicionar
                   </button>
                 </form>
@@ -398,12 +398,12 @@ export default function ChecklistTab({ project, focusTaskId }) {
         </div>
       </DragDropContext>
 
-      <form onSubmit={safe(addSection)} className="grid gap-3 sm:grid-cols-[1fr_auto] sm:gap-4">
-          <div className="flex h-14 items-center gap-4 rounded-lg border border-white/[0.085] bg-white/[0.032] px-5">
-          <Plus size={22} className="text-white/70" />
-          <input value={newSection} onChange={(e) => setNewSection(e.target.value)} placeholder="Nova seção..." className="min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-white/42" />
+      <form onSubmit={safe(addSection)} className="grid gap-3 sm:grid-cols-[1fr_auto]">
+          <div className="flex h-10 items-center gap-3 rounded-md border border-white/[0.12] bg-white/[0.035] px-3 focus-within:border-white/35 focus-within:ring-2 focus-within:ring-primary/20">
+          <Plus size={16} className="shrink-0 text-muted-foreground" />
+          <input value={newSection} onChange={(e) => setNewSection(e.target.value)} placeholder="Nova seção..." className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-white/50" />
         </div>
-        <button className="h-12 rounded-md bg-primary px-7 text-base font-bold text-primary-foreground transition-colors hover:bg-primary/90 sm:h-14">Adicionar</button>
+        <button className="dz-primary-button">Adicionar</button>
       </form>
 
       {noteSection && <NotesDialog section={noteSection} onClose={() => setNoteSection(null)} />}

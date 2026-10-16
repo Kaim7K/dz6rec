@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import PageLoading from "@/components/PageLoading";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import LinkedReview from "@/components/projects/LinkedReview";
 import { toast } from "@/components/ui/use-toast";
@@ -55,7 +56,7 @@ export default function ProjectDetail() {
     if (searchParams.get("task")) { setFocusTaskId(searchParams.get("task")); setActiveTab("checklist"); }
   }, [searchParams]);
   if (!project && loadError) return <div role="alert" className="dz-card p-5"><p className="text-sm text-red-200">{loadError}</p><button type="button" className="dz-ghost-button mt-3" onClick={load}>Tentar novamente</button></div>;
-  if (!project) return <p className="text-muted-foreground">Carregando...</p>;
+  if (!project) return <PageLoading variant="project" />;
 
   const patch = async (field, value, text) => {
     if (savingField) return;

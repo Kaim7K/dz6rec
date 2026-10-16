@@ -34,7 +34,7 @@ export default function EditUserDialog({ user, cargos, onClose, onSaved }) {
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="max-w-md text-stage-ink">
         <DialogHeader>
-          <DialogTitle className="text-lg font-semibold text-stage-ink">Editar usuário</DialogTitle>
+          <DialogTitle className="text-stage-ink">Editar usuário</DialogTitle>
           <DialogDescription>Defina cargos, permissão e status de acesso.</DialogDescription>
         </DialogHeader>
         <div className="space-y-5">

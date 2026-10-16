@@ -24,12 +24,12 @@ export default function TemplateItemEditor({ item, allItems, depth, cargos, onAd
     setObservation(item.observation || "");
   }, [item.observation]);
   return (
-    <div>
-      <div className="flex flex-wrap items-center gap-2 py-1.5" style={{ paddingLeft: depth * 18 }}>
-        <span className="min-w-0 flex-1 text-sm text-white/85">{item.text}</span>
+    <div className="min-w-0">
+      <div className="flex min-w-0 flex-wrap items-center gap-2 py-2.5" style={{ paddingLeft: `min(${depth * 18}px, 15%)` }}>
+        <span className="min-w-0 flex-1 basis-40 text-sm leading-6 text-white/85 [overflow-wrap:anywhere]">{item.text}</span>
         <CargoBadge cargo={item.cargo} cargos={cargos} small />
         <Select value={item.cargo || undefined} onValueChange={(v) => onSetCargo(item, v === NONE ? null : v)}>
-          <SelectTrigger className="h-6 w-auto min-w-[4.5rem] border-white/[0.08] bg-white/[0.04] px-2 text-2xs text-muted-foreground"><SelectValue placeholder="cargo" /></SelectTrigger>
+          <SelectTrigger aria-label="Cargo da tarefa do template" className="h-8 w-auto min-w-[4.5rem] border-white/[0.08] bg-white/[0.04] px-2 text-xs text-muted-foreground"><SelectValue placeholder="cargo" /></SelectTrigger>
           <SelectContent>
             {item.cargo && <SelectItem value={NONE} className="text-muted-foreground">— Limpar —</SelectItem>}
             {cargos.map((c) => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}
@@ -37,7 +37,7 @@ export default function TemplateItemEditor({ item, allItems, depth, cargos, onAd
         </Select>
         {depth < 1 && (
           <Select value={detailMode} onValueChange={(value) => onPatch(item, { detail_mode: value })}>
-            <SelectTrigger className="h-7 w-[7.5rem] border-white/[0.08] bg-white/[0.04] px-2 py-0 text-2xs text-white/55">
+            <SelectTrigger aria-label="Formato da tarefa do template" className="h-8 w-[7.5rem] border-white/[0.08] bg-white/[0.04] px-2 py-0 text-xs text-white/70">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -45,12 +45,12 @@ export default function TemplateItemEditor({ item, allItems, depth, cargos, onAd
             </SelectContent>
           </Select>
         )}
-        <button onClick={() => onDelete(item)} className="rounded p-1 text-muted-foreground transition-colors hover:bg-white/5 hover:text-red-400"><Trash2 size={13} /></button>
-        {depth < 1 && canUseSubtasks(detailMode) && <button onClick={() => setAdding((a) => !a)} className="rounded p-1 text-muted-foreground transition-colors hover:bg-white/5 hover:text-white"><Plus size={13} /></button>}
+        <button onClick={() => onDelete(item)} aria-label="Excluir tarefa do template" className="dz-icon-button h-8 w-8 hover:text-red-400"><Trash2 size={13} /></button>
+        {depth < 1 && canUseSubtasks(detailMode) && <button onClick={() => setAdding((a) => !a)} aria-label="Adicionar subtarefa ao template" className="dz-icon-button h-8 w-8"><Plus size={13} /></button>}
       </div>
       {depth < 1 && canUseNotes(detailMode) && (
-        <label className="mb-1 block rounded-lg border border-white/[0.06] bg-white/[0.025] p-2" style={{ marginLeft: depth * 18 + 24 }}>
-          <span className="mb-1 flex items-center gap-1.5 text-2xs uppercase tracking-[0.14em] text-muted-foreground">
+        <label className="mb-1 block min-w-0 rounded-md border border-white/[0.06] bg-white/[0.025] p-3" style={{ marginLeft: `min(${depth * 18 + 24}px, 15%)` }}>
+          <span className="mb-1 flex items-center gap-1.5 text-xs text-muted-foreground">
             <MessageSquareText size={12} /> Observacao
           </span>
           <textarea
@@ -59,14 +59,14 @@ export default function TemplateItemEditor({ item, allItems, depth, cargos, onAd
             onBlur={() => onPatch(item, { observation: observation.trim() })}
             rows={2}
             placeholder="Texto de observacao deste item no template..."
-            className="w-full resize-y bg-transparent text-xs leading-5 text-white/65 outline-none placeholder:text-white/25"
+            className="min-w-0 w-full resize-y bg-transparent text-sm leading-6 text-white/80 outline-none placeholder:text-white/50"
           />
         </label>
       )}
       {adding && canUseSubtasks(detailMode) && (
-        <form onSubmit={(e) => { e.preventDefault(); onAddSub(item, text); setText(""); setAdding(false); }} className="flex items-center gap-2 py-1" style={{ paddingLeft: (depth + 1) * 18 + 24 }}>
-          <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Subtarefa..." className="flex-1 rounded-lg border border-white/[0.06] bg-white/[0.04] px-3 py-1.5 text-sm outline-none placeholder:text-white/30" autoFocus />
-          <button className="text-2xs text-white/50">Adicionar</button>
+        <form onSubmit={(e) => { e.preventDefault(); onAddSub(item, text); setText(""); setAdding(false); }} className="flex min-w-0 flex-wrap items-center gap-2 py-1" style={{ paddingLeft: `min(${(depth + 1) * 18 + 24}px, 15%)` }}>
+          <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Subtarefa..." aria-label="Nome da subtarefa do template" className="dz-input min-w-0 flex-1 basis-32" autoFocus />
+          <button className="dz-ghost-button px-3 text-xs">Adicionar</button>
         </form>
       )}
       {canUseSubtasks(detailMode) && children.map((c) => <TemplateItemEditor key={c.id} item={c} allItems={allItems} depth={depth + 1} cargos={cargos} onAddSub={onAddSub} onSetCargo={onSetCargo} onPatch={onPatch} onDelete={onDelete} />)}

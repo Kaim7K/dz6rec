@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import PageLoading from "@/components/PageLoading";
 import { Link } from "react-router-dom";
 import { apiClient } from "@/api/appClient";
 import FeaturedProject from "@/components/home/FeaturedProject";
@@ -115,7 +116,7 @@ export default function Home() {
     );
   }
 
-  if (!data) return <p className="text-sm text-muted-foreground">Carregando...</p>;
+  if (!data) return <PageLoading variant="project" />;
 
   const metrics = [
     { label: "Projetos ativos", value: data.active, icon: FolderKanban },

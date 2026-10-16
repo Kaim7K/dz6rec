@@ -51,6 +51,7 @@
     --surface-3: #141313;
     --line-soft: rgba(255,255,255,0.075);
     --line-strong: rgba(255,255,255,0.115);
+    --section-gap: 1.25rem;
   }
 }
 
@@ -151,6 +152,14 @@
   .dz-kanban-grid { display: grid; gap: 1rem; }
   .dz-kanban-drop { min-height: 6rem; }
   .dz-checklist-grid { display: grid; min-width: 0; gap: 1rem; }
+  .dz-checklist-column { min-width: 0; }
+  .dz-settings-section { display: grid; min-width: 0; gap: var(--section-gap); padding: 1.25rem; }
+  .dz-settings-section > * { min-width: 0; }
+  .dz-settings-cargos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: 0.5rem; }
+  .dz-module-title { font-size: 0.9375rem; line-height: 1.5rem; font-weight: 600; letter-spacing: -0.01em; }
+  .dz-history-entry { position: relative; padding: 1rem 0 1rem 1.5rem; }
+  .dz-history-entry:not(:last-child)::before { content: ''; position: absolute; top: 1.5rem; bottom: -1.5rem; left: 0.21875rem; width: 1px; background: var(--line-soft); }
+  .dz-history-entry::after { content: ''; position: absolute; top: 1.5rem; left: 0; width: 0.5rem; height: 0.5rem; border-radius: 50%; background: #757070; box-shadow: 0 0 0 4px var(--surface-2); }
   .dz-workspace-grid { display: grid; gap: 2rem; }
   .dz-workspace-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr)); gap: 0.75rem; }
   .dz-invite-form { display: grid; min-width: 0; }
@@ -166,6 +175,12 @@
     .dz-checklist-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   }
   .dz-track-list { container: track-list / inline-size; }
+  @container app-content (min-width: 72rem) {
+    .dz-checklist-column { min-height: 22rem; }
+  }
+  @container app-content (min-width: 60rem) {
+    .dz-settings-section { grid-template-columns: minmax(12rem, 0.75fr) minmax(0, 1.5fr); gap: 2rem; }
+  }
   .dz-track-row { display: grid; grid-template-columns: 2rem minmax(0, 1fr); gap: 0.5rem 0.75rem; align-items: center; }
   .dz-track-index { grid-area: 1 / 1; }
   .dz-track-title { grid-area: 1 / 2; }
@@ -361,6 +376,7 @@
     background: rgba(255,255,255,0.032);
   }
   .dz-dialog form, .dz-dialog fieldset { min-width: 0; }
+  .dz-dialog p, .dz-dialog legend { overflow-wrap: anywhere; }
   .dz-dialog-scroll:has(.dz-dialog-footer) { padding-bottom: 0; }
   .dz-dialog-footer > button { min-height: 40px; }
   .dz-dialog-footer > button:last-child { min-width: 96px; }
@@ -391,4 +407,6 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .dz-dialog { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  .animate-pulse { animation: none; }
+  [data-vaul-drawer] { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }

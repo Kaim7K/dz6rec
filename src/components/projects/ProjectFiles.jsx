@@ -31,7 +31,7 @@ export default function ProjectFiles({ project, files, defaultReviewerId, onChan
     finally { setLoading(false); setProgress(0); }
   };
   return <section id={`project-files-${project.id}`} className="min-w-0">
-    <div className="mb-3 flex items-center justify-between gap-3"><h2 className="text-sm font-bold">Arquivos</h2><span className="text-xs text-muted-foreground">{files.length} itens</span></div>
+    <div className="mb-3 flex items-center justify-between gap-3"><h2 className="dz-module-title">Arquivos</h2><span className="text-xs text-muted-foreground">{files.length} itens</span></div>
     <div className="border-y border-white/[0.05]">
       {files.map(entry => {
         const { Icon, label } = TYPES[entry.category] || TYPES.documento;

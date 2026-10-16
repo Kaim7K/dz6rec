@@ -25,7 +25,7 @@ try {
       await page.evaluate(() => document.fonts.ready);
     };
     const capture = async (name) => {
-      await page.waitForTimeout(120);
+      await page.waitForTimeout(await page.locator('[data-vaul-drawer]').count() ? 550 : 120);
       const issues = await page.evaluate(() => {
         const found = [];
         const width = innerWidth;
@@ -78,7 +78,7 @@ try {
     await scenario("new-artist", () => page.getByRole("button", { name: "Novo artista", exact: true }).click());
     await scenario("upload-preview", async () => {
       await page.locator('[role="dialog"] input[type="file"]').setInputFiles({ name: "retrato-do-artista-com-nome-longo-para-validar-truncamento.png", mimeType: "image/png", buffer: image });
-      await page.getByRole("button", { name: "Substituir arquivo" }).waitFor();
+      await page.getByRole("button", { name: "Remover arquivo", exact: true }).waitFor();
     });
     await page.getByRole("button", { name: "Remover arquivo" }).click();
     await dismiss();
@@ -99,8 +99,8 @@ try {
     await scenario("add-track", () => page.getByRole("button", { name: "Adicionar faixa", exact: true }).click());
     await dismiss();
     await scenario("track-menu", () => page.getByRole("button", { name: "Opções da faixa Single Piloto" }).click());
-    await page.getByRole("button", { name: "Opções da faixa Single Piloto" }).click();
-    await scenario("player", () => page.getByRole("button", { name: "Reproduzir Single Piloto" }).click());
+    await page.keyboard.press("Escape");
+    await scenario("player", () => page.getByRole("button", { name: "Reproduzir", exact: true }).click());
     await scenario("delete-project", () => page.getByRole("button", { name: "Excluir Single Piloto" }).click());
     await page.getByRole("button", { name: "Cancelar", exact: true }).click();
 
@@ -159,7 +159,7 @@ try {
     await scenario("validation-error", async () => {
       await visit("/register");
       await page.getByLabel("Nome", { exact: true }).fill("Teste visual");
-      await page.getByLabel("E-mail", { exact: true }).fill("visual-qa@example.test");
+      await page.getByLabel("Usuario", { exact: true }).fill("visual-qa@example.test");
       await page.getByLabel("Senha", { exact: true }).fill("local-test-123");
       await page.getByLabel("Confirmar senha", { exact: true }).fill("different-local-test");
       await page.getByRole("button", { name: "Criar conta", exact: true }).click();

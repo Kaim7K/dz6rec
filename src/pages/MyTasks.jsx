@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
+import PageLoading from "@/components/PageLoading";
 import { Link } from "react-router-dom";
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { apiClient } from "@/api/appClient";
 import CargoBadge from "@/components/CargoBadge";
 import ChatAvatar from "@/components/projects/ChatAvatar";
 import { dueLabel, isDueSoon, isOverdue, PRIORITY, STATUS, taskResponsibleIds, taskResponsibleNames, taskScore } from "@/lib/music";
-import { CheckCircle2, Clock3, ExternalLink, GripVertical, Loader2, PlayCircle, TimerReset } from "lucide-react";
+import { CheckCircle2, Clock3, ExternalLink, GripVertical, PlayCircle, TimerReset } from "lucide-react";
 
 const COLUMNS = [
   {
@@ -174,7 +175,7 @@ export default function MyTasks() {
   const overdueCount = tasks.filter((task) => isOverdue(task.due_date, task.completed)).length;
 
   if (loading) {
-    return <div className="grid min-h-[50vh] place-items-center"><Loader2 className="animate-spin text-red-300" /></div>;
+    return <PageLoading />;
   }
 
   if (error) {

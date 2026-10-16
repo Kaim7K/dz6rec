@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import PageLoading from "@/components/PageLoading";
 import { apiClient } from "@/api/appClient";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import EditUserDialog from "@/components/users/EditUserDialog";
@@ -54,7 +55,7 @@ export default function Users() {
     });
   }, [users, search, filterCargo]);
 
-  if (loading) return <div className="grid min-h-[50vh] place-items-center"><Loader2 className="animate-spin text-stage-accent" /></div>;
+  if (loading) return <PageLoading />;
   if (me?.permissao !== "superadmin") return (
     <div className="dz-card mx-auto max-w-md p-7 text-center">
       <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-stage-accent-soft"><ShieldCheck className="text-stage-accent" /></div>

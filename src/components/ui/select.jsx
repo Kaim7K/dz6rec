@@ -21,13 +21,13 @@ const SelectTrigger = React.forwardRef(({ className, children, ...props }, ref) 
     id={props.id || field?.id}
     aria-labelledby={props["aria-labelledby"] || field?.labelId}
     className={cn(
-      "flex h-10 min-w-0 w-full items-center justify-between gap-2 whitespace-nowrap rounded-md border border-white/[0.12] bg-white/[0.035] px-3 py-2 text-sm text-white data-[placeholder]:text-white/50 hover:border-white/20 focus:border-white/35 focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:min-w-0 [&>span]:truncate",
+      "flex h-10 min-w-0 w-full max-w-full items-center justify-between gap-2 whitespace-nowrap rounded-md border border-white/[0.12] bg-white/[0.035] px-3 py-2 text-sm text-white data-[placeholder]:text-white/50 hover:border-white/20 focus:border-white/35 focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:min-w-0 [&>span]:truncate",
       className
     )}
     {...props}>
     {children}
     <SelectPrimitive.Icon asChild>
-      <ChevronDown className="h-4 w-4 opacity-50" />
+      <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
     </SelectPrimitive.Icon>
   </SelectPrimitive.Trigger>
   );

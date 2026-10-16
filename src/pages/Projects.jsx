@@ -49,6 +49,7 @@ export default function Projects() {
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
+              aria-pressed={statusFilter === status}
               className={`rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${statusFilter === status ? "border-primary/30 bg-primary/12 text-white" : "border-white/[0.06] bg-white/[0.02] text-muted-foreground hover:border-white/[0.12] hover:bg-white/[0.045] hover:text-white/75"}`}
             >
               {status === "todos" ? "Todos" : STATUS[status] || status}

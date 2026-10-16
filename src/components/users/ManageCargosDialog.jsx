@@ -63,7 +63,7 @@ export default function ManageCargosDialog({ user, catalog, onClose, onSaved }) 
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="max-w-[600px] text-stage-ink">
         <DialogHeader>
-          <DialogTitle className="text-lg font-semibold text-stage-ink">Editar Cargos</DialogTitle>
+          <DialogTitle className="text-stage-ink">Editar Cargos</DialogTitle>
           <DialogDescription>Adicione ou remova cargos deste usuário, incluindo os descontinuados.</DialogDescription>
         </DialogHeader>
         <div className="max-h-[52vh] overflow-y-auto pr-1">

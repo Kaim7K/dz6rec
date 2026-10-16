@@ -45,7 +45,7 @@ export default function TemplateEditorDialog({ template, cargos, onClose, onSave
             return (
               <div key={s.id} className="rounded-lg border border-white/[0.075] bg-white/[0.035] p-4">
                 <div className="mb-3 flex flex-wrap items-center gap-2">
-                  <input defaultValue={s.name} onBlur={(e) => { if (e.target.value !== s.name) renameSection(s, e.target.value); }} className="rounded-md border border-transparent bg-white/[0.045] px-2.5 py-1 text-sm font-medium outline-none transition-colors focus:border-primary/45" />
+                  <input aria-label="Nome da seção" defaultValue={s.name} onBlur={(e) => { if (e.target.value !== s.name) renameSection(s, e.target.value); }} className="h-9 min-w-0 max-w-full flex-1 basis-44 rounded-md border border-transparent bg-white/[0.045] px-2.5 py-1 text-sm font-medium outline-none transition-colors focus:border-primary/45" />
                   <CargoBadge cargo={s.cargo} cargos={cargos} />
                   <Select value={s.cargo || undefined} onValueChange={(v) => setSectionCargo(s, v === NONE ? null : v)}>
                     <SelectTrigger className="h-7 w-auto min-w-[5rem] border-white/[0.08] bg-white/[0.04] px-2 text-2xs text-muted-foreground"><SelectValue placeholder="cargo" /></SelectTrigger>
@@ -54,7 +54,7 @@ export default function TemplateEditorDialog({ template, cargos, onClose, onSave
                       {cargos.map((c) => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}
                     </SelectContent>
                   </Select>
-                  <button onClick={() => delSection(s)} className="ml-auto rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-white/5 hover:text-red-400"><Trash2 size={15} /></button>
+                  <button onClick={() => delSection(s)} aria-label="Excluir seção" className="dz-icon-button ml-auto h-8 w-8 hover:text-red-400"><Trash2 size={15} /></button>
                 </div>
                 <div className="space-y-1">
                   {sItems.filter((i) => !i.parent_id).map((item) => (
@@ -62,8 +62,8 @@ export default function TemplateEditorDialog({ template, cargos, onClose, onSave
                   ))}
                 </div>
                 <form onSubmit={(e) => { e.preventDefault(); const f = e.target; addItem(s.id, f.text.value); f.reset(); }} className="mt-2 flex items-center gap-2">
-                  <Plus size={14} className="text-muted-foreground" />
-                  <input name="text" placeholder="Adicionar tarefa..." className="flex-1 bg-transparent text-sm outline-none placeholder:text-white/30" />
+                  <Plus size={14} className="shrink-0 text-muted-foreground" />
+                  <input name="text" aria-label="Adicionar tarefa à seção" placeholder="Adicionar tarefa..." className="h-9 min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-white/50" />
                 </form>
               </div>
             );
