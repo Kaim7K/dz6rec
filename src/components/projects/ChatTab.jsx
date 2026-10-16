@@ -69,9 +69,11 @@ function MentionMenu({ options, onPick }) {
   );
 }
 
-export default function ChatTab({ project }) {
+export default function ChatTab({ project, compact = false, draft, onDraftChange, onMessagesLoaded }) {
   const [messages, setMessages] = useState([]);
-  const [text, setText] = useState("");
+  const [localText, setLocalText] = useState("");
+  const text = draft ?? localText;
+  const setText = value => { if (onDraftChange) onDraftChange(typeof value === 'function' ? value(text) : value); else setLocalText(value); };
   const [me, setMe] = useState(null);
   const [users, setUsers] = useState([]);
   const [cargos, setCargos] = useState([]);
@@ -81,6 +83,7 @@ export default function ChatTab({ project }) {
   const [error, setError] = useState("");
   const endRef = useRef(null);
   const inputRef = useRef(null);
+  const messagesRef = useRef(null);
 
   const userById = useMemo(() => Object.fromEntries(users.map((user) => [user.id, user])), [users]);
   const participants = useMemo(() => {
@@ -150,8 +153,10 @@ export default function ChatTab({ project }) {
   }, [project.id]);
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [messages]);
+    if (compact && messagesRef.current) messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
+    else endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    if (messages.length) onMessagesLoaded?.(messages.at(-1));
+  }, [messages, compact, onMessagesLoaded]);
 
   const handleType = (value) => {
     setText(value);
@@ -218,8 +223,8 @@ export default function ChatTab({ project }) {
   });
 
   return (
-    <div className="dz-card flex h-[min(38rem,calc(100svh-9rem))] min-h-[min(22rem,70svh)] flex-col overflow-hidden">
-      <div className="flex items-center justify-between gap-3 border-b border-white/[0.06] px-4 py-3">
+    <div className={compact ? "flex min-h-0 flex-1 flex-col overflow-hidden" : "dz-card flex h-[min(38rem,calc(100svh-9rem))] min-h-[min(22rem,70svh)] flex-col overflow-hidden"}>
+      <div className={`flex items-center justify-between gap-3 border-b border-white/[0.06] px-4 py-3 ${compact ? 'hidden' : ''}`}>
         <div className="flex min-w-0 items-center gap-3">
           {participants.length > 0 ? (
             <div className="flex -space-x-2.5">
@@ -240,7 +245,7 @@ export default function ChatTab({ project }) {
         <span className="dz-pill h-7">{messages.length}</span>
       </div>
 
-      <div className="min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain px-3 py-4 sm:px-4">
+      <div ref={messagesRef} tabIndex={0} role="log" aria-label="Mensagens do projeto" className="min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain px-3 py-4 sm:px-4">
         {loading ? (
           <div className="grid h-full place-items-center"><Loader2 className="animate-spin text-red-300" /></div>
         ) : messages.length === 0 ? (
@@ -289,6 +294,7 @@ export default function ChatTab({ project }) {
         {mentionQuery !== null && mentionOptions.length > 0 && <MentionMenu options={mentionOptions} onPick={pickMention} />}
         <textarea
           ref={inputRef}
+          autoFocus={compact}
           value={text}
           rows={1}
           onChange={(event) => handleType(event.target.value)}

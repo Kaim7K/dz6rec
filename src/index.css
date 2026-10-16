@@ -454,3 +454,20 @@
   .animate-pulse { animation: none; }
   [data-vaul-drawer] { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+
+/* Persistent communication surfaces: separate from page and modal stacking. */
+.dz-team-sidebar { position: fixed; top: 4rem; right: 0; z-index: 34; display: flex; width: 16rem; min-height: 0; flex-direction: column; border-left: 1px solid var(--line-soft); background: #111010; }
+.dz-team-person { display: flex; width: 100%; min-width: 0; align-items: center; gap: 0.75rem; border-radius: 6px; padding: 0.625rem; transition: background-color 150ms, opacity 150ms; }
+.dz-team-person[data-offline="true"] { opacity: 0.55; }
+.dz-team-person[data-offline="true"]:is(:hover, :focus-visible, [data-state="open"]) { opacity: 1; }
+.dz-team-person:hover, .dz-team-person[data-state="open"] { background: rgba(255,255,255,0.055); }
+.dz-chat-toolbar { position: fixed; z-index: 42; right: 1rem; bottom: var(--chat-bottom, 1rem); display: flex; align-items: center; gap: 0.5rem; }
+.dz-chat-toolbar > button { background-color: #171414; }
+.dz-chat-window { position: fixed; right: 1rem; bottom: calc(var(--chat-bottom, 1rem) + 3.25rem); z-index: 45; display: flex; width: min(25rem, calc(100vw - 1.5rem)); height: min(39rem, calc(100dvh - var(--chat-bottom, 1rem) - 8rem)); min-height: 0; max-height: calc(100dvh - var(--chat-bottom, 1rem) - 8rem); flex-direction: column; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 10px; background: #111010; box-shadow: 0 12px 48px rgba(0,0,0,0.55); }
+@media (min-width: 1280px) {
+  .dz-chat-workspace[data-team-open="true"] { padding-right: 16rem; }
+  .dz-global-chat[data-team-open="true"] .dz-chat-toolbar, .dz-global-chat[data-team-open="true"] .dz-chat-window { right: 17rem; }
+}
+@media (max-height: 560px) {
+  .dz-chat-window { top: 4.5rem; bottom: 0.5rem; height: auto; max-height: none; }
+}

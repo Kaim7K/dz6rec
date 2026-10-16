@@ -148,6 +148,18 @@ const entityNames = [
 ];
 
 export const apiClient = {
+  chat: {
+    overview: () => request('/api/chat/overview'),
+    presence: data => request('/api/chat/presence', { method: 'POST', body: JSON.stringify(data), keepalive: true }),
+    messages: (userId, before) => request('/api/chat/messages?' + new URLSearchParams({ user_id: userId, ...(before ? { before } : {}) })),
+    send: async data => {
+      const message = await request('/api/chat/messages', { method: 'POST', body: JSON.stringify(data) });
+      emitEntityChange('DirectMessage'); emitEntityChange('Notification');
+      return message;
+    },
+    markRead: data => request('/api/chat/read', { method: 'POST', body: JSON.stringify(data) }),
+    subscribe: (callback, options = {}) => subscribeEntity('DirectMessage', callback, options.interval || 4000),
+  },
   reviews: {
     submit: async data => {
       const result = await request("/api/reviews", { method: "POST", body: JSON.stringify(data) });

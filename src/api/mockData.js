@@ -171,6 +171,44 @@ export async function mockRequest(path, options = {}) {
   const method = (options.method || "GET").toUpperCase();
   const url = new URL(path, window.location.origin);
   const parts = url.pathname.replace(/^\/api\/?/, "").split("/").filter(Boolean);
+  if (parts[0] === 'chat') {
+    const store = getMockStore(); const actor = getCurrentUser(); const body = JSON.parse(options.body || '{}');
+    const fail = (message, status = 400) => { throw Object.assign(new Error(message), { status }); };
+    if (actor?.status !== 'ativo') fail('Acesso não autorizado.', 403);
+    store._ChatMessages ||= []; store._ChatPresence ||= []; store._ChatReads ||= {};
+    const messagesFor = target => store._ChatMessages.filter(m => (m.sender_id === actor.id && m.recipient_id === target) || (m.sender_id === target && m.recipient_id === actor.id)).sort((a, b) => a.created_date.localeCompare(b.created_date) || a.id.localeCompare(b.id));
+    const unread = (rows, key) => rows.filter(m => m.sender_id !== actor.id && m.user_id !== actor.id && (!store._ChatReads[actor.id + ':' + key] || [m.created_date, m.id].join('|') > store._ChatReads[actor.id + ':' + key])).length;
+    if (parts[1] === 'presence' && method === 'POST') {
+      store._ChatPresence = store._ChatPresence.filter(p => p.user_id !== actor.id || p.session_id !== body.session_id);
+      store._ChatPresence.push({ user_id: actor.id, session_id: body.session_id, available: body.available, at: Date.now() }); saveMockStore(store); return { ok: true };
+    }
+    if (parts[1] === 'overview') return clone({
+      users: store.User.map(u => ({ ...u, online: u.status === 'ativo' && store._ChatPresence.some(p => p.user_id === u.id && p.available && Date.now() - p.at < 75000) })),
+      cargos: store.Cargo, projects: store.Project,
+      conversations: store.User.filter(u => u.id !== actor.id).flatMap(u => { const rows = messagesFor(u.id); const last = rows.at(-1); return last ? [{ user_id: u.id, last_message: last.text, created_date: last.created_date, unread_count: unread(rows, 'direct:' + u.id) }] : []; }),
+      project_unread: store.Project.map(p => ({ project_id: p.id, unread_count: unread(store.ProjectMessage.filter(m => m.project_id === p.id), 'project:' + p.id) })),
+    });
+    if (parts[1] === 'messages') {
+      const targetId = method === 'GET' ? url.searchParams.get('user_id') : body.recipient_id;
+      const target = store.User.find(u => u.id === targetId);
+      if (!target || target.id === actor.id) fail('Usuário não encontrado.', 404);
+      if (method === 'GET') { let rows = messagesFor(targetId); const before = url.searchParams.get('before'); if (before) rows = rows.slice(0, rows.findIndex(m => m.id === before)); const start = Math.max(0, rows.length - 50); return clone({ messages: rows.slice(start), next_cursor: start ? rows[start].id : null }); }
+      if (target.status !== 'ativo') fail('Esta conta não tem acesso ativo.', 403);
+      const text = String(body.text || '').trim(); if (!text || text.length > 8000) fail('Mensagem inválida.');
+      const existing = store._ChatMessages.find(m => m.sender_id === actor.id && m.client_id === body.client_id);
+      if (existing) { if (existing.text !== text || existing.recipient_id !== target.id) fail('Envio já utilizado.', 409); return clone(existing); }
+      const message = { id: nextId('dm'), sender_id: actor.id, recipient_id: target.id, text, client_id: body.client_id, created_date: new Date().toISOString() };
+      store._ChatMessages.push(message); store.Notification.push({ id: nextId('Notification'), user_id: target.id, text: `Nova mensagem de ${actor.full_name || actor.email}`, link: `/?chat=direct&chatId=${actor.id}`, read: false, created_date: message.created_date }); saveMockStore(store); return clone(message);
+    }
+    if (parts[1] === 'read') {
+      const rows = body.kind === 'direct' ? messagesFor(body.target_id) : store.ProjectMessage.filter(m => m.project_id === body.target_id);
+      const message = rows.find(m => m.id === body.message_id); if (!message) fail('Mensagem não encontrada.', 404);
+      const key = actor.id + ':' + body.kind + ':' + body.target_id; const cursor = [message.created_date, message.id].join('|');
+      if (!store._ChatReads[key] || cursor > store._ChatReads[key]) store._ChatReads[key] = cursor;
+      saveMockStore(store); return { ok: true };
+    }
+    fail('Requisição inválida.');
+  }
   if (parts[0] === "reviews") {
     const body = JSON.parse(options.body || "{}");
     const store = getMockStore();

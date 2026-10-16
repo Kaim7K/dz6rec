@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import { handleChat } from './_chat.js';
 import { put } from "@vercel/blob";
 import { handleUpload as handleBlobUpload } from "@vercel/blob/client";
 import formidable from "formidable";
@@ -521,6 +522,7 @@ export default async function handler(req, res) {
     if (!user) return send(res, 401, { error: "Authentication required" });
     if (user.status !== "ativo") return send(res, 403, { error: "Seu acesso ainda nao foi aprovado" });
     if (parts[0] === "reviews" && parts.length === 1) return await handleReview(req, res, sql, user);
+    if (parts[0] === "chat" && parts.length === 2) return await handleChat(req, res, sql, user, parts[1]);
     if (parts[0] === "users") return handleUsers(req, res, parts[1], sql);
     if (parts[0] === "entities") return await handleEntities(req, res, parts, sql);
     return send(res, 404, { error: "Not found" });
