@@ -5,6 +5,7 @@ import ProjectCard from "@/components/projects/ProjectCard";
 import NewProjectDialog from "@/components/projects/NewProjectDialog";
 import EditProjectDialog from "@/components/projects/EditProjectDialog";
 import { STATUS } from "@/lib/music";
+import { STATUS_COLORS } from "@/lib/choiceColors";
 
 export default function Projects() {
   const [projects, setProjects] = useState([]);
@@ -50,8 +51,11 @@ export default function Projects() {
               key={status}
               onClick={() => setStatusFilter(status)}
               aria-pressed={statusFilter === status}
-              className={`rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${statusFilter === status ? "border-primary/30 bg-primary/12 text-white" : "border-white/[0.06] bg-white/[0.02] text-muted-foreground hover:border-white/[0.12] hover:bg-white/[0.045] hover:text-white/75"}`}
+              data-accent={statusFilter === status && STATUS_COLORS[status] ? "true" : undefined}
+              style={{ "--choice-color": STATUS_COLORS[status] || "#c20000" }}
+              className={`dz-choice-trigger inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${statusFilter === status ? "border-primary/30 bg-primary/12 text-white" : "border-white/[0.06] bg-white/[0.02] text-muted-foreground hover:border-white/[0.12] hover:bg-white/[0.045] hover:text-white/75"}`}
             >
+              {STATUS_COLORS[status] && <span aria-hidden="true" className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: STATUS_COLORS[status] }} />}
               {status === "todos" ? "Todos" : STATUS[status] || status}
             </button>
           ))}

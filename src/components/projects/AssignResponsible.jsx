@@ -54,12 +54,7 @@ export default function AssignResponsible({ item, users, cargos = [], onAssign, 
           <SelectContent className="max-h-64">
             {(selectedUsers.length > 0 || item.cargo) && <SelectItem value={NONE} className="text-muted-foreground">Remover atribuicao</SelectItem>}
             {cargos.map((cargo) => (
-              <SelectItem key={`cargo-${cargo.name}`} value={CARGO + cargo.name}>
-                <span className="flex items-center gap-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: cargoColor(cargo.name, cargos) || "#888" }} />
-                  {cargo.name}
-                </span>
-              </SelectItem>
+              <SelectItem key={`cargo-${cargo.name}`} value={CARGO + cargo.name} accentColor={cargoColor(cargo.name, cargos)}>{cargo.name}</SelectItem>
             ))}
             {users.filter((user) => !selectedIds.includes(user.id)).map((user) => (
               <SelectItem key={user.id} value={user.id}>

@@ -13,15 +13,18 @@ const SelectGroup = SelectPrimitive.Group
 
 const SelectValue = SelectPrimitive.Value
 
-const SelectTrigger = React.forwardRef(({ className, children, ...props }, ref) => {
+const SelectTrigger = React.forwardRef(({ className, children, accentColor, style, ...props }, ref) => {
   const field = useField();
   return (
   <SelectPrimitive.Trigger
     ref={ref}
     id={props.id || field?.id}
     aria-labelledby={props["aria-labelledby"] || field?.labelId}
+    data-accent={accentColor ? "true" : undefined}
+    style={{ ...style, ...(accentColor ? { "--choice-color": accentColor } : {}) }}
     className={cn(
       "flex h-10 min-w-0 w-full max-w-full items-center justify-between gap-2 whitespace-nowrap rounded-md border border-white/[0.12] bg-white/[0.035] px-3 py-2 text-sm text-white data-[placeholder]:text-white/50 hover:border-white/20 focus:border-white/35 focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:min-w-0 [&>span]:truncate",
+      accentColor && "dz-choice-trigger",
       className
     )}
     {...props}>
@@ -87,11 +90,13 @@ const SelectLabel = React.forwardRef(({ className, ...props }, ref) => (
 ))
 SelectLabel.displayName = SelectPrimitive.Label.displayName
 
-const SelectItem = React.forwardRef(({ className, children, ...props }, ref) => (
+const SelectItem = React.forwardRef(({ className, children, accentColor, style, ...props }, ref) => (
   <SelectPrimitive.Item
     ref={ref}
+    data-accent={accentColor ? "true" : undefined}
+    style={{ ...style, ...(accentColor ? { "--choice-color": accentColor } : {}) }}
     className={cn(
-      "relative flex w-full cursor-default select-none items-center rounded-md py-1.5 pl-2 pr-8 text-sm leading-5 text-white/78 outline-none focus:bg-white/[0.075] focus:text-white data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>span:last-child]:min-w-0 [&>span:last-child]:truncate",
+      "dz-choice-item relative flex w-full cursor-default select-none items-center rounded-md py-2 pl-2.5 pr-8 text-sm leading-5 text-white/78 outline-none focus:bg-white/[0.075] focus:text-white data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>span:last-child]:min-w-0 [&>span:last-child]:truncate",
       className
     )}
     {...props}>
@@ -100,7 +105,7 @@ const SelectItem = React.forwardRef(({ className, children, ...props }, ref) => 
         <Check className="h-4 w-4" />
       </SelectPrimitive.ItemIndicator>
     </span>
-    <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+    <SelectPrimitive.ItemText>{accentColor ? <span className="inline-flex min-w-0 max-w-full items-center gap-2"><span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: accentColor }} /><span className="min-w-0 truncate">{children}</span></span> : children}</SelectPrimitive.ItemText>
   </SelectPrimitive.Item>
 ))
 SelectItem.displayName = SelectPrimitive.Item.displayName

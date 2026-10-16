@@ -1,3 +1,4 @@
+import { REVIEW_COLORS } from "@/lib/choiceColors";
 import React, { useEffect, useState } from "react";
 import { apiClient } from "@/api/appClient";
 import { useAuth } from "@/lib/AuthContext";
@@ -90,7 +91,7 @@ export default function ArtifactReviewDialog({ entity, artifact: initialArtifact
         </div>
           {error && <p role="alert" className="rounded-md border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-200">{error} <button type="button" onClick={refresh} disabled={saving} className="underline">Atualizar dados</button></p>}
           <fieldset disabled={saving || (!canRequest && !canDecide)} className="min-w-0 space-y-4">
-            <Field label="Ação de revisão"><Select value={action} onValueChange={value => { if (value) setAction(value); }}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="request" disabled={!canRequest}>Solicitar revisão</SelectItem>{canDecide && <><SelectItem value="approve">Aprovar arquivo</SelectItem><SelectItem value="request_changes">Solicitar ajustes</SelectItem></>}</SelectContent></Select></Field>
+            <Field label="Ação de revisão"><Select value={action} onValueChange={value => { if (value) setAction(value); }}><SelectTrigger accentColor={REVIEW_COLORS[action]}><SelectValue /></SelectTrigger><SelectContent><SelectItem value="request" accentColor={REVIEW_COLORS.request} disabled={!canRequest}>Solicitar revisão</SelectItem>{canDecide && <><SelectItem value="approve" accentColor={REVIEW_COLORS.approve}>Aprovar arquivo</SelectItem><SelectItem value="request_changes" accentColor={REVIEW_COLORS.request_changes}>Solicitar ajustes</SelectItem></>}</SelectContent></Select></Field>
             {action === "request" && <Field label="Revisor do arquivo">{loading ? <Input disabled readOnly value="Carregando revisores..." /> : <Select value={reviewerId} onValueChange={value => { if (value) setReviewerId(value); }}><SelectTrigger><SelectValue placeholder="Selecionar revisor" /></SelectTrigger><SelectContent>{users.map(row => <SelectItem key={row.id} value={row.id}>{row.full_name || row.email} · {row.email}</SelectItem>)}</SelectContent></Select>}</Field>}
             {pending && !canDecide && <p className="text-xs leading-5 text-muted-foreground">A decisão está disponível para o revisor selecionado e para a administração.</p>}
             <Field label={action === "request_changes" ? "Ajustes necessários" : "Comentário (opcional)"}><Textarea required={action === "request_changes"} maxLength={4000} rows={3} value={comment} onChange={event => setComment(event.target.value)} placeholder={action === "request_changes" ? "Descreva o que precisa ser alterado." : "Orientações para esta revisão."} /></Field>

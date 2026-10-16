@@ -1,3 +1,4 @@
+import { PRIORITY_COLORS } from "@/lib/choiceColors";
 import React, { useEffect, useRef, useState } from "react";
 import { CalendarDays, ChevronDown, Circle, GripVertical, MessageSquareText, Trash2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -110,11 +111,11 @@ export default function ChecklistItemRow({ item, allItems, depth, users, cargos,
                 )}
               </div>
               <Select value={item.priority || "normal"} onValueChange={(value) => onPatch(item, { priority: value })}>
-                <SelectTrigger aria-label="Prioridade da tarefa" className={`h-7 w-[6.5rem] shrink-0 border-0 bg-white/[0.035] px-2 py-0 text-2xs shadow-none focus:bg-white/[0.045] [&>svg]:h-3 [&>svg]:w-3 ${priority.tone}`}>
+                <SelectTrigger accentColor={PRIORITY_COLORS[item.priority || "normal"]} aria-label="Prioridade da tarefa" className={`h-7 w-[6.5rem] shrink-0 border-0 bg-white/[0.035] px-2 py-0 text-2xs shadow-none focus:bg-white/[0.045] [&>svg]:h-3 [&>svg]:w-3 ${priority.tone}`}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {PRIORITY_ORDER.map((key) => <SelectItem key={key} value={key}>{PRIORITY[key].label}</SelectItem>)}
+                  {PRIORITY_ORDER.map((key) => <SelectItem key={key} value={key} accentColor={PRIORITY_COLORS[key]}>{PRIORITY[key].label}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>

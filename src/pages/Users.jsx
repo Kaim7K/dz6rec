@@ -1,3 +1,4 @@
+import { cargoColor } from "@/components/CargoBadge";
 import React, { useEffect, useMemo, useState } from "react";
 import PageLoading from "@/components/PageLoading";
 import { apiClient } from "@/api/appClient";
@@ -103,7 +104,7 @@ export default function Users() {
           <SelectTrigger aria-label="Filtrar por cargo" className="h-10 w-full rounded-md text-sm text-white sm:w-56"><SelectValue placeholder="Filtrar por cargo" /></SelectTrigger>
           <SelectContent className="border-stage-border bg-stage-card text-stage-ink">
             <SelectItem value={ALL}>Todos os cargos</SelectItem>
-            {cargos.map((c) => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}
+            {cargos.map((c) => <SelectItem key={c.id} value={c.name} accentColor={cargoColor(c.name, cargos)}>{c.name}</SelectItem>)}
           </SelectContent>
         </Select>
       </div>
@@ -112,7 +113,7 @@ export default function Users() {
         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@gravadora.com" required className="dz-input flex-1" />
         <Select value={inviteCargo} onValueChange={setInviteCargo}>
           <SelectTrigger aria-label="Cargo do convidado" className="h-10 w-full rounded-md text-sm text-white"><SelectValue placeholder="Cargo (opcional)" /></SelectTrigger>
-          <SelectContent className="border-stage-border bg-stage-card text-stage-ink">{cargos.map((c) => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}</SelectContent>
+          <SelectContent className="border-stage-border bg-stage-card text-stage-ink">{cargos.map((c) => <SelectItem key={c.id} value={c.name} accentColor={cargoColor(c.name, cargos)}>{c.name}</SelectItem>)}</SelectContent>
         </Select>
         <button disabled={sending} className="dz-primary-button disabled:opacity-60">
           {sending ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />}Convidar

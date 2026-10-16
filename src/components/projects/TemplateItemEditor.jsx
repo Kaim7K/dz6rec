@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MessageSquareText, Plus, Trash2 } from "lucide-react";
-import CargoBadge from "@/components/CargoBadge";
+import CargoBadge, { cargoColor } from "@/components/CargoBadge";
 
 const NONE = "__none__";
 const DETAIL_MODE = {
@@ -32,7 +32,7 @@ export default function TemplateItemEditor({ item, allItems, depth, cargos, onAd
           <SelectTrigger aria-label="Cargo da tarefa do template" className="h-8 w-auto min-w-[4.5rem] border-white/[0.08] bg-white/[0.04] px-2 text-xs text-muted-foreground"><SelectValue placeholder="cargo" /></SelectTrigger>
           <SelectContent>
             {item.cargo && <SelectItem value={NONE} className="text-muted-foreground">— Limpar —</SelectItem>}
-            {cargos.map((c) => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}
+            {cargos.map((c) => <SelectItem key={c.id} value={c.name} accentColor={cargoColor(c.name, cargos)}>{c.name}</SelectItem>)}
           </SelectContent>
         </Select>
         {depth < 1 && (

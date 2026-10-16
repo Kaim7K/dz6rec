@@ -1,3 +1,4 @@
+import { ACCOUNT_COLORS, PERMISSION_COLORS } from "@/lib/choiceColors";
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -42,10 +43,10 @@ export default function EditUserDialog({ user, cargos, onClose, onSaved }) {
             <UserCargosEditor value={cargosArr} onChange={setCargosArr} catalog={cargos} />
           </fieldset>
           <Field label="Permissão">
-            <Select value={permissao} onValueChange={setPermissao}><SelectTrigger className={selectCls}><SelectValue /></SelectTrigger><SelectContent className={contentCls}>{Object.entries(PERMISSAO).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}</SelectContent></Select>
+            <Select value={permissao} onValueChange={setPermissao}><SelectTrigger accentColor={PERMISSION_COLORS[permissao]} className={selectCls}><SelectValue /></SelectTrigger><SelectContent className={contentCls}>{Object.entries(PERMISSAO).map(([k, v]) => <SelectItem key={k} value={k} accentColor={PERMISSION_COLORS[k]}>{v}</SelectItem>)}</SelectContent></Select>
           </Field>
           <Field label="Status">
-            <Select value={status} onValueChange={setStatus}><SelectTrigger className={selectCls}><SelectValue /></SelectTrigger><SelectContent className={contentCls}><SelectItem value="pendente">Pendente</SelectItem><SelectItem value="ativo">Ativo</SelectItem><SelectItem value="inativo">Inativo</SelectItem></SelectContent></Select>
+            <Select value={status} onValueChange={setStatus}><SelectTrigger accentColor={ACCOUNT_COLORS[status]} className={selectCls}><SelectValue /></SelectTrigger><SelectContent className={contentCls}><SelectItem value="pendente" accentColor={ACCOUNT_COLORS.pendente}>Pendente</SelectItem><SelectItem value="ativo" accentColor={ACCOUNT_COLORS.ativo}>Ativo</SelectItem><SelectItem value="inativo" accentColor={ACCOUNT_COLORS.inativo}>Inativo</SelectItem></SelectContent></Select>
           </Field>
           <Field label="@usuário"><Input value={handle} onChange={(e) => setHandle(e.target.value)} placeholder="handle" className={selectCls + " placeholder:text-stage-muted"} /></Field>
           <Field label="Foto de perfil">

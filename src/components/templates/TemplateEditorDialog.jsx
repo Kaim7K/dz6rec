@@ -3,7 +3,7 @@ import { apiClient } from "@/api/appClient";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Trash2 } from "lucide-react";
-import CargoBadge from "@/components/CargoBadge";
+import CargoBadge, { cargoColor } from "@/components/CargoBadge";
 import TemplateItemEditor from "@/components/projects/TemplateItemEditor";
 
 const NONE = "__none__";
@@ -51,7 +51,7 @@ export default function TemplateEditorDialog({ template, cargos, onClose, onSave
                     <SelectTrigger className="h-7 w-auto min-w-[5rem] border-white/[0.08] bg-white/[0.04] px-2 text-2xs text-muted-foreground"><SelectValue placeholder="cargo" /></SelectTrigger>
                     <SelectContent>
                       {s.cargo && <SelectItem value={NONE} className="text-muted-foreground">— Limpar —</SelectItem>}
-                      {cargos.map((c) => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}
+                      {cargos.map((c) => <SelectItem key={c.id} value={c.name} accentColor={cargoColor(c.name, cargos)}>{c.name}</SelectItem>)}
                     </SelectContent>
                   </Select>
                   <button onClick={() => delSection(s)} aria-label="Excluir seção" className="dz-icon-button ml-auto h-8 w-8 hover:text-red-400"><Trash2 size={15} /></button>

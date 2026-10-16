@@ -394,6 +394,32 @@
     background: rgba(255,255,255,0.032);
   }
   .dz-dialog form, .dz-dialog fieldset { min-width: 0; }
+  .dz-choice-trigger[data-accent] {
+    border-color: color-mix(in srgb, var(--choice-color) 30%, transparent);
+    background-color: color-mix(in srgb, var(--choice-color) 8%, var(--surface-2));
+  }
+  .dz-choice-trigger[data-accent]:is(:hover, [data-state="open"]) {
+    border-color: color-mix(in srgb, var(--choice-color) 60%, transparent);
+    background-color: color-mix(in srgb, var(--choice-color) 13%, var(--surface-2));
+  }
+  .dz-choice-item[data-state="checked"] { background-color: rgba(194,0,0,0.11); color: #fff; }
+  .dz-choice-item[data-accent][data-state="checked"], .dz-menu-item[data-accent][data-current="true"] {
+    background-color: color-mix(in srgb, var(--choice-color) 13%, var(--surface-3));
+    color: #fff;
+  }
+  .dz-choice-item[data-accent][data-highlighted], .dz-menu-item[data-accent][data-highlighted] {
+    background-color: color-mix(in srgb, var(--choice-color) 21%, var(--surface-3));
+    color: #fff;
+    box-shadow: inset 2px 0 var(--choice-color);
+    outline: 1px solid rgba(255,255,255,0.14);
+    outline-offset: -1px;
+  }
+  .dz-choice-item[data-accent] > span:first-child, .dz-menu-item[data-accent] > svg { color: var(--choice-color); }
+  .dz-choice-item:not([data-accent])[data-highlighted], .dz-menu-item:not([data-accent])[data-highlighted] {
+    background-color: rgba(194,0,0,0.12);
+    color: #fff;
+    box-shadow: inset 2px 0 hsl(var(--primary));
+  }
   .dz-dialog p, .dz-dialog legend { overflow-wrap: anywhere; }
   .dz-dialog-scroll:has(.dz-dialog-footer) { padding-bottom: 0; }
   .dz-dialog-footer > button { min-height: 40px; }

@@ -1,3 +1,4 @@
+import { STATUS_COLORS, TYPE_COLORS } from "@/lib/choiceColors";
 import React, { useEffect, useState } from "react";
 import PageLoading from "@/components/PageLoading";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
@@ -100,16 +101,16 @@ export default function ProjectDetail() {
             <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2 xl:gap-3">
               <Select value={project.type} onValueChange={changeType} disabled={!!savingField}>
-                <SelectTrigger aria-label="Tipo do projeto" className="h-8 w-auto gap-1.5 rounded-md border-white/[0.08] bg-white/[0.045] px-3 text-xs font-medium text-white/80">
+                <SelectTrigger accentColor={TYPE_COLORS[project.type]} aria-label="Tipo do projeto" className="h-8 w-auto gap-1.5 rounded-md border-white/[0.08] bg-white/[0.045] px-3 text-xs font-medium text-white/80">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>{Object.entries(TYPE).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}</SelectContent>
+                <SelectContent>{Object.entries(TYPE).map(([k, v]) => <SelectItem key={k} value={k} accentColor={TYPE_COLORS[k]}>{v}</SelectItem>)}</SelectContent>
               </Select>
               <Select value={project.status} onValueChange={changeStatus} disabled={!!savingField}>
-                <SelectTrigger aria-label="Status do projeto" className="h-8 w-auto gap-2 rounded-md border-white/[0.08] bg-white/[0.025] px-3 text-xs font-medium text-white/82">
+                <SelectTrigger accentColor={STATUS_COLORS[project.status]} aria-label="Status do projeto" className="h-8 w-auto gap-2 rounded-md border-white/[0.08] bg-white/[0.025] px-3 text-xs font-medium text-white/82">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>{STATUS_ORDER.map((s) => <SelectItem key={s} value={s}>{STATUS[s]}</SelectItem>)}</SelectContent>
+                <SelectContent>{STATUS_ORDER.map((s) => <SelectItem key={s} value={s} accentColor={STATUS_COLORS[s]}>{STATUS[s]}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <h1 className="dz-project-title mt-3 break-words font-display font-semibold tracking-tight text-white">{project.name}</h1>
@@ -138,7 +139,7 @@ export default function ProjectDetail() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="min-w-0 pt-1">
         <TabsList className="dz-card h-auto w-full justify-start gap-1 overflow-x-auto overscroll-x-contain bg-[var(--surface-2)] p-1">
-          {tabs.map(([v, label, Icon]) => <TabsTrigger key={v} value={v} className="shrink-0 gap-2 rounded-md border border-transparent bg-transparent px-3 py-2 text-sm font-medium text-muted-foreground transition-colors data-[state=active]:border-white/[0.08] data-[state=active]:bg-white/[0.07] data-[state=active]:text-white"><Icon size={16} />{label}</TabsTrigger>)}
+          {tabs.map(([v, label, Icon]) => <TabsTrigger key={v} value={v} className="shrink-0 gap-2 rounded-md border border-transparent bg-transparent px-3 py-2 text-sm font-medium text-muted-foreground transition-colors data-[state=active]:border-primary/30 data-[state=active]:bg-primary/12 data-[state=active]:text-white"><Icon size={16} />{label}</TabsTrigger>)}
         </TabsList>
         <TabsContent value="operacao" className="mt-5"><ProjectWorkspace project={project} artist={artist} tracks={tracks} sections={sections} items={items} files={files} onChanged={load} onOpenTasks={taskId => { setFocusTaskId(taskId); setActiveTab("checklist"); }} onOpenProject={() => setActiveTab("faixas")} onEditArtist={() => setEditArtistOpen(true)} /></TabsContent>
         <TabsContent value="faixas" className="mt-5">
