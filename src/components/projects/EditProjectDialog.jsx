@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { apiClient } from "@/api/appClient";
-import { uploadFile, logActivity } from "@/lib/music";
+import { logActivity } from "@/lib/music";
 import { Loader2 } from "lucide-react";
 import ProjectFormFields from "./ProjectFormFields";
-import { validateSquareCover } from "@/lib/cover";
+import { uploadProjectCover } from "@/lib/cover";
 import { toast } from "@/components/ui/use-toast";
 
 
@@ -42,10 +42,10 @@ export default function EditProjectDialog({ project, open, onClose, onSaved, art
     setError("");
     try {
     const artist = artists.find((a) => a.id === form.main_artist_id);
-    /** @type {typeof form & { main_artist_name: string, cover_url?: string }} */
+    /** @type {typeof form & { main_artist_name: string, cover_url?: string, cover_thumbnail_url?: string }} */
     const data = { ...form, main_artist_name: artist ? artist.name : form.main_artist_id ? "" : project.main_artist_name };
-    if (cover) { await validateSquareCover(cover); data.cover_url = await uploadFile(cover); }
-    else if (removeCover) data.cover_url = "";
+    if (cover) Object.assign(data, await uploadProjectCover(cover));
+    else if (removeCover) Object.assign(data, { cover_url: "", cover_thumbnail_url: "" });
     await apiClient.entities.Project.update(project.id, data);
     const me = await apiClient.auth.me().catch(() => null);
     await logActivity(project.id, "Projeto atualizado", me?.full_name);

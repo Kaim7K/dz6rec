@@ -12,6 +12,24 @@ const bundle = serverMode ? await build({ stdin: { contents: 'export { mockReque
 const output = 'artifacts/visual-audit/product-workflow';
 await mkdir(output, { recursive: true });
 const svg = (w, h) => Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><rect width="100%" height="100%" fill="#171010"/><circle cx="${w / 2}" cy="${h / 2}" r="${w / 4}" fill="#c20000"/></svg>`);
+const sampleRate = 8000;
+const samples = sampleRate * 4;
+const audioFixture = Buffer.alloc(44 + samples * 2);
+audioFixture.write("RIFF", 0);
+audioFixture.writeUInt32LE(audioFixture.length - 8, 4);
+audioFixture.write("WAVEfmt ", 8);
+audioFixture.writeUInt32LE(16, 16);
+audioFixture.writeUInt16LE(1, 20);
+audioFixture.writeUInt16LE(1, 22);
+audioFixture.writeUInt32LE(sampleRate, 24);
+audioFixture.writeUInt32LE(sampleRate * 2, 28);
+audioFixture.writeUInt16LE(2, 32);
+audioFixture.writeUInt16LE(16, 34);
+audioFixture.write("data", 36);
+audioFixture.writeUInt32LE(samples * 2, 40);
+for (let sample = 0; sample < samples; sample++) {
+  audioFixture.writeInt16LE(Math.round(12000 * Math.sin(sample / 6)), 44 + sample * 2);
+}
 const browser = await chromium.launch();
 try {
   for (const width of [360, 768, 1440]) {
@@ -27,6 +45,18 @@ try {
       } catch { await route.fulfill({ status: 500, contentType: 'application/json', body: '{"error":"Falha simulada no teste"}' }); }
     });
     await page.route('**/qa-cover.svg', route => route.fulfill({ contentType: 'image/svg+xml', body: svg(512, 512) }));
+    await page.route(/\/qa-audio(?:-2)?\.wav$/, route => {
+      const range = route.request().headers().range?.match(/^bytes=(\d+)-(\d*)$/);
+      if (!range) return route.fulfill({ contentType: 'audio/wav', body: audioFixture });
+      const start = Number(range[1]);
+      const end = range[2] ? Math.min(Number(range[2]), audioFixture.length - 1) : audioFixture.length - 1;
+      return route.fulfill({
+        status: 206,
+        contentType: 'audio/wav',
+        headers: { 'content-range': `bytes ${start}-${end}/${audioFixture.length}`, 'accept-ranges': 'bytes' },
+        body: audioFixture.subarray(start, end + 1),
+      });
+    });
     const errors = []; page.on('pageerror', error => errors.push(error.message));
     const store = () => page.evaluate(() => JSON.parse(localStorage.getItem('dz6_mock_store_v1')));
     const choose = async (label, name) => { await page.getByRole('combobox', { name: label, exact: true }).click(); await page.getByRole('option', { name, exact: true }).click(); };
@@ -64,6 +94,18 @@ try {
     assert.equal((await store()).Project[0].cover_url, origin + '/qa-cover.svg');
     await close();
     await versions(); await checkDialog('versions');
+    const comparison = page.getByLabel('Player de comparação');
+    await page.waitForFunction(() => document.querySelector('audio[aria-label="Player de comparação"]').readyState >= 1);
+    await comparison.evaluate(audio => { audio.currentTime = 2; });
+    await page.waitForFunction(() => {
+      const audio = document.querySelector('audio[aria-label="Player de comparação"]');
+      return !audio.seeking && Math.abs(audio.currentTime - 2) < 0.1;
+    });
+    await page.getByLabel('Comparar versões', { exact: true }).selectOption('qa-v1');
+    await page.waitForFunction(() => {
+      const audio = document.querySelector('audio[aria-label="Player de comparação"]');
+      return audio.currentSrc.endsWith('/qa-audio.wav') && Math.abs(audio.currentTime - 2) < 0.1;
+    });
     const first = page.getByRole('article').filter({ hasText: 'Demo 01' });
     await first.getByRole('button', { name: 'Renomear Demo 01', exact: true }).click();
     await page.getByRole('textbox', { name: 'Nome da versão', exact: true }).fill('Demo final');
@@ -80,9 +122,19 @@ try {
     assert.equal(await page.getByRole('button', { name: 'Aprovar', exact: true }).count(), 0);
     assert.ok(await page.getByRole('button', { name: 'Solicitar revisão', exact: true }).isDisabled());
     await close();
-    await gotoReview('user-artista', 'TrackVersion', 'qa-v2');
+    await page.evaluate(() => localStorage.setItem('dz6_mock_profile_id', 'user-artista'));
+    await page.goto(origin + '/');
+    await page.getByRole('heading', { name: 'Aguardando minha aprovação', exact: true }).waitFor();
+    await page.getByRole('link', { name: /Mix 2/ }).click();
+    await page.getByRole('heading', { name: 'Revisão do arquivo', exact: true }).waitFor();
     await choose('Ação de revisão', 'Solicitar ajustes');
-    await page.getByRole('textbox', { name: 'Ajustes necessários', exact: true }).fill('Reduzir o volume da voz.');
+    await page.getByRole('button', { name: 'Mostrar forma de onda' }).click();
+    const waveform = page.getByRole('slider', { name: 'Navegar pela forma de onda' });
+    await waveform.press('Home');
+    await waveform.press('ArrowRight');
+    await page.getByRole('button', { name: 'Inserir minuto e segundo' }).click();
+    assert.match(await page.getByRole('textbox', { name: 'Ajustes necessários', exact: true }).inputValue(), /^\[0:00\]/);
+    await page.getByRole('textbox', { name: 'Ajustes necessários', exact: true }).fill('[0:00] Reduzir o volume da voz.');
     await page.getByRole('button', { name: 'Solicitar ajustes', exact: true }).click();
     await page.getByRole('dialog').waitFor({ state: 'hidden' });
     assert.equal((await store()).TrackVersion.find(v => v.id === 'qa-v2').review_status, 'ajuste');
@@ -122,6 +174,25 @@ try {
     await page.goto(origin + '/projetos/project-1?tab=checklist&task=item-3');
     await page.getByRole('tab', { name: 'Tarefas', selected: true }).waitFor();
     await page.locator('[data-task-id="item-3"]').getByRole('button', { name: 'Recolher tarefa', exact: true }).waitFor();
+    if (!serverMode) {
+      await versions();
+      const confirm = page.getByRole('alertdialog');
+      await page.getByRole('button', { name: 'Excluir versão Master final', exact: true }).click();
+      await confirm.getByRole('button', { name: 'Cancelar', exact: true }).click();
+      assert.equal((await store()).TrackVersion.length, 3);
+      await page.getByRole('button', { name: 'Excluir versão Master final', exact: true }).click();
+      await confirm.getByRole('button', { name: 'Excluir', exact: true }).click();
+      await page.getByRole('button', { name: 'Excluir versão Master final', exact: true }).waitFor({ state: 'hidden' });
+      assert.equal((await store()).Track[0].audio_url, '');
+      assert.equal((await store()).TrackVersion.length, 2);
+      await close();
+      await page.getByRole('button', { name: 'Opções da faixa Single Piloto', exact: true }).click();
+      await page.getByRole('menuitem', { name: 'Excluir faixa', exact: true }).click();
+      await confirm.getByRole('button', { name: 'Excluir', exact: true }).click();
+      await page.getByRole('button', { name: 'Opções da faixa Single Piloto', exact: true }).waitFor({ state: 'hidden' });
+      assert.equal((await store()).Track.length, 0);
+      assert.equal((await store()).TrackVersion.length, 0);
+    }
     assert.deepEqual(errors, []);
     console.log(`${width}px: square covers, invalid cover recovery, version rename/select, reviewer permissions, changes/approval/history, exact links and upload feedback passed`);
     await context.close();

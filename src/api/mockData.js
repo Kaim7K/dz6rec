@@ -284,7 +284,11 @@ export async function mockRequest(path, options = {}) {
     let list = where ? store[entity].filter((item) => matchesWhere(item, where)) : store[entity];
     list = sortList(list, url.searchParams.get("sort"));
     const limit = Number(url.searchParams.get("limit") || 0);
-    if (limit) list = list.slice(0, limit);
+    const offset = Number(url.searchParams.get("offset") || 0);
+    if (entity === "Project" && url.searchParams.has("offset") && url.searchParams.get("sort") === "-created_date") {
+      list = [...list].sort((a, b) => b.created_date.localeCompare(a.created_date) || b.id.localeCompare(a.id));
+    }
+    if (limit) list = list.slice(offset, offset + limit);
     return clone(list);
   }
 
@@ -331,10 +335,25 @@ export async function mockRequest(path, options = {}) {
   }
 
   if (method === "DELETE") {
-    if (['Project', 'ChecklistTemplate'].includes(entity)) {
+    if (entity === "TrackVersion") {
+      const removed = store.TrackVersion.filter(item => id === "many" ? matchesWhere(item, body.where) : item.id === id);
+      const tracks = [];
+      store.TrackVersion = store.TrackVersion.filter(item => !removed.includes(item));
+      store.Track = store.Track.map(track => {
+        if (!removed.some(version => version.track_id === track.id &&
+          (track.current_version_id ? track.current_version_id === version.id : track.audio_url && track.audio_url === version.audio_url))) return track;
+        const updated = { ...track, current_version_id: "", audio_url: "", version_label: "" };
+        tracks.push(updated);
+        return updated;
+      });
+      saveMockStore(store);
+      return clone({ ok: true, count: removed.length, tracks });
+    }
+    if (['Project', 'ChecklistTemplate', 'Track'].includes(entity)) {
       const targets = new Set(store[entity].filter(item => id === 'many' ? matchesWhere(item, body.where) : item.id === id).map(item => item.id));
-      const sections = new Set((store.ChecklistSection || []).filter(item => targets.has(item[entity === 'Project' ? 'project_id' : 'template_id'])).map(item => item.id));
-      const tracks = new Set(entity === 'Project' ? (store.Track || []).filter(item => targets.has(item.project_id)).map(item => item.id) : []);
+      const sections = new Set((store.ChecklistSection || []).filter(item => entity !== 'Track' && targets.has(item[entity === 'Project' ? 'project_id' : 'template_id'])).map(item => item.id));
+      const tracks = new Set(entity === 'Project' ? (store.Track || []).filter(item => targets.has(item.project_id)).map(item => item.id) : entity === 'Track' ? targets : []);
+      const affectedProjects = new Set(entity === 'Track' ? store.Track.filter(item => targets.has(item.id)).map(item => item.project_id) : []);
       for (const [kind, rows] of Object.entries(store)) if (Array.isArray(rows)) store[kind] = rows.filter(item => !(
         kind === entity && targets.has(item.id)
         || entity === 'Project' && ['Track', 'ChecklistSection', 'ChecklistItem', 'ActivityLog', 'Notification', 'ProjectFile', 'ProjectMessage'].includes(kind) && targets.has(item.project_id)
@@ -342,6 +361,9 @@ export async function mockRequest(path, options = {}) {
         || kind === 'ChecklistSection' && sections.has(item.id)
         || ['ChecklistItem', 'ChecklistNote'].includes(kind) && sections.has(item.section_id)
       ));
+      for (const project of store.Project) {
+        if (affectedProjects.has(project.id)) project.track_count = store.Track.filter(track => track.project_id === project.id).length;
+      }
       saveMockStore(store); return { ok: true };
     }
     if (id === "many") {

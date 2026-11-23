@@ -27,6 +27,7 @@ export async function ensureDatabase() {
       )
     `;
     await sql`CREATE INDEX IF NOT EXISTS app_records_entity_idx ON app_records(entity)`;
+    await sql`CREATE INDEX IF NOT EXISTS app_records_entity_created_idx ON app_records(entity, created_date DESC, id DESC)`;
     await sql`CREATE INDEX IF NOT EXISTS app_records_data_gin_idx ON app_records USING gin(data)`;
     await sql`
       CREATE TABLE IF NOT EXISTS app_users (

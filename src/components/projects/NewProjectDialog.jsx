@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/button";
 import Field from "@/components/ui/form-field";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiClient } from "@/api/appClient";
-import { uploadFile, applyTemplate, logActivity } from "@/lib/music";
+import { applyTemplate, logActivity } from "@/lib/music";
 import { Loader2 } from "lucide-react";
 import ProjectFormFields from "./ProjectFormFields";
-import { validateSquareCover } from "@/lib/cover";
+import { uploadProjectCover } from "@/lib/cover";
 import { toast } from "@/components/ui/use-toast";
 
 
@@ -21,9 +21,9 @@ export default function NewProjectDialog({ open, onClose, onCreated, artists, te
   const submit = async (e) => {
     e.preventDefault(); if (loading) return; setLoading(true); setError("");
     try {
-    let cover_url = ""; if (cover) { await validateSquareCover(cover); cover_url = await uploadFile(cover); }
+    const coverData = cover ? await uploadProjectCover(cover) : { cover_url: "", cover_thumbnail_url: "" };
     const artist = artists.find((a) => a.id === form.main_artist_id);
-    const proj = await apiClient.entities.Project.create({ ...form, main_artist_name: artist?.name, cover_url });
+    const proj = await apiClient.entities.Project.create({ ...form, main_artist_name: artist?.name, ...coverData });
     let templateFailed = false;
     if (templateId) { try { await applyTemplate(proj.id, templateId); } catch { templateFailed = true; } }
     const me = await apiClient.auth.me().catch(() => null);

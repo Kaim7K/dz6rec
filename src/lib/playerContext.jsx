@@ -15,6 +15,14 @@ export function PlayerProvider({ children }) {
   const [queue, setQueue] = useState([]);
 
   useEffect(() => {
+    if (!current && audioRef.current?.hasAttribute("src")) {
+      audioRef.current.pause();
+      audioRef.current.removeAttribute("src");
+      audioRef.current.load();
+      setIsPlaying(false);
+      setProgress(0);
+      setDuration(0);
+    }
     if (current?.track?.audio_url && audioRef.current) {
       audioRef.current.src = current.track.audio_url;
       audioRef.current.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
@@ -25,7 +33,7 @@ export function PlayerProvider({ children }) {
 
   const play = useCallback((track, project, q) => {
     setCurrent({ track, project });
-    if (q) setQueue(q);
+    if (q) setQueue(q.filter(item => item.audio_url));
   }, []);
 
   const togglePlay = useCallback(() => {
@@ -33,6 +41,20 @@ export function PlayerProvider({ children }) {
     if (isPlaying) { audioRef.current.pause(); setIsPlaying(false); }
     else { audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {}); }
   }, [isPlaying, current]);
+
+  const removeFromPlayback = (trackId, version = null, updatedTrack = null) => {
+    setQueue(rows => version
+      ? rows.map(row => updatedTrack && row.id === trackId ? updatedTrack : row).filter(row => row.audio_url)
+      : rows.filter(row => row.id !== trackId));
+    setCurrent(previous => {
+      if (previous?.track.id !== trackId) return previous;
+      const playing = previous.track;
+      const matches = !version || (playing.current_version_id
+        ? playing.current_version_id === version.id
+        : !!playing.audio_url && playing.audio_url === version.audio_url);
+      return matches ? null : previous;
+    });
+  };
 
   const seek = useCallback((t) => { if (audioRef.current) { audioRef.current.currentTime = t; setProgress(t); } }, []);
 
@@ -55,7 +77,7 @@ export function PlayerProvider({ children }) {
     playIndex((idx - 1 + queue.length) % queue.length);
   }, [queue, current, playIndex]);
 
-  const value = { current, isPlaying, progress, duration, volume, repeat, shuffle, queue, play, togglePlay, seek, next, prev, setVolume, setRepeat, setShuffle };
+  const value = { current, isPlaying, progress, duration, volume, repeat, shuffle, queue, play, togglePlay, seek, next, prev, setVolume, setRepeat, setShuffle, removeFromPlayback };
   return (
     <PlayerContext.Provider value={value}>
       <audio

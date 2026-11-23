@@ -1,5 +1,5 @@
 import { REVIEW_COLORS } from "@/lib/choiceColors";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { apiClient } from "@/api/appClient";
 import { useAuth } from "@/lib/AuthContext";
 import { artifactUrl, canDecideReview, canRequestReview, reviewStatus, REVIEW_LABELS, REVIEW_TONES } from "@/lib/reviews";
@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import Field from "@/components/ui/form-field";
 import { toast } from "@/components/ui/use-toast";
+import ReviewWaveform from "./ReviewWaveform";
 
 export function ReviewBadge({ entity, artifact }) {
   const status = reviewStatus(entity, artifact);
@@ -32,7 +33,17 @@ export default function ArtifactReviewDialog({ entity, artifact: initialArtifact
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [attempt, setAttempt] = useState(0);
+  const audioRef = useRef(null);
   const url = artifactUrl(entity, artifact);
+  const isAudio = (entity === "TrackVersion" || artifact.category === "audio") && !!url;
+  const addTimestamp = () => {
+    const seconds = Math.floor(audioRef.current?.currentTime ?? 0);
+    const timestamp = `[${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}]`;
+    setComment(current => {
+      const next = `${current.trimEnd()}${current.trim() ? "\n" : ""}${timestamp} `;
+      return next.length <= 4000 ? next : current;
+    });
+  };
   const refresh = async () => {
     try {
       const current = await apiClient.entities[entity].get(artifact.id);
@@ -81,7 +92,8 @@ export default function ArtifactReviewDialog({ entity, artifact: initialArtifact
         <form onSubmit={submit} className="min-w-0 space-y-4">
         <div className="min-w-0 space-y-3">
           {entity === "ProjectFile" && artifact.category === "capa" && url && <div className="mx-auto aspect-square w-full max-w-64 overflow-hidden rounded-lg border border-white/10 bg-black"><img src={url} alt={`Capa: ${artifact.name}`} className="h-full w-full object-contain" /></div>}
-          {(entity === "TrackVersion" || artifact.category === "audio") && url && <audio controls preload="none" src={url} aria-label={`Ouvir ${artifact.name}`} style={{ colorScheme: "dark" }} className="w-full max-w-full" />}
+          {isAudio && <audio ref={audioRef} controls preload="metadata" src={url} aria-label={`Ouvir ${artifact.name}`} style={{ colorScheme: "dark" }} className="w-full max-w-full" />}
+          {isAudio && <ReviewWaveform key={url} url={url} audioRef={audioRef} />}
           {url && <a href={url} target="_blank" rel="noreferrer" className="inline-block text-xs text-red-200 hover:text-white">Abrir arquivo original</a>}
           <div className="rounded-md border border-white/[0.08] p-3 text-sm">
             <ReviewBadge entity={entity} artifact={artifact} />
@@ -95,6 +107,7 @@ export default function ArtifactReviewDialog({ entity, artifact: initialArtifact
             {action === "request" && <Field label="Revisor do arquivo">{loading ? <Input disabled readOnly value="Carregando revisores..." /> : <Select value={reviewerId} onValueChange={value => { if (value) setReviewerId(value); }}><SelectTrigger><SelectValue placeholder="Selecionar revisor" /></SelectTrigger><SelectContent>{users.map(row => <SelectItem key={row.id} value={row.id}>{row.full_name || row.email} · {row.email}</SelectItem>)}</SelectContent></Select>}</Field>}
             {pending && !canDecide && <p className="text-xs leading-5 text-muted-foreground">A decisão está disponível para o revisor selecionado e para a administração.</p>}
             <Field label={action === "request_changes" ? "Ajustes necessários" : "Comentário (opcional)"}><Textarea required={action === "request_changes"} maxLength={4000} rows={3} value={comment} onChange={event => setComment(event.target.value)} placeholder={action === "request_changes" ? "Descreva o que precisa ser alterado." : "Orientações para esta revisão."} /></Field>
+            {isAudio && <Button type="button" variant="outline" size="sm" onClick={addTimestamp} disabled={comment.length > 3985}>Inserir minuto e segundo</Button>}
           </fieldset>
         <section className="min-w-0 space-y-3 border-t border-white/[0.08] pt-4">
           <h3 className="text-sm font-semibold">Histórico deste arquivo</h3>

@@ -65,7 +65,7 @@ export default function TrackList({ project, tracks, onChanged, progressPct = 0,
           </Droppable>
         </DragDropContext>
       )}
-      <AddTrackDialog open={open} onClose={() => setOpen(false)} onCreated={onChanged} project={project} trackCount={list.length} />
+      <AddTrackDialog open={open} onClose={() => setOpen(false)} onCreated={onChanged} project={project} trackCount={list.length} nextTrackNumber={Math.max(0, ...list.map(track => Number(track.track_number) || 0)) + 1} />
     </section>
   );
 }

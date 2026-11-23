@@ -100,10 +100,11 @@ function entityClient(entity) {
       return request(`/api/entities/${entity}${params.toString() ? `?${params}` : ""}`);
     },
     get: (id) => request(`/api/entities/${entity}/${id}`),
-    filter: (where = {}, sort, limit) => {
+    filter: (where = {}, sort, limit, offset) => {
       const params = new URLSearchParams({ filter: JSON.stringify(where) });
       if (sort) params.set("sort", sort);
       if (limit) params.set("limit", String(limit));
+      if (offset != null) params.set("offset", String(offset));
       return request(`/api/entities/${entity}?${params}`);
     },
     create: (data) => write(request(`/api/entities/${entity}`, { method: "POST", body: JSON.stringify(data) })),

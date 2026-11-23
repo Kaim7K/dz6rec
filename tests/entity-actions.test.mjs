@@ -16,6 +16,7 @@ const sql = async (strings, ...values) => {
   if (query.includes('SELECT * FROM app_records')) return rows;
   return [];
 };
+sql.transaction = buildStatements => Promise.all(buildStatements(sql));
 mock.module('../api/_db.js', { namedExports: { ensureDatabase: async () => {}, getSql: () => sql } });
 const { default: handler } = await import('../api/[...path].js');
 
@@ -69,4 +70,15 @@ test('ordinary message creation keeps its existing response', async () => {
   const res = await request('POST', 'ProjectMessage', { project_id: 'project-1', text: 'Hello' });
   assert.equal(res.statusCode, 201);
   assert.equal(res.body.text, 'Hello');
+});
+
+test('catalog pages apply the status filter and stable server-side ordering', async () => {
+  rows = [{ id: 'project-25', data: { status: 'producao' } }];
+  const filter = encodeURIComponent(JSON.stringify({ status: 'producao' }));
+  const res = await request('GET', `Project?sort=-created_date&filter=${filter}&limit=25&offset=24`, {});
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.body[0].id, 'project-25');
+  const query = queries.find(entry => entry.query.includes('ORDER BY created_date DESC, id DESC'));
+  assert.deepEqual(query.values, ['Project', '{"status":"producao"}', 25, 24]);
+  assert.equal((await request('GET', 'Project?sort=-created_date&limit=101&offset=0', {})).statusCode, 400);
 });

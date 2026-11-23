@@ -12,7 +12,7 @@ CREATE TABLE app_records (id text PRIMARY KEY, entity text NOT NULL, data jsonb 
 INSERT INTO app_users(id,email,full_name,password_hash,reset_token) VALUES ('a','a@test.local','Pessoa A','secret','reset-secret'),('b','b@test.local','Pessoa B','secret','reset-secret'),('c','c@test.local','Pessoa C','secret','reset-secret');`);
 const sql = async (strings, ...values) => (await db.query(strings.reduce((text, part, index) => text + (index ? `$${index}` : '') + part, ''), values)).rows;
 await ensureChatDatabase(sql);
-mock.module('../api/_db.js', { exports: { ensureDatabase: async () => {}, getSql: () => sql } });
+mock.module('../api/_db.js', { namedExports: { ensureDatabase: async () => {}, getSql: () => sql } });
 const { default: handler } = await import('../api/[...path].js');
 after(() => db.close());
 beforeEach(async () => { await db.exec(`TRUNCATE app_records, app_chat_messages, app_chat_presence, app_chat_reads; UPDATE app_users SET status='ativo'; INSERT INTO app_records(id,entity,data) VALUES ('p1','Project','{"name":"Projeto 1"}'),('pm1','ProjectMessage','{"project_id":"p1","user_id":"a","text":"Mensagem existente"}');`); });

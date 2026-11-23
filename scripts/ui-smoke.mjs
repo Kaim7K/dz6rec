@@ -27,6 +27,7 @@ try {
   await page.getByRole("option", { name: "EP", exact: true }).click();
   await page.getByRole("combobox", { name: "Artista principal", exact: true }).click();
   await page.getByRole("option", { name: "Artista QA Revisado", exact: true }).click();
+  await page.getByRole("dialog").locator('input[type="file"]').setInputFiles({ name: "capa.png", mimeType: "image/png", buffer: await readFile("src/assets/dz6-profile.png") });
   await page.getByRole("button", { name: "Criar projeto", exact: true }).click();
   await page.getByText("Projeto QA", { exact: true }).click();
   await page.getByRole("button", { name: "Editar projeto", exact: true }).click();
@@ -51,6 +52,8 @@ try {
   const project = store.Project.find((record) => record.name === "Projeto QA Revisado");
   assert.equal(artist.photo_url, "#", "local mock upload contract is retained");
   assert.equal(project.type, "ep");
+  assert.equal(project.cover_url, "#");
+  assert.equal(project.cover_thumbnail_url, "#", "a large cover also creates a catalogue thumbnail");
   assert.equal(project.main_artist_id, artist.id);
   assert.ok(store.Track.some((record) => record.name === "Faixa QA" && record.project_id === project.id));
   assert.ok(store.ChecklistItem.some((record) => record.text === "Tarefa QA" && record.completed && record.project_id === project.id));

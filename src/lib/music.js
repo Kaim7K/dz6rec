@@ -113,20 +113,6 @@ export function nextProjectAction(project, items = [], files = [], reviews = [])
     };
   }
 
-  const approval = open.find((item) => /aprovar|aprovação|revisar|validar|confirmar|capa|master|mix/i.test(item.text || ""));
-  if (approval) {
-    return {
-      tone: "warn",
-      title: "Aguardando aprovação",
-      text: approval.text,
-      detail: approval.responsible_name || approval.cargo || "Pendente",
-      href: `/projetos/${project.id}`,
-      action: "Revisar",
-      target: "task",
-      task_id: approval.id,
-    };
-  }
-
   if (!files.length) {
     return {
       tone: "neutral",
@@ -145,7 +131,7 @@ export function nextProjectAction(project, items = [], files = [], reviews = [])
       tone: "neutral",
       title: "Continuar tarefa",
       text: nextTask.text,
-      detail: nextTask.due_date ? dueLabel(nextTask.due_date) : nextTask.responsible_name || "Sem prazo",
+      detail: nextTask.due_date ? dueLabel(nextTask.due_date) : "Sem prazo",
       href: `/projetos/${project.id}`,
       action: "Continuar",
       target: "task",

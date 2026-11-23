@@ -10,8 +10,8 @@ import { uploadFile, logActivity } from "@/lib/music";
 import { Loader2 } from "lucide-react";
 
 
-export default function AddTrackDialog({ open, onClose, onCreated, project, trackCount }) {
-  const [form, setForm] = useState({ name: "", main_artist_name: project?.main_artist_name || "", featuring: "", version_label: "Demo 01", track_number: trackCount + 1, bpm: "", key: "", isrc: "", notes: "" });
+export default function AddTrackDialog({ open, onClose, onCreated, project, trackCount, nextTrackNumber }) {
+  const [form, setForm] = useState({ name: "", main_artist_name: project?.main_artist_name || "", featuring: "", version_label: "Demo 01", track_number: null, bpm: "", key: "", isrc: "", notes: "" });
   const [audio, setAudio] = useState(null);
   const [loading, setLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -28,13 +28,13 @@ export default function AddTrackDialog({ open, onClose, onCreated, project, trac
         audio_url = await uploadFile(audio, { onProgress: (value) => setUploadProgress(Math.max(0, Math.min(100, value || 0))) });
         setUploading(false);
       }
-      const data = { ...form, name: trackName, project_id: project.id, audio_url, bpm: form.bpm ? Number(form.bpm) : undefined, track_number: Number(form.track_number) };
+      const data = { ...form, name: trackName, project_id: project.id, audio_url, bpm: form.bpm ? Number(form.bpm) : undefined, track_number: Number(form.track_number ?? nextTrackNumber) };
       const track = await apiClient.entities.Track.create(data);
       if (audio_url) await apiClient.entities.TrackVersion.create({ track_id: track.id, name: form.version_label, audio_url });
       const me = await apiClient.auth.me().catch(() => null);
       await logActivity(project.id, `Faixa adicionada: ${trackName}`, me?.full_name);
       await apiClient.entities.Project.update(project.id, { track_count: trackCount + 1 });
-      setAudio(null); setUploadProgress(0);
+      setAudio(null); setUploadProgress(0); set("track_number", null);
       onCreated(); onClose();
     } catch (err) {
       setUploadProgress(0);
@@ -58,7 +58,7 @@ export default function AddTrackDialog({ open, onClose, onCreated, project, trac
           <Field label="Nome"><Input value={form.name} onChange={(e) => set("name", e.target.value)} placeholder={project?.name || "Ex. Noite Clara"} /></Field>
           <div className="dz-form-columns">
             <Field label="Artista principal"><Input value={form.main_artist_name} onChange={(e) => set("main_artist_name", e.target.value)} /></Field>
-            <Field label="Nº da faixa"><Input type="number" value={form.track_number} onChange={(e) => set("track_number", e.target.value)} /></Field>
+            <Field label="Nº da faixa"><Input type="number" value={form.track_number ?? nextTrackNumber} onChange={(e) => set("track_number", e.target.value)} /></Field>
           </div>
           <div className="dz-form-columns">
             <Field label="Participações"><Input value={form.featuring} onChange={(e) => set("featuring", e.target.value)} placeholder="Artistas convidados" /></Field>

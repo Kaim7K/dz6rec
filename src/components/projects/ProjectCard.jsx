@@ -13,7 +13,7 @@ export default function ProjectCard({ project, progress, onEdit, onDeleted }) {
     <CatalogTile>
       <Link to={`/projetos/${project.id}`} className="block">
       <div className="dz-catalog-artwork">
-        <img src={project.cover_url || dz6ProfileLogo} className="h-full w-full object-cover" alt="" />
+        <img src={project.cover_thumbnail_url || project.cover_url || dz6ProfileLogo} className="h-full w-full object-cover" alt="" loading="lazy" decoding="async" />
       </div>
       <div className="px-0.5 pb-1 pt-3">
         <div className="flex items-center gap-1.5">

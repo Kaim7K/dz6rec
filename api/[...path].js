@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { handleChat } from './_chat.js';
-import { deleteRecordTrees } from './_delete.js';
+import { deleteRecordTrees, deleteTrackVersions } from './_delete.js';
 import { put } from "@vercel/blob";
 import { handleUpload as handleBlobUpload } from "@vercel/blob/client";
 import formidable from "formidable";
@@ -329,6 +329,20 @@ async function handleEntities(req, res, parts, sql) {
     const params = new URL(req.url, "http://localhost").searchParams;
     const sort = params.get("sort");
     const filter = params.get("filter");
+    if (entity === "Project" && sort === "-created_date" && params.has("offset")) {
+      const offset = Number(params.get("offset"));
+      const limit = Number(params.get("limit"));
+      if (!Number.isSafeInteger(offset) || offset < 0 || !Number.isInteger(limit) || limit < 1 || limit > 100) {
+        return send(res, 400, { error: "Paginação inválida." });
+      }
+      const rows = await sql`
+        SELECT * FROM app_records
+        WHERE entity = ${entity} AND data @> ${filter || "{}"}::jsonb
+        ORDER BY created_date DESC, id DESC
+        LIMIT ${limit} OFFSET ${offset}
+      `;
+      return send(res, 200, rows.map(record));
+    }
     const rows = filter
       ? await sql`SELECT * FROM app_records WHERE entity = ${entity} AND data @> ${filter}::jsonb`
       : await sql`SELECT * FROM app_records WHERE entity = ${entity}`;
@@ -338,17 +352,16 @@ async function handleEntities(req, res, parts, sql) {
   if (req.method === "POST" && action === "bulk") {
     const { items = [] } = await readJson(req);
     items.forEach(item => checkReviewFields(item, true));
-    const created = [];
-    for (const item of items) {
+    if (!items.length) return send(res, 201, []);
+    const results = await sql.transaction(transaction => items.map(item => {
       const recId = id(entity.toLowerCase());
-      const rows = await sql`
+      return transaction`
         INSERT INTO app_records (id, entity, data)
         VALUES (${recId}, ${entity}, ${JSON.stringify(item)}::jsonb)
         RETURNING *
       `;
-      created.push(record(rows[0]));
-    }
-    return send(res, 201, created);
+    }));
+    return send(res, 201, results.flat().map(record));
   }
 
   if (req.method === "POST" && !entityId) {
@@ -366,18 +379,14 @@ async function handleEntities(req, res, parts, sql) {
   if (req.method === "PATCH" && action === "bulk") {
     const { items = [] } = await readJson(req);
     items.forEach(item => checkReviewFields(item));
-    const updated = [];
-    for (const item of items) {
-      const { id: itemId, ...data } = item;
-      const rows = await sql`
+    if (!items.length) return send(res, 200, []);
+    const results = await sql.transaction(transaction => items.map(({ id: itemId, ...data }) => transaction`
         UPDATE app_records
         SET data = data || ${JSON.stringify(data)}::jsonb, updated_date = now()
         WHERE entity = ${entity} AND id = ${itemId}
         RETURNING *
-      `;
-      if (rows[0]) updated.push(record(rows[0]));
-    }
-    return send(res, 200, updated);
+    `));
+    return send(res, 200, results.flat().map(record));
   }
 
   if (req.method === "PATCH" && action === "many") {
@@ -385,17 +394,15 @@ async function handleEntities(req, res, parts, sql) {
     checkReviewFields(patch);
     const rows = await sql`SELECT * FROM app_records WHERE entity = ${entity}`;
     const changes = normalizePatch(patch);
-    const updated = [];
-    for (const row of rows.map(record).filter((item) => filtersMatch(where, item))) {
-      const saved = await sql`
+    const matches = rows.map(record).filter(item => filtersMatch(where, item));
+    if (!matches.length) return send(res, 200, []);
+    const results = await sql.transaction(transaction => matches.map(row => transaction`
         UPDATE app_records
         SET data = data || ${JSON.stringify(changes)}::jsonb, updated_date = now()
         WHERE entity = ${entity} AND id = ${row.id}
         RETURNING *
-      `;
-      if (saved[0]) updated.push(record(saved[0]));
-    }
-    return send(res, 200, updated);
+    `));
+    return send(res, 200, results.flat().map(record));
   }
 
   if (req.method === "PATCH" && entityId) {
@@ -414,15 +421,17 @@ async function handleEntities(req, res, parts, sql) {
     const { where = {} } = await readJson(req);
     const rows = await sql`SELECT * FROM app_records WHERE entity = ${entity}`;
     const matches = rows.map(record).filter((item) => filtersMatch(where, item));
-    if (['Project', 'ChecklistTemplate'].includes(entity)) return send(res, 200, await deleteRecordTrees(sql, entity, matches.map(item => item.id)));
-    for (const item of matches) {
-      await sql`DELETE FROM app_records WHERE entity = ${entity} AND id = ${item.id}`;
+    if (entity === "TrackVersion") return send(res, 200, await deleteTrackVersions(sql, matches.map(item => item.id)));
+    if (['Project', 'ChecklistTemplate', 'Track'].includes(entity)) return send(res, 200, await deleteRecordTrees(sql, entity, matches.map(item => item.id)));
+    if (matches.length) {
+      await sql.transaction(transaction => matches.map(item => transaction`DELETE FROM app_records WHERE entity = ${entity} AND id = ${item.id}`));
     }
     return send(res, 200, { ok: true, count: matches.length });
   }
 
   if (req.method === "DELETE" && entityId) {
-    if (['Project', 'ChecklistTemplate'].includes(entity)) return send(res, 200, await deleteRecordTrees(sql, entity, [entityId]));
+    if (entity === "TrackVersion") return send(res, 200, await deleteTrackVersions(sql, [entityId]));
+    if (['Project', 'ChecklistTemplate', 'Track'].includes(entity)) return send(res, 200, await deleteRecordTrees(sql, entity, [entityId]));
     await sql`DELETE FROM app_records WHERE entity = ${entity} AND id = ${entityId}`;
     return send(res, 200, { ok: true });
   }

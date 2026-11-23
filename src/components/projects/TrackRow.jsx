@@ -5,28 +5,13 @@ import { STATUS, STATUS_TONE } from "@/lib/music";
 import TrackVersionsDialog from "./TrackVersionsDialog";
 import { ReviewBadge } from "./ArtifactReviewDialog";
 import { toast } from "@/components/ui/use-toast";
-import { Check, Pause, Play, Plus, MoreHorizontal, GripVertical, Download } from "lucide-react";
+import { Check, Pause, Play, Plus, MoreHorizontal, GripVertical, Download, Trash2 } from "lucide-react";
+import DeleteConfirmation from "@/components/DeleteConfirmation";
 import dz6ProfileLogo from "@/assets/dz6-profile.png";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
-function Waveform({ pct = 0 }) {
-  const bars = [18, 26, 34, 22, 38, 30, 16, 28, 42, 24, 35, 20, 30, 18, 40, 26, 32, 22, 36, 19, 28, 24, 34, 16, 30, 22, 38, 20, 32, 24];
-  const active = Math.max(1, Math.round((pct / 100) * bars.length));
-
-  return (
-    <div className="flex h-8 items-center gap-0.5">
-      {bars.map((height, index) => (
-        <span
-          key={`${height}-${index}`}
-          className={`w-0.5 rounded-full ${index < active ? "bg-primary" : "bg-white/20"}`}
-          style={{ height }}
-        />
-      ))}
-    </div>
-  );
-}
-
 export default function TrackRow({ track, project, queue, index, provided, progressPct = 0, onChanged, defaultReviewerId }) {
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const player = usePlayer();
   const isCollection = project.type === "album" || project.type === "ep";
   const [versions, setVersions] = useState([]);
@@ -122,7 +107,7 @@ export default function TrackRow({ track, project, queue, index, provided, progr
         {STATUS[project?.status] || "Status"}
       </span>
       <div className="dz-track-progress items-center gap-3">
-        <div className="dz-track-waveform"><Waveform pct={progressPct} /></div>
+        <div className="dz-track-waveform" aria-hidden="true"><div className="h-1 w-16 overflow-hidden rounded-full bg-white/15"><div className="h-full bg-primary" style={{ width: `${progressPct}%` }} /></div></div>
         <span className="text-sm font-bold tabular-nums text-white/78">{progressPct}%</span>
       </div>
 
@@ -136,11 +121,18 @@ export default function TrackRow({ track, project, queue, index, provided, progr
             <DropdownMenuItem onSelect={() => { setPendingFile(null); setManagerOpen(true); }} className="rounded-md px-3 py-2 text-xs text-white/80">Gerenciar versões</DropdownMenuItem>
             {track.audio_url && <DropdownMenuItem onSelect={downloadTrack} className="rounded-md px-3 py-2 text-xs text-white/80"><Download size={14} />Baixar áudio</DropdownMenuItem>}
             <DropdownMenuItem onSelect={() => fileRef.current?.click()} className="rounded-md px-3 py-2 text-xs text-white/80"><Plus size={14} />Nova versão</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => setDeleteOpen(true)} className="rounded-md px-3 py-2 text-xs text-red-300"><Trash2 size={14} />Excluir faixa</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         <input ref={fileRef} type="file" accept="audio/*" className="hidden" onChange={addVersion} />
       </div>
       {managerOpen && <TrackVersionsDialog track={track} project={project} queue={queue} isCollection={isCollection} defaultReviewerId={defaultReviewerId} initialFile={pendingFile} onClose={() => setManagerOpen(false)} onChanged={() => { refreshVersions(); onChanged?.(); }} />}
+      <DeleteConfirmation open={deleteOpen} onOpenChange={setDeleteOpen} title="Excluir faixa" onConfirm={async () => {
+        await apiClient.entities.Track.delete(track.id);
+        player.removeFromPlayback(track.id);
+      }} onDeleted={onChanged}>
+        Excluir <strong>{track.name}</strong> e todas as suas versões?
+      </DeleteConfirmation>
     </div>
   );
 }

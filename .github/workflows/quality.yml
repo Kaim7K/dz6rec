@@ -1,0 +1,30 @@
+name: Quality
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run build
+      - run: node --experimental-test-module-mocks --test tests/*.test.mjs
+      - run: npx playwright install --with-deps chromium
+      - name: Check review workflow
+        run: |
+          npm run dev -- --host 127.0.0.1 --port 5173 --strictPort &
+          for attempt in {1..30}; do
+            if curl --fail --silent --output /dev/null http://127.0.0.1:5173; then break; fi
+            sleep 1
+          done
+          npm run test:ui
+          node scripts/product-workflow-smoke.mjs

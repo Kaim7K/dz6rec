@@ -9,7 +9,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChevronRight, Clock3, ListChecks, MessageCircle, Music2, Pencil, Play, Shuffle, Trash2, Workflow } from "lucide-react";
 import { usePlayer } from "@/lib/playerContext";
-import { TYPE, STATUS, STATUS_ORDER, logActivity } from "@/lib/music";
+import { TYPE, STATUS, STATUS_ORDER, logActivity, nextProjectAction, taskResponsibleLabel, dueLabel } from "@/lib/music";
+import { reviewStatus } from "@/lib/reviews";
 import { computeProgress } from "@/lib/progress";
 import EditProjectDialog from "@/components/projects/EditProjectDialog";
 import EditArtistDialog from "@/components/artists/EditArtistDialog";
@@ -28,6 +29,8 @@ export default function ProjectDetail() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [project, setProject] = useState(null);
   const [tracks, setTracks] = useState([]);
+  const [versions, setVersions] = useState([]);
+  const [reviewsError, setReviewsError] = useState(false);
   const [items, setItems] = useState([]);
   const [sections, setSections] = useState([]);
   const [files, setFiles] = useState([]);
@@ -51,6 +54,16 @@ export default function ProjectDetail() {
     }).catch(err => setLoadError(err.message || "Não foi possível carregar o projeto."));
   };
   useEffect(() => { load(); }, [id]);
+  const trackIds = JSON.stringify(tracks.filter(track => track.project_id === id).map(track => track.id));
+  useEffect(() => {
+    let active = true;
+    const refresh = () => Promise.all(JSON.parse(trackIds).map(trackId => apiClient.entities.TrackVersion.filter({ track_id: trackId })))
+      .then(rows => { if (active) { setVersions(rows.flat()); setReviewsError(false); } })
+      .catch(() => { if (active) setReviewsError(true); });
+    refresh();
+    const unsubscribe = apiClient.entities.TrackVersion.subscribe(refresh, { interval: 15000 });
+    return () => { active = false; unsubscribe(); };
+  }, [trackIds]);
   useEffect(() => {
     const tab = searchParams.get("tab");
     if (["faixas", "checklist", "operacao", "historico", "chat"].includes(tab)) setActiveTab(tab);
@@ -74,7 +87,28 @@ export default function ProjectDetail() {
   const changeType = (v) => patch("type", v, `Tipo alterado para ${TYPE[v]}`);
   const changeStatus = (v) => patch("status", v, `Status alterado para ${STATUS[v]}`);
   const progress = computeProgress(items, sections);
+  const playableTracks = tracks.filter(track => track.audio_url);
   const artist = artists.find(row => row.id === project.main_artist_id);
+  const pendingReviews = [
+    ...versions.filter(artifact => tracks.some(track => track.id === artifact.track_id)).map(artifact => ({ entity: "TrackVersion", artifact })),
+    ...files.map(artifact => ({ entity: "ProjectFile", artifact })),
+  ].filter(({ entity, artifact }) => ["revisao", "ajuste"].includes(reviewStatus(entity, artifact)));
+  const nextAction = nextProjectAction(project, items, files, pendingReviews);
+  const nextTask = items.find(item => item.id === nextAction.task_id);
+  const onReviewSaved = saved => {
+    setVersions(rows => rows.map(row => row.id === saved.id ? saved : row));
+    load();
+  };
+  const openNextAction = () => {
+    if (nextAction.target === "review") {
+      setSearchParams({ tab: "operacao", review: nextAction.review.entity, record: nextAction.review.artifact.id });
+    } else if (nextAction.target === "task") {
+      setActiveTab("checklist");
+      setFocusTaskId(nextAction.task_id);
+    } else {
+      setActiveTab("operacao");
+    }
+  };
 
   /** @type {[string, string, import("lucide-react").LucideIcon][]} */
   const tabs = [
@@ -120,8 +154,8 @@ export default function ProjectDetail() {
             <p className="mt-2.5 max-w-2xl text-xs leading-5 text-muted-foreground xl:mt-3 xl:text-sm xl:leading-6">{project.description || "Projeto sem descrição."}</p>
 
             <div className="mt-4 flex flex-wrap items-center gap-2 xl:mt-5">
-              <button onClick={() => tracks.length && player.play(tracks[0], project, tracks)} className="dz-primary-button h-10 shrink-0 px-3"><Play size={14} fill="currentColor" />Reproduzir</button>
-              <button aria-label="Aleatório" title="Aleatório" onClick={() => tracks.length && player.play(tracks[Math.floor(Math.random() * tracks.length)], project, tracks)} className="dz-icon-button h-10 w-10"><Shuffle size={16} /></button>
+              <button disabled={!playableTracks.length} onClick={() => player.play(playableTracks[0], project, playableTracks)} className="dz-primary-button h-10 shrink-0 px-3 disabled:opacity-50"><Play size={14} fill="currentColor" />Reproduzir</button>
+              <button disabled={!playableTracks.length} aria-label="Aleatório" title="Aleatório" onClick={() => player.play(playableTracks[Math.floor(Math.random() * playableTracks.length)], project, playableTracks)} className="dz-icon-button h-10 w-10 disabled:opacity-50"><Shuffle size={16} /></button>
               <button aria-label="Editar projeto" title="Editar projeto" onClick={() => setEditOpen(true)} className="dz-icon-button h-10 w-10"><Pencil size={16} /></button>
               <DeleteProjectButton
                 project={project}
@@ -139,11 +173,22 @@ export default function ProjectDetail() {
         </div>
       </section>
 
+      {activeTab !== "operacao" && nextAction.target !== "project" && <section aria-label="Próxima ação" className="dz-card flex flex-wrap items-center justify-between gap-3 p-4">
+        <div className="min-w-0 flex-1 basis-52">
+          <p className="text-xs font-medium text-muted-foreground">Próxima ação · {nextAction.title}</p>
+          <p className="mt-1 break-words text-sm font-semibold">{nextAction.text}</p>
+          <p className="mt-1 break-words text-xs text-muted-foreground">{nextTask
+            ? `${taskResponsibleLabel(nextTask) || "Sem responsável"} · ${nextTask.due_date ? dueLabel(nextTask.due_date) : "Sem prazo"}`
+            : nextAction.detail}</p>
+        </div>
+        <button type="button" onClick={openNextAction} className="dz-ghost-button">{nextAction.target === "review" || nextAction.target === "task" ? nextAction.action : "Abrir operação"} <ChevronRight size={14} /></button>
+      </section>}
+
       <Tabs value={activeTab} onValueChange={setActiveTab} className="min-w-0 pt-1">
         <TabsList className="dz-project-tabs h-auto w-full justify-start gap-1 overflow-x-auto overscroll-x-contain rounded-none border-b border-white/[0.08] bg-transparent p-0">
           {tabs.map(([v, label, Icon]) => <TabsTrigger key={v} value={v} className="shrink-0 gap-2 rounded-none border-b-2 border-transparent bg-transparent px-3 py-3 text-sm font-medium text-muted-foreground transition-colors hover:text-white data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-white data-[state=active]:shadow-none"><Icon size={16} />{label}</TabsTrigger>)}
         </TabsList>
-        <TabsContent value="operacao" className="mt-5"><ProjectWorkspace project={project} artist={artist} tracks={tracks} sections={sections} items={items} files={files} onChanged={load} onOpenTasks={taskId => { setFocusTaskId(taskId); setActiveTab("checklist"); }} onOpenProject={() => setActiveTab("faixas")} onEditArtist={() => setEditArtistOpen(true)} /></TabsContent>
+        <TabsContent value="operacao" className="mt-5"><ProjectWorkspace project={project} artist={artist} tracks={tracks} sections={sections} items={items} files={files} pendingReviews={pendingReviews} reviewsError={reviewsError} onReviewSaved={onReviewSaved} onChanged={load} onOpenTasks={taskId => { setFocusTaskId(taskId); setActiveTab("checklist"); }} onOpenProject={() => setActiveTab("faixas")} onEditArtist={() => setEditArtistOpen(true)} /></TabsContent>
         <TabsContent value="faixas" className="mt-5">
           <div className="space-y-5">
             <TrackList project={project} tracks={tracks} onChanged={load} progressPct={progress.total.pct} defaultReviewerId={artist?.user_id} />
@@ -156,7 +201,7 @@ export default function ProjectDetail() {
 
       <EditProjectDialog project={project} open={editOpen} onClose={() => setEditOpen(false)} onSaved={load} artists={artists} />
       <EditArtistDialog artist={artist} open={editArtistOpen} onClose={() => setEditArtistOpen(false)} onSaved={load} />
-      {searchParams.get("review") && searchParams.get("record") && <LinkedReview entity={searchParams.get("review")} recordId={searchParams.get("record")} project={project} defaultReviewerId={artist?.user_id} onSaved={load} onClose={() => setSearchParams(previous => { const next = new URLSearchParams(previous); next.delete("review"); next.delete("record"); return next; }, { replace: true })} />}
+      {searchParams.get("review") && searchParams.get("record") && <LinkedReview entity={searchParams.get("review")} recordId={searchParams.get("record")} project={project} defaultReviewerId={artist?.user_id} onSaved={onReviewSaved} onClose={() => setSearchParams(previous => { const next = new URLSearchParams(previous); next.delete("review"); next.delete("record"); return next; }, { replace: true })} />}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { apiClient } from "@/api/appClient";
 import PageLoading from "@/components/PageLoading";
 import PageError from "@/components/PageError";
@@ -6,8 +6,10 @@ import { Plus, Disc3 } from "lucide-react";
 import ProjectCard from "@/components/projects/ProjectCard";
 import NewProjectDialog from "@/components/projects/NewProjectDialog";
 import EditProjectDialog from "@/components/projects/EditProjectDialog";
-import { STATUS } from "@/lib/music";
+import { STATUS, STATUS_ORDER } from "@/lib/music";
 import { STATUS_COLORS } from "@/lib/choiceColors";
+
+const PAGE_SIZE = 24;
 
 export default function Projects() {
   const [projects, setProjects] = useState([]);
@@ -19,19 +21,47 @@ export default function Projects() {
   const [statusFilter, setStatusFilter] = useState("todos");
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
+  const [moreError, setMoreError] = useState("");
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+  const generation = useRef(0);
+  const fetchPage = offset => apiClient.entities.Project.filter(statusFilter === "todos" ? {} : { status: statusFilter }, "-created_date", PAGE_SIZE + 1, offset);
+
   const load = () => {
+    const current = ++generation.current;
     setLoading(true); setLoadError("");
-    return Promise.all([apiClient.entities.Project.list("-created_date"), apiClient.entities.Artist.list(), apiClient.entities.ChecklistTemplate.list(), apiClient.entities.ChecklistItem.list()]).then(([p, a, t, items]) => {
-      setProjects(p); setArtists(a); setTemplates(t);
+    setLoadingMore(false); setMoreError("");
+    return Promise.all([fetchPage(0), apiClient.entities.Artist.list(), apiClient.entities.ChecklistTemplate.list(), apiClient.entities.ChecklistItem.list()]).then(([p, a, t, items]) => {
+      if (current !== generation.current) return;
+      setProjects(p.slice(0, PAGE_SIZE)); setHasMore(p.length > PAGE_SIZE);
+      setArtists(a); setTemplates(t);
       const m = {};
       items.forEach((i) => { if (!i.project_id) return; m[i.project_id] = m[i.project_id] || { d: 0, t: 0 }; m[i.project_id].t++; if (i.completed) m[i.project_id].d++; });
       setByP(m);
-    }).catch(err => setLoadError(err.message || "Não foi possível carregar os projetos.")).finally(() => setLoading(false));
+    }).catch(err => {
+      if (current === generation.current) setLoadError(err.message || "Não foi possível carregar os projetos.");
+    }).finally(() => { if (current === generation.current) setLoading(false); });
   };
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+    return () => { generation.current++; };
+  }, [statusFilter]);
 
-  const statusOptions = ["todos", ...Array.from(new Set(projects.map((p) => p.status).filter(Boolean)))];
-  const visibleProjects = statusFilter === "todos" ? projects : projects.filter((p) => p.status === statusFilter);
+  const loadMore = async () => {
+    if (loadingMore || !hasMore) return;
+    const current = generation.current;
+    setLoadingMore(true); setMoreError("");
+    try {
+      const page = await fetchPage(projects.length);
+      if (current !== generation.current) return;
+      setProjects(rows => [...rows, ...page.slice(0, PAGE_SIZE)]);
+      setHasMore(page.length > PAGE_SIZE);
+    } catch {
+      if (current === generation.current) setMoreError("Não foi possível carregar mais projetos.");
+    } finally {
+      if (current === generation.current) setLoadingMore(false);
+    }
+  };
 
   if (loading) return <PageLoading />;
   if (loadError) return <PageError message={loadError} onRetry={load} />;
@@ -42,7 +72,7 @@ export default function Projects() {
         <div>
           <p className="dz-kicker">Catálogo</p>
           <h1 className="dz-page-title">Projetos</h1>
-          <p className="dz-page-subtitle">{projects.length} {projects.length === 1 ? 'projeto no catálogo' : 'projetos no catálogo'} · Singles, EPs e álbuns</p>
+          <p className="dz-page-subtitle">{projects.length} {projects.length === 1 ? "projeto exibido" : "projetos exibidos"} · Singles, EPs e álbuns</p>
         </div>
         <button
           onClick={() => setOpen(true)}
@@ -52,9 +82,9 @@ export default function Projects() {
         </button>
       </header>
 
-      {projects.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {statusOptions.map((status) => (
+      {(projects.length > 0 || statusFilter !== "todos") && (
+        <div className="flex flex-wrap gap-2" aria-label="Status dos projetos">
+          {["todos", ...STATUS_ORDER].map((status) => (
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
@@ -70,7 +100,7 @@ export default function Projects() {
         </div>
       )}
 
-      {projects.length === 0 ? (
+      {projects.length === 0 && statusFilter === "todos" ? (
         <div className="dz-empty">
           <div className="grid h-14 w-14 place-items-center rounded-full bg-white/[0.04] ring-1 ring-white/[0.06]">
             <Disc3 size={22} className="text-muted-foreground" />
@@ -83,12 +113,16 @@ export default function Projects() {
             <Plus size={16} /> Novo projeto
           </button>
         </div>
-      ) : visibleProjects.length === 0 ? (
+      ) : projects.length === 0 ? (
         <div className="dz-empty"><p>Nenhum projeto com este status.</p><button type="button" className="dz-ghost-button" onClick={() => setStatusFilter("todos")}>Mostrar todos</button></div>
       ) : (
-        <div className="dz-catalog-grid">
-          {visibleProjects.map((p) => <ProjectCard key={p.id} project={p} progress={byP[p.id]} onEdit={setEditing} onDeleted={load} />)}
-        </div>
+        <>
+          <div className="dz-catalog-grid">
+            {projects.map((p) => <ProjectCard key={p.id} project={p} progress={byP[p.id]} onEdit={setEditing} onDeleted={load} />)}
+          </div>
+          {moreError && <p role="alert" className="text-sm text-red-200">{moreError}</p>}
+          {hasMore && <button type="button" onClick={loadMore} disabled={loadingMore} className="dz-ghost-button mx-auto">{loadingMore ? "Carregando…" : "Carregar mais projetos"}</button>}
+        </>
       )}
 
       <NewProjectDialog open={open} onClose={() => setOpen(false)} onCreated={load} artists={artists} templates={templates} />

@@ -10,7 +10,7 @@ await db.exec(`CREATE TABLE app_users(id text PRIMARY KEY,status text,permissao 
 CREATE TABLE app_records(id text PRIMARY KEY,entity text,data jsonb,created_date timestamptz DEFAULT now(),updated_date timestamptz DEFAULT now());
 INSERT INTO app_users VALUES ('actor','ativo','membro'),('inactive','inativo','membro');`);
 const sql = async (parts, ...values) => (await db.query(parts.reduce((query, part, i) => query + (i ? '$' + i : '') + part, ''), values)).rows;
-mock.module('../api/_db.js', { exports: { ensureDatabase: async () => {}, getSql: () => sql } });
+mock.module('../api/_db.js', { namedExports: { ensureDatabase: async () => {}, getSql: () => sql } });
 const { default: handler } = await import('../api/[...path].js');
 after(() => db.close());
 beforeEach(async () => {
@@ -49,4 +49,24 @@ test('authentication and active account requirements remain enforced; missing de
 });
 test('filtered batch deletion uses the same atomic tree operation',async()=>{
   const res=await remove('Project','many','actor',{where:{id:'p1'}});assert.equal(res.statusCode,200);assert.equal(res.body.count,1);assert.equal(res.body.deleted_count,11);assert.ok((await ids()).includes('p2'));assert.ok(!(await ids()).includes('version'));
+});
+test('deleting a track removes its versions and updates the project count', async () => {
+  const before = await ids();
+  const res = await remove('Track', 'track');
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.body.deleted_count, 2);
+  assert.deepEqual(await ids(), before.filter(id => !['track', 'version'].includes(id)));
+  assert.equal((await db.query("SELECT data FROM app_records WHERE id = 'p1'")).rows[0].data.track_count, 0);
+});
+test('deleting the active version clears its audio and preserves other versions', async () => {
+  await db.exec(`UPDATE app_records SET data = data || '{"current_version_id":"version","audio_url":"current.wav","version_label":"Mix"}' WHERE id = 'track';
+    INSERT INTO app_records(id, entity, data) VALUES ('alternate', 'TrackVersion', '{"track_id":"track","audio_url":"alternate.wav"}');`);
+  const res = await remove('TrackVersion', 'version');
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.body.count, 1);
+  assert.equal(res.body.tracks[0].id, 'track');
+  assert.equal(res.body.tracks[0].audio_url, '');
+  assert.equal(res.body.tracks[0].current_version_id, '');
+  assert.ok((await ids()).includes('alternate'));
+  assert.ok(!(await ids()).includes('version'));
 });
