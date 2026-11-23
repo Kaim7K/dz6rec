@@ -87,6 +87,7 @@ export default function ProjectDetail() {
   const changeType = (v) => patch("type", v, `Tipo alterado para ${TYPE[v]}`);
   const changeStatus = (v) => patch("status", v, `Status alterado para ${STATUS[v]}`);
   const progress = computeProgress(items, sections);
+  const collectionTracks = activeTab === "faixas" && (project.type === "album" || project.type === "ep");
   const playableTracks = tracks.filter(track => track.audio_url);
   const artist = artists.find(row => row.id === project.main_artist_id);
   const pendingReviews = [
@@ -120,7 +121,7 @@ export default function ProjectDetail() {
   ];
   return (
     <div className="min-w-0 space-y-5">
-      <nav aria-label="Localização" className="flex min-w-0 items-center gap-2 text-xs text-muted-foreground"><Link to="/projetos" className="shrink-0 hover:text-white">Projetos</Link><ChevronRight size={13} className="shrink-0" /><span className="truncate text-white/75">{project.name}</span></nav>
+      <nav aria-label="Localização" className="flex min-w-0 items-center gap-2 text-xs text-muted-foreground"><Link to="/projetos" className="shrink-0 hover:text-white">Projetos</Link><ChevronRight size={13} className="shrink-0" /><span aria-current="page" className="truncate text-white/75">{project.name}</span></nav>
       {loadError && <p role="alert" className="rounded-md border border-red-500/20 p-3 text-sm text-red-200">{loadError} <button type="button" onClick={load} className="underline">Tentar novamente</button></p>}
       <section className="dz-project-header min-w-0">
         <div className="dz-project-hero">
@@ -135,7 +136,7 @@ export default function ProjectDetail() {
           <div className="dz-project-information">
           <div className="dz-project-summary flex min-w-0 flex-col">
             <div className="min-w-0">
-            <h1 className="dz-project-title break-words font-display font-semibold tracking-tight text-white">{project.name}</h1>
+            <h1 className={collectionTracks ? "sr-only" : "dz-project-title break-words font-display font-semibold tracking-tight text-white"}>{project.name}</h1>
             {project.main_artist_name && <p className="dz-project-artist mt-1.5 font-medium text-white/75 [overflow-wrap:anywhere]">{project.main_artist_name}{project.featuring ? ` feat. ${project.featuring}` : ""}</p>}
             <div className="mt-3 flex flex-wrap items-center gap-2 xl:gap-3">
               <Select value={project.type} onValueChange={changeType} disabled={!!savingField}>

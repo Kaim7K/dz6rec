@@ -21,14 +21,20 @@ export default function AddTrackDialog({ open, onClose, onCreated, project, trac
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [uploadError, setUploadError] = useState("");
+  const isCollection = project.type === "album" || project.type === "ep";
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
   const submit = async (e) => {
     e.preventDefault();
     if (loading) return;
+    const name = form.name.trim();
+    if (isCollection && !name) {
+      setError("Informe o nome da faixa.");
+      return;
+    }
     setLoading(true); setUploadProgress(0); setError(""); setUploadError("");
     let sendingAudio = Boolean(audio);
     try {
-      const trackName = form.name.trim() || project.name || "Faixa sem nome";
+      const trackName = name || project.name || "Faixa sem nome";
       let audio_url = "";
       if (audio) {
         setUploading(true);
@@ -44,6 +50,7 @@ export default function AddTrackDialog({ open, onClose, onCreated, project, trac
       await logActivity(project.id, `Faixa adicionada: ${trackName}`, me?.full_name);
       await apiClient.entities.Project.update(project.id, { track_count: trackCount + 1 });
       setAudio(null); setUploadProgress(0); set("track_number", null);
+      if (isCollection) set("name", "");
       onCreated(); onClose();
     } catch (err) {
       setUploadProgress(0);
@@ -63,7 +70,7 @@ export default function AddTrackDialog({ open, onClose, onCreated, project, trac
         </DialogHeader>
         {error && <div role="alert" className="rounded-md border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</div>}
         <form onSubmit={submit} className="space-y-4">
-          <Field label="Nome"><Input value={form.name} onChange={(e) => set("name", e.target.value)} placeholder={project?.name || "Ex. Noite Clara"} /></Field>
+          <Field label="Nome"><Input required={isCollection} value={form.name} onChange={(e) => set("name", e.target.value)} placeholder={isCollection ? "Ex. Noite Clara" : project.name || "Ex. Noite Clara"} /></Field>
           <div className="dz-form-columns">
             <Field label="Artista principal"><Input value={form.main_artist_name} onChange={(e) => set("main_artist_name", e.target.value)} /></Field>
             <Field label="Nº da faixa"><Input type="number" value={form.track_number ?? nextTrackNumber} onChange={(e) => set("track_number", e.target.value)} /></Field>
