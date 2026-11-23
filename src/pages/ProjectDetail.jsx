@@ -122,7 +122,7 @@ export default function ProjectDetail() {
     <div className="min-w-0 space-y-5">
       <nav aria-label="Localização" className="flex min-w-0 items-center gap-2 text-xs text-muted-foreground"><Link to="/projetos" className="shrink-0 hover:text-white">Projetos</Link><ChevronRight size={13} className="shrink-0" /><span className="truncate text-white/75">{project.name}</span></nav>
       {loadError && <p role="alert" className="rounded-md border border-red-500/20 p-3 text-sm text-red-200">{loadError} <button type="button" onClick={load} className="underline">Tentar novamente</button></p>}
-      <section className="dz-project-header relative min-w-0 border-b border-white/[0.08] pb-6">
+      <section className="dz-project-header min-w-0">
         <div className="dz-project-hero">
           <div className="dz-project-cover">
             {project.cover_url ? <img src={project.cover_url} className="h-full w-full object-cover" alt="" /> : (
@@ -135,7 +135,9 @@ export default function ProjectDetail() {
           <div className="dz-project-information">
           <div className="dz-project-summary flex min-w-0 flex-col">
             <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2 xl:gap-3">
+            <h1 className="dz-project-title break-words font-display font-semibold tracking-tight text-white">{project.name}</h1>
+            {project.main_artist_name && <p className="dz-project-artist mt-1.5 font-medium text-white/75 [overflow-wrap:anywhere]">{project.main_artist_name}{project.featuring ? ` feat. ${project.featuring}` : ""}</p>}
+            <div className="mt-3 flex flex-wrap items-center gap-2 xl:gap-3">
               <Select value={project.type} onValueChange={changeType} disabled={!!savingField}>
                 <SelectTrigger accentColor={TYPE_COLORS[project.type]} aria-label="Tipo do projeto" className="h-8 w-auto gap-1.5 rounded-md border-white/[0.08] bg-white/[0.045] px-3 text-xs font-medium text-white/80">
                   <SelectValue />
@@ -149,9 +151,7 @@ export default function ProjectDetail() {
                 <SelectContent>{STATUS_ORDER.map((s) => <SelectItem key={s} value={s} accentColor={STATUS_COLORS[s]}>{STATUS[s]}</SelectItem>)}</SelectContent>
               </Select>
             </div>
-            <h1 className="dz-project-title mt-3 break-words font-display font-semibold tracking-tight text-white">{project.name}</h1>
-            <p className="dz-project-artist mt-1 text-white/60 [overflow-wrap:anywhere]">{project.main_artist_name}{project.featuring ? ` feat. ${project.featuring}` : ""}</p>
-            <p className="mt-2.5 max-w-2xl text-xs leading-5 text-muted-foreground xl:mt-3 xl:text-sm xl:leading-6">{project.description || "Projeto sem descrição."}</p>
+            {project.description && <p className="mt-3 max-w-prose text-sm leading-6 text-muted-foreground [overflow-wrap:anywhere]">{project.description}</p>}
 
             <div className="mt-4 flex flex-wrap items-center gap-2 xl:mt-5">
               <button disabled={!playableTracks.length} onClick={() => player.play(playableTracks[0], project, playableTracks)} className="dz-primary-button h-10 shrink-0 px-3 disabled:opacity-50"><Play size={14} fill="currentColor" />Reproduzir</button>
@@ -173,10 +173,10 @@ export default function ProjectDetail() {
         </div>
       </section>
 
-      {activeTab !== "operacao" && nextAction.target !== "project" && <section aria-label="Próxima ação" className="dz-card flex flex-wrap items-center justify-between gap-3 p-4">
+      {activeTab !== "operacao" && nextAction.target !== "project" && <section aria-label="Próxima ação" data-tone={nextAction.tone} className="dz-card dz-project-next-action flex flex-wrap items-center justify-between gap-3 p-4">
         <div className="min-w-0 flex-1 basis-52">
-          <p className="text-xs font-medium text-muted-foreground">Próxima ação · {nextAction.title}</p>
-          <p className="mt-1 break-words text-sm font-semibold">{nextAction.text}</p>
+          <p className="text-xs font-medium text-muted-foreground">Próxima ação</p>
+          <p className="mt-1 break-words text-sm font-semibold">{nextAction.title} · {nextAction.text}</p>
           <p className="mt-1 break-words text-xs text-muted-foreground">{nextTask
             ? `${taskResponsibleLabel(nextTask) || "Sem responsável"} · ${nextTask.due_date ? dueLabel(nextTask.due_date) : "Sem prazo"}`
             : nextAction.detail}</p>

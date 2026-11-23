@@ -8,6 +8,7 @@ import NewProjectDialog from "@/components/projects/NewProjectDialog";
 import EditProjectDialog from "@/components/projects/EditProjectDialog";
 import { STATUS, STATUS_ORDER } from "@/lib/music";
 import { STATUS_COLORS } from "@/lib/choiceColors";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const PAGE_SIZE = 24;
 
@@ -65,6 +66,7 @@ export default function Projects() {
 
   if (loading) return <PageLoading />;
   if (loadError) return <PageError message={loadError} onRetry={load} />;
+  const statuses = ["todos", ...STATUS_ORDER];
 
   return (
     <div className="dz-page">
@@ -83,8 +85,17 @@ export default function Projects() {
       </header>
 
       {(projects.length > 0 || statusFilter !== "todos") && (
-        <div className="flex flex-wrap gap-2" aria-label="Status dos projetos">
-          {["todos", ...STATUS_ORDER].map((status) => (
+        <>
+        <div className="sm:hidden">
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger aria-label="Filtrar por status" className="h-10 w-full"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {statuses.map(status => <SelectItem key={status} value={status} accentColor={STATUS_COLORS[status]}>{status === "todos" ? "Todos os status" : STATUS[status]}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="hidden flex-wrap gap-2 sm:flex" role="group" aria-label="Status dos projetos">
+          {statuses.map((status) => (
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
@@ -98,6 +109,7 @@ export default function Projects() {
             </button>
           ))}
         </div>
+        </>
       )}
 
       {projects.length === 0 && statusFilter === "todos" ? (

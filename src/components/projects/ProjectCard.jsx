@@ -11,22 +11,22 @@ export default function ProjectCard({ project, progress, onEdit, onDeleted }) {
   const tone = STATUS_TONE[project.status] || STATUS_TONE.rascunho;
   return (
     <CatalogTile>
-      <Link to={`/projetos/${project.id}`} className="block">
+      <Link to={`/projetos/${project.id}`} className="block rounded-xl">
       <div className="dz-catalog-artwork">
         <img src={project.cover_thumbnail_url || project.cover_url || dz6ProfileLogo} className="h-full w-full object-cover" alt="" loading="lazy" decoding="async" />
       </div>
-      <div className="px-0.5 pb-1 pt-3">
-        <div className="flex items-center gap-1.5">
-          <span className={`h-1.5 w-1.5 rounded-full ${tone.dot}`} />
-          <span className={`text-xs font-medium ${tone.text}`}>{STATUS[project.status]}</span>
+      <div className="px-0.5 pb-1 pt-3.5">
+        <p className="line-clamp-2 break-words font-display text-base font-semibold leading-6 tracking-tight text-white">{project.name}</p>
+        <p className="mt-0.5 truncate text-xs leading-5 text-muted-foreground">{[project.main_artist_name, TYPE[project.type]].filter(Boolean).join(" · ")}</p>
+        <div className="mt-3 flex items-center justify-between gap-3">
+          <span className={`inline-flex min-w-0 items-center gap-1.5 text-xs font-medium ${tone.text}`}>
+            <span aria-hidden="true" className={`h-1.5 w-1.5 shrink-0 rounded-full ${tone.dot}`} />
+            <span className="truncate">{STATUS[project.status] || STATUS.rascunho}</span>
+          </span>
+          <span className="shrink-0 text-xs tabular-nums text-muted-foreground" aria-label={`Progresso: ${pct}%`}>{pct}%</span>
         </div>
-        <p className="mt-2 line-clamp-2 break-words font-display text-base font-semibold leading-6 tracking-tight text-white">{project.name}</p>
-        <p className="mt-0.5 truncate text-xs text-muted-foreground">{project.main_artist_name || "—"} · {TYPE[project.type]}</p>
-        <div className="mt-3 flex items-center gap-2.5">
-          <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/[0.08]">
-            <div className="h-full bg-primary transition-all duration-500" style={{ width: `${pct}%` }} />
-          </div>
-          <span className="text-2xs tabular-nums text-muted-foreground">{pct}%</span>
+        <div aria-hidden="true" className="mt-2 h-0.5 overflow-hidden rounded-full bg-white/10">
+          <div className="h-full rounded-full bg-white/55" style={{ width: `${pct}%` }} />
         </div>
       </div>
       </Link>
@@ -37,7 +37,7 @@ export default function ProjectCard({ project, progress, onEdit, onDeleted }) {
               type="button"
               onClick={() => onEdit(project)}
               aria-label={`Editar ${project.name}`}
-              className="rounded-md bg-black/55 p-2 text-white/80 backdrop-blur transition-colors hover:bg-black/80 hover:text-white"
+              className="grid h-9 w-9 place-items-center rounded-lg border border-white/10 bg-black/75 text-white/90 transition-colors hover:bg-black"
             >
               <Pencil size={13} />
             </button>
@@ -46,7 +46,7 @@ export default function ProjectCard({ project, progress, onEdit, onDeleted }) {
             <DeleteProjectButton
               project={project}
               onDeleted={onDeleted}
-              className="h-[1.8125rem] w-[1.8125rem] rounded-md bg-black/55 p-0 text-white/75 backdrop-blur hover:bg-red-950/80 hover:text-red-200"
+              className="h-9 w-9 rounded-lg border border-white/10 bg-black/75 p-0 text-white/85 hover:bg-red-950/80 hover:text-red-200"
             />
           )}
         </div>
