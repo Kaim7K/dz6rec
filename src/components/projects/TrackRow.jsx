@@ -28,7 +28,7 @@ function Waveform({ pct = 0 }) {
 
 export default function TrackRow({ track, project, queue, index, provided, progressPct = 0, onChanged, defaultReviewerId }) {
   const player = usePlayer();
-  const isCurrent = player.current?.track?.id === track.id;
+  const isCollection = project.type === "album" || project.type === "ep";
   const [versions, setVersions] = useState([]);
   const [menu, setMenu] = useState(false);
   const [managerOpen, setManagerOpen] = useState(false);
@@ -36,9 +36,16 @@ export default function TrackRow({ track, project, queue, index, provided, progr
   const [switching, setSwitching] = useState(false);
   const fileRef = useRef(null);
   const tone = STATUS_TONE[project?.status] || STATUS_TONE.rascunho;
-  const currentVersion = track.current_version_id ? versions.find(row => row.id === track.current_version_id) : versions.find(row => row.audio_url === track.audio_url);
+  const currentVersion = track.current_version_id
+    ? versions.find(row => row.id === track.current_version_id)
+    : versions.find(row => row.audio_url === track.audio_url && row.name === track.version_label)
+      || versions.find(row => row.audio_url === track.audio_url);
   const versionLabel = currentVersion?.name || track.version_label;
   const trackTitle = versionLabel?.trim() ? `${track.name} (${versionLabel.trim()})` : track.name;
+  const playingTrack = player.current?.track;
+  const mainVersionId = track.current_version_id || currentVersion?.id;
+  const isCurrent = playingTrack?.id === track.id && playingTrack.audio_url === track.audio_url
+    && (!playingTrack.current_version_id || playingTrack.current_version_id === mainVersionId);
 
   const refreshVersions = () => apiClient.entities.TrackVersion.filter({ track_id: track.id }).then(setVersions).catch(() => {});
   useEffect(() => { refreshVersions(); }, [track.id, track.audio_url, track.version_label]);
@@ -89,7 +96,7 @@ export default function TrackRow({ track, project, queue, index, provided, progr
         <button {...(provided?.dragHandleProps || {})} className="dz-track-drag shrink-0 cursor-grab touch-none text-white/35 transition hover:text-white/65 active:cursor-grabbing" aria-label="Mover faixa">
           <GripVertical size={14} />
         </button>
-        <button onClick={play} className="grid h-8 w-8 shrink-0 place-items-center rounded-md text-sm text-white/55 group-hover:bg-white/[0.04] group-hover:text-white">
+        <button type="button" onClick={play} disabled={!track.audio_url} aria-label={`${isCurrent && player.isPlaying ? "Pausar" : "Reproduzir"} ${trackTitle}`} className="grid h-8 w-8 shrink-0 place-items-center rounded-md text-sm text-white/55 group-hover:bg-white/[0.04] group-hover:text-white disabled:opacity-50">
           {isCurrent && player.isPlaying ? <Pause size={15} fill="currentColor" /> : <><span className="group-hover:hidden tabular-nums">{String(index + 1).padStart(2, "0")}</span><Play size={15} fill="currentColor" className="hidden group-hover:block" /></>}
         </button>
       </div>
@@ -99,7 +106,11 @@ export default function TrackRow({ track, project, queue, index, provided, progr
           {project?.cover_url ? <img src={project.cover_url} alt="" className="h-full w-full object-cover" /> : <img src={dz6ProfileLogo} alt="" className="h-full w-full object-cover opacity-90" />}
         </div>
         <div className="min-w-0">
-          <p title={trackTitle} className={`truncate text-sm font-medium ${isCurrent ? "text-white" : "text-white/88"}`}>{trackTitle}</p>
+          {isCollection ? (
+            <button type="button" title={trackTitle} aria-label={`Versões de ${track.name}`} onClick={() => { setPendingFile(null); setManagerOpen(true); }} className="block max-w-full truncate text-left text-sm font-medium text-white/88 hover:text-white hover:underline">{trackTitle}</button>
+          ) : (
+            <p title={trackTitle} className={`truncate text-sm font-medium ${isCurrent ? "text-white" : "text-white/88"}`}>{trackTitle}</p>
+          )}
           <p className="truncate text-xs text-muted-foreground">{[track.main_artist_name || project?.main_artist_name, track.featuring && `feat. ${track.featuring}`].filter(Boolean).join(" · ")}</p>
           {currentVersion?.review_status && <div className="mt-1"><ReviewBadge entity="TrackVersion" artifact={currentVersion} /></div>}
         </div>
@@ -121,7 +132,7 @@ export default function TrackRow({ track, project, queue, index, provided, progr
             <button type="button" disabled={switching} aria-label={`Opções da faixa ${track.name}`} className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-white/5 hover:text-white"><MoreHorizontal size={16} /></button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" sideOffset={6} collisionPadding={12} className="max-h-[var(--radix-dropdown-menu-content-available-height)] w-52 max-w-[calc(100vw-1.5rem)] overflow-y-auto rounded-lg border-white/[0.12] p-1.5 shadow-elev">
-            {versions.map((v) => <DropdownMenuItem key={v.id} onSelect={() => switchVersion(v)} disabled={switching} accentColor={currentVersion?.id === v.id ? "#34d399" : undefined} data-current={currentVersion?.id === v.id ? "true" : undefined} className="rounded-md px-3 py-2 text-xs text-white/80">{currentVersion?.id === v.id && <Check size={14} aria-hidden="true" />}<span className="min-w-0 truncate">{v.name}</span></DropdownMenuItem>)}
+            {!isCollection && versions.map((v) => <DropdownMenuItem key={v.id} onSelect={() => switchVersion(v)} disabled={switching} accentColor={currentVersion?.id === v.id ? "#34d399" : undefined} data-current={currentVersion?.id === v.id ? "true" : undefined} className="rounded-md px-3 py-2 text-xs text-white/80">{currentVersion?.id === v.id && <Check size={14} aria-hidden="true" />}<span className="min-w-0 truncate">{v.name}</span></DropdownMenuItem>)}
             <DropdownMenuItem onSelect={() => { setPendingFile(null); setManagerOpen(true); }} className="rounded-md px-3 py-2 text-xs text-white/80">Gerenciar versões</DropdownMenuItem>
             {track.audio_url && <DropdownMenuItem onSelect={downloadTrack} className="rounded-md px-3 py-2 text-xs text-white/80"><Download size={14} />Baixar áudio</DropdownMenuItem>}
             <DropdownMenuItem onSelect={() => fileRef.current?.click()} className="rounded-md px-3 py-2 text-xs text-white/80"><Plus size={14} />Nova versão</DropdownMenuItem>
@@ -129,7 +140,7 @@ export default function TrackRow({ track, project, queue, index, provided, progr
         </DropdownMenu>
         <input ref={fileRef} type="file" accept="audio/*" className="hidden" onChange={addVersion} />
       </div>
-      {managerOpen && <TrackVersionsDialog track={track} project={project} queue={queue} defaultReviewerId={defaultReviewerId} initialFile={pendingFile} onClose={() => setManagerOpen(false)} onChanged={() => { refreshVersions(); onChanged?.(); }} />}
+      {managerOpen && <TrackVersionsDialog track={track} project={project} queue={queue} isCollection={isCollection} defaultReviewerId={defaultReviewerId} initialFile={pendingFile} onClose={() => setManagerOpen(false)} onChanged={() => { refreshVersions(); onChanged?.(); }} />}
     </div>
   );
 }

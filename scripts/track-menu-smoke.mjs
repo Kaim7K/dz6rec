@@ -61,6 +61,65 @@ try {
     await page.getByTitle('Single Piloto (Mix 40)', { exact: true }).waitFor();
     await page.reload();
     await page.getByTitle('Single Piloto (Mix 40)', { exact: true }).waitFor();
+
+    if (!published && (width === 390 || width === 1440)) {
+      const type = width === 390 ? 'ep' : 'album';
+      const wav = Buffer.alloc(44 + 8000 * 2 * 10);
+      wav.write('RIFF', 0);
+      wav.writeUInt32LE(wav.length - 8, 4);
+      wav.write('WAVEfmt ', 8);
+      wav.writeUInt32LE(16, 16);
+      wav.writeUInt16LE(1, 20);
+      wav.writeUInt16LE(1, 22);
+      wav.writeUInt32LE(8000, 24);
+      wav.writeUInt32LE(16000, 28);
+      wav.writeUInt16LE(2, 32);
+      wav.writeUInt16LE(16, 34);
+      wav.write('data', 36);
+      wav.writeUInt32LE(wav.length - 44, 40);
+      await page.route('**/qa-*.wav', route => route.fulfill({ contentType: 'audio/wav', body: wav }));
+      await page.evaluate(type => {
+        const store = JSON.parse(localStorage.getItem('dz6_mock_store_v1'));
+        store.Project.find(project => project.id === 'project-1').type = type;
+        const track = store.Track.find(track => track.project_id === 'project-1');
+        Object.assign(track, { current_version_id: 'qa-main', version_label: 'Original', audio_url: '/qa-main.wav' });
+        store.Track = [track, ...Array.from({ length: 7 }, (_, index) => ({
+          ...track, id: `other-${index}`, name: `Faixa ${index + 2}`, track_number: index + 2, current_version_id: '',
+        }))];
+        store.TrackVersion = [
+          { id: 'qa-main', track_id: track.id, name: 'Original', audio_url: '/qa-main.wav' },
+          { id: 'qa-preview', track_id: track.id, name: 'Prévia QA', audio_url: '/qa-preview.wav' },
+          { id: 'qa-unrelated', track_id: 'other-0', name: 'Versão de outra faixa', audio_url: '/qa-other.wav' },
+        ];
+        localStorage.setItem('dz6_mock_store_v1', JSON.stringify(store));
+      }, type);
+      const mainVersion = () => page.evaluate(() => JSON.parse(localStorage.getItem('dz6_mock_store_v1')).Track[0].current_version_id);
+      await page.reload();
+      const trackButton = page.getByRole('button', { name: 'Versões de Single Piloto', exact: true });
+      await trackButton.click();
+      const dialog = page.getByRole('dialog');
+      assert.equal(await page.locator('.dz-track-row').count(), 8);
+      assert.equal(await dialog.getByText('Versão de outra faixa', { exact: true }).count(), 0);
+      await dialog.getByRole('button', { name: 'Ouvir Prévia QA', exact: true }).click();
+      const pause = dialog.getByRole('button', { name: 'Pausar Prévia QA', exact: true });
+      await pause.waitFor();
+      assert.equal(await mainVersion(), 'qa-main');
+      await pause.click();
+      await dialog.getByRole('textbox', { name: 'Nome da nova versão', exact: true }).fill('Novo mix');
+      await dialog.locator('input[type=file]').setInputFiles({ name: 'novo.wav', mimeType: 'audio/wav', buffer: wav });
+      await dialog.getByRole('button', { name: 'Enviar versão', exact: true }).click();
+      await dialog.getByRole('button', { name: 'Ouvir Novo mix', exact: true }).waitFor();
+      assert.equal(await mainVersion(), 'qa-main');
+      await dialog.getByRole('article').filter({ hasText: 'Prévia QA' }).getByRole('button', { name: 'Definir como principal', exact: true }).click();
+      await dialog.getByRole('article').filter({ hasText: 'Prévia QA' }).getByText('Versão principal', { exact: true }).waitFor();
+      assert.equal(await mainVersion(), 'qa-preview');
+      await dialog.getByRole('button', { name: 'Fechar', exact: true }).click();
+      await page.reload();
+      await page.getByTitle('Single Piloto (Prévia QA)', { exact: true }).waitFor();
+      assert.equal(await page.locator('.dz-track-row').count(), 8);
+      assert.equal(await page.getByText('Novo mix', { exact: true }).count(), 0);
+      console.log(`${type}: scoped versions, playback, upload without promotion and persisted main version passed`);
+    }
     assert.deepEqual(errors, []);
     console.log(`${width}px: portal, viewport, Escape, keyboard, file picker, scrolling and version selection passed`);
     await context.close();

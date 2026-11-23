@@ -83,7 +83,7 @@ export default function Topbar({ onMenu }) {
   const profileLabel = cargoList(me?.cargo)[0] || PERMISSAO[me?.permissao] || "Equipe DZ6";
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 min-w-0 items-center gap-2 border-b border-white/[0.075] bg-[#0b0a0a]/95 px-3 backdrop-blur-sm sm:gap-3 sm:px-5 lg:px-7">
+    <header className="sticky top-0 z-30 flex h-16 min-w-0 items-center gap-2 border-b border-white/[0.075] bg-[#0b0a0a]/95 px-3 backdrop-blur-sm sm:gap-3 sm:px-5 lg:px-7 xl:z-[35]">
       <button onClick={onMenu} className="dz-icon-button lg:hidden" aria-label="Abrir menu"><Menu size={20} /></button>
       <WorkspaceSearch />
       <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-1.5">
