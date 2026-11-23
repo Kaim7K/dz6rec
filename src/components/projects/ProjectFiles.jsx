@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { apiClient } from "@/api/appClient";
 import FileField from "@/components/ui/file-field";
+import UploadError from "./UploadError";
+import Field from "@/components/ui/form-field";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { uploadFile } from "@/lib/music";
 import { validateSquareCover } from "@/lib/cover";
@@ -12,6 +15,7 @@ const TYPES = { capa: { label: "Capa", Icon: FileImage }, audio: { label: "Áudi
 
 export default function ProjectFiles({ project, files, defaultReviewerId, onChanged }) {
   const [file, setFile] = useState(null);
+  const uploadedFile = useRef(null);
   const [category, setCategory] = useState("referencia");
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,8 +28,12 @@ export default function ProjectFiles({ project, files, defaultReviewerId, onChan
     setLoading(true); setError(""); setProgress(0);
     try {
       if (category === "capa" && file) await validateSquareCover(file);
-      const file_url = file ? await uploadFile(file, { onProgress: setProgress }) : "";
+      if (file && uploadedFile.current?.file !== file) {
+        uploadedFile.current = { file, url: await uploadFile(file, { onProgress: setProgress }) };
+      }
+      const file_url = file ? uploadedFile.current.url : "";
       await apiClient.entities.ProjectFile.create({ project_id: project.id, name: name.trim() || file?.name || "Arquivo", category, file_url, status: "recebido" });
+      uploadedFile.current = null;
       setName(""); setFile(null); onChanged(); toast({ title: "Arquivo adicionado" });
     } catch (err) { setError(err.message || "Não foi possível enviar o arquivo. Seus dados foram mantidos para tentar novamente."); }
     finally { setLoading(false); setProgress(0); }
@@ -41,16 +49,16 @@ export default function ProjectFiles({ project, files, defaultReviewerId, onChan
           <div className="flex shrink-0 items-center gap-3">{entry.file_url && <a href={entry.file_url} target="_blank" rel="noreferrer" className="text-xs text-muted-foreground hover:text-white">Abrir</a>}<Button type="button" variant="outline" disabled={!entry.file_url} aria-label={`Revisar arquivo ${entry.name}`} onClick={() => setReview(entry)}>Revisar</Button></div>
         </article>;
       })}
-      {!files.length && <p className="py-6 text-center text-sm text-muted-foreground">Nenhum arquivo anexado.</p>}
+      {!files.length && <p className="py-4 text-sm text-muted-foreground">Nenhum arquivo anexado. Adicione o primeiro abaixo.</p>}
     </div>
     <form onSubmit={submit} className="mt-4 min-w-0 space-y-3">
-      {error && <p role="alert" className="rounded-md border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-200">{error}</p>}
       <fieldset disabled={loading} className="min-w-0 space-y-3">
-        <label className="block space-y-1.5 text-xs text-muted-foreground"><span>Nome do arquivo</span><input value={name} onChange={event => setName(event.target.value)} placeholder="Nome do arquivo" className="dz-input w-full" /></label>
-        <label className="block space-y-1.5 text-xs text-muted-foreground"><span>Categoria do arquivo</span><select aria-label="Categoria do arquivo" value={category} onChange={event => setCategory(event.target.value)} className="dz-input w-full">{Object.entries(TYPES).map(([key, type]) => <option key={key} value={key}>{type.label}</option>)}</select></label>
-        <FileField value={file} onChange={setFile} disabled={loading} accept={category === "capa" ? "image/*" : category === "audio" ? "audio/*" : ""} hint={category === "capa" ? "Capa quadrada, proporção 1:1." : "Arquivo, áudio ou referência do projeto."} />
+        <Field label="Nome do arquivo"><Input value={name} onChange={event => setName(event.target.value)} /></Field>
+        <label className="block space-y-1.5 text-xs text-muted-foreground"><span>Categoria do arquivo</span><select value={category} onChange={event => { setCategory(event.target.value); setError(""); }} className="dz-input w-full">{Object.entries(TYPES).map(([key, type]) => <option key={key} value={key}>{type.label}</option>)}</select></label>
+        <FileField value={file} onChange={value => { setFile(value); setError(""); }} disabled={loading} accept={category === "capa" ? "image/*" : category === "audio" ? "audio/*" : ""} hint={category === "capa" ? "Capa quadrada, proporção 1:1." : "Arquivo, áudio ou referência do projeto."} />
       </fieldset>
-      <div className="flex flex-wrap items-center justify-between gap-3"><p role="status" className="min-h-4 text-xs text-muted-foreground">{loading ? `Enviando… ${Math.round(progress || 0)}%` : ""}</p><Button type="submit" disabled={loading || (!file && !name.trim())}><Upload size={14} />{loading ? "Enviando..." : "Adicionar arquivo"}</Button></div>
+      <UploadError message={error} />
+      {!error && <div className="flex flex-wrap items-center justify-between gap-3"><p role="status" className="min-h-4 text-xs text-muted-foreground">{loading ? `Enviando… ${Math.round(progress || 0)}%` : ""}</p><Button type="submit" disabled={loading || (!file && !name.trim())}><Upload size={14} />{loading ? "Enviando..." : "Adicionar arquivo"}</Button></div>}
     </form>
     {review && <ArtifactReviewDialog entity="ProjectFile" artifact={review} project={project} defaultReviewerId={defaultReviewerId} onClose={() => setReview(null)} onSaved={onChanged} />}
   </section>;

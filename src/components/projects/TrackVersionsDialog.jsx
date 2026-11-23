@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import Field from "@/components/ui/form-field";
 import FileField from "@/components/ui/file-field";
 import AudioStorageField from "./AudioStorageField";
+import UploadError from "./UploadError";
 import { toast } from "@/components/ui/use-toast";
 import ArtifactReviewDialog, { ReviewBadge } from "./ArtifactReviewDialog";
 import { Pause, Pencil, Play, Trash2 } from "lucide-react";
@@ -50,6 +51,8 @@ export default function TrackVersionsDialog({ track, project, queue, isCollectio
   const [error, setError] = useState("");
   const [name, setName] = useState("");
   const [file, setFile] = useState(initialFile || null);
+  const [uploadError, setUploadError] = useState("");
+  const uploadedAudio = useRef(null);
   const [storage, setStorage] = useState("blob");
   const [progress, setProgress] = useState(0);
   const [editing, setEditing] = useState(null);
@@ -121,18 +124,26 @@ export default function TrackVersionsDialog({ track, project, queue, isCollectio
   const upload = async event => {
     event.preventDefault();
     if (!file || loading || busy) return;
-    setBusy("upload"); setError(""); setProgress(0);
+    setBusy("upload"); setError(""); setUploadError(""); setProgress(0);
     let created;
     try {
-      const audio_url = storage === "drive" ? (await apiClient.drive.uploadAudio(file, setProgress)).file_url : await uploadFile(file, { onProgress: setProgress });
+      if (uploadedAudio.current?.file !== file || uploadedAudio.current?.storage !== storage) {
+        const url = storage === "drive" ? (await apiClient.drive.uploadAudio(file, setProgress)).file_url : await uploadFile(file, { onProgress: setProgress });
+        uploadedAudio.current = { file, storage, url };
+      }
+      const audio_url = uploadedAudio.current.url;
       if (track.audio_url && !versions.some(version => version.audio_url === track.audio_url)) await apiClient.entities.TrackVersion.create({ track_id: track.id, name: track.version_label || "Versão anterior", audio_url: track.audio_url });
       created = await apiClient.entities.TrackVersion.create({ track_id: track.id, name: name.trim() || `Mix ${versions.length + 1}`, audio_url, original_filename: file.name });
+      uploadedAudio.current = null;
       setFile(null); setName("");
       if (!isCollection) await activate(created);
       const me = await apiClient.auth.me().catch(() => null);
       await logActivity(project.id, `Versão adicionada em ${track.name}: ${created.name}`, me?.full_name);
       toast({ title: "Versão enviada", description: created.name });
-    } catch (err) { setError(created ? "O arquivo foi salvo, mas não foi possível torná-lo atual. Use o botão Usar versão abaixo; não é necessário reenviar." : err.message || "Não foi possível enviar. O arquivo selecionado foi mantido para tentar novamente."); }
+    } catch (err) {
+      if (created) setError("A versão foi salva. Use o botão Usar versão abaixo para ativá-la.");
+      else setUploadError(err.message || "Não foi possível salvar a versão. O áudio continua selecionado.");
+    }
     finally { await sync(); setBusy(""); setProgress(0); }
   };
   if (review) return <ArtifactReviewDialog entity="TrackVersion" artifact={review} project={project} defaultReviewerId={defaultReviewerId} onClose={() => setReview(null)} onSaved={() => { sync(); }} />;
@@ -144,9 +155,10 @@ export default function TrackVersionsDialog({ track, project, queue, isCollectio
         <form onSubmit={upload} className="min-w-0 space-y-3 border-b border-white/[0.08] pb-5">
           <h3 className="text-sm font-semibold">Nova versão</h3>
           <Field label="Nome da nova versão"><Input value={name} disabled={!!busy} maxLength={120} onChange={event => setName(event.target.value)} placeholder={`Mix ${versions.length + 1}`} /></Field>
-          <Field label="Arquivo da versão"><FileField value={file} onChange={setFile} disabled={loading || !!busy} accept="audio/*" hint={isCollection ? "O envio mantém a versão principal da faixa." : "O áudio atual permanece disponível no histórico."} /></Field>
-          {file && <AudioStorageField value={storage} onChange={setStorage} disabled={!!busy} />}
-          <div className="flex flex-wrap items-center justify-between gap-3"><p role="status" className="text-xs text-muted-foreground">{busy === "upload" ? `Enviando… ${Math.round(progress || 0)}%` : "Nomeie a versão para facilitar as revisões."}</p><Button type="submit" className="w-full sm:w-auto" disabled={!file || loading || !!busy}>{busy === "upload" ? "Enviando..." : "Enviar versão"}</Button></div>
+          <Field label="Arquivo da versão"><FileField value={file} onChange={value => { setFile(value); setUploadError(""); }} disabled={loading || !!busy} accept="audio/*" hint={isCollection ? "O envio mantém a versão principal da faixa." : "O áudio atual permanece disponível no histórico."} /></Field>
+          {file && <AudioStorageField value={storage} onChange={value => { setStorage(value); setUploadError(""); }} disabled={!!busy} />}
+          <UploadError message={uploadError} disabled={loading || !!busy} />
+          {!uploadError && <div className="flex flex-wrap items-center justify-between gap-3"><p role="status" className="text-xs text-muted-foreground">{busy === "upload" ? `Enviando… ${Math.round(progress || 0)}%` : "Nomeie a versão para facilitar as revisões."}</p><Button type="submit" className="w-full sm:w-auto" disabled={!file || loading || !!busy}>{busy === "upload" ? "Enviando..." : "Enviar versão"}</Button></div>}
         </form>
         {playableVersions.length > 1 && <VersionComparison versions={playableVersions} mainPlayerPlaying={player.isPlaying} onPlay={() => { if (player.isPlaying) player.togglePlay(); }} />}
         <section className="min-w-0 divide-y divide-white/[0.08]" aria-label="Lista de versões">
@@ -155,7 +167,15 @@ export default function TrackVersionsDialog({ track, project, queue, isCollectio
               {version.audio_url && <button type="button" aria-label={`${isPlayingVersion(version) && player.isPlaying ? "Pausar" : "Ouvir"} ${version.name}`} onClick={() => listen(version)} className="dz-icon-button shrink-0">
                 {isPlayingVersion(version) && player.isPlaying ? <Pause size={15} /> : <Play size={15} />}
               </button>}
-              <div className="min-w-0 flex-1"><p className="break-words text-sm font-semibold">{version.name}</p><div className="mt-1 flex flex-wrap items-center gap-3">{current(version) && <span className="text-xs font-semibold text-white">{isCollection ? "Versão principal" : "Versão atual"}</span>}<ReviewBadge entity="TrackVersion" artifact={version} /></div>{version.reviewer_name && <p className="mt-1 text-xs text-muted-foreground [overflow-wrap:anywhere]">Revisor: {version.reviewer_name}</p>}</div>
+              <div className="min-w-0 flex-1">
+                <p className="break-words text-sm font-semibold">{version.name}</p>
+                <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                  {current(version) && <span className="rounded-md border border-white/15 bg-white/[0.06] px-1.5 py-0.5 text-xs text-white/90">Versão principal</span>}
+                  {isPlayingVersion(version) && player.isPlaying && <span className="rounded-md bg-red-500/10 px-1.5 py-0.5 text-xs text-red-200">Em reprodução</span>}
+                  <ReviewBadge entity="TrackVersion" artifact={version} />
+                </div>
+                {version.reviewer_name && <p className="mt-1 text-xs text-muted-foreground [overflow-wrap:anywhere]">Revisor: {version.reviewer_name}</p>}
+              </div>
               <button type="button" disabled={!!busy} aria-label={`Renomear ${version.name}`} onClick={() => { setEditing(version.id); setEditName(version.name); }} className="dz-icon-button shrink-0"><Pencil size={15} /></button>
               <DeleteConfirmation title="Excluir versão" onConfirm={() => deleteVersion(version)} onDeleted={onChanged} trigger={
                 <button type="button" disabled={!!busy} aria-label={`Excluir versão ${version.name}`} className="dz-icon-button shrink-0 text-red-300"><Trash2 size={15} /></button>

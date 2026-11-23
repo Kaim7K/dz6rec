@@ -6,15 +6,15 @@ import { apiClient } from "@/api/appClient";
 import FeaturedProject from "@/components/home/FeaturedProject";
 import MetricStrip from "@/components/home/MetricStrip";
 import dz6ProfileLogo from "@/assets/dz6-profile.png";
-import { ArrowRight, Disc3, FolderKanban, ListTodo } from "lucide-react";
+import { ArrowRight, Clock3, Disc3, FileCheck, FolderKanban, ListTodo } from "lucide-react";
 import { dueLabel, isDueSoon, isOverdue, STATUS, STATUS_TONE, taskResponsibleIds, taskResponsibleNames, taskScore } from "@/lib/music";
 import { useAuth } from "@/lib/AuthContext";
 import { reviewStatus } from "@/lib/reviews";
 
 function Panel({ title, action = "", to = "/projetos", children }) {
   return (
-    <section className="min-w-0 border-t border-white/[0.08] pt-5">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+    <section className="dz-card min-w-0 p-4 sm:p-5">
+      <div className="mb-2 flex min-h-8 flex-wrap items-center justify-between gap-2 border-b border-white/[0.08] pb-3">
         <h2 className="dz-panel-title">{title}</h2>
         {action && <Link to={to} className="inline-flex items-center gap-2 text-xs font-medium text-muted-foreground transition-colors hover:text-white">
           {action} <ArrowRight size={13} />
@@ -27,46 +27,40 @@ function Panel({ title, action = "", to = "/projetos", children }) {
 
 function MiniCover({ project }) {
   return (
-    <div className="h-12 w-12 shrink-0 overflow-hidden rounded-md border border-white/[0.06] bg-black">
-      <img src={project.cover_thumbnail_url || project.cover_url || dz6ProfileLogo} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
-    </div>
+    <img src={project.cover_thumbnail_url || project.cover_url || dz6ProfileLogo} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
   );
 }
 
-function ActionIcon() {
+function OverviewRow({ to, title, context, leading, status, tone = "text-muted-foreground" }) {
   return (
-    <span className="grid h-9 w-7 shrink-0 place-items-center text-white/64">
-      <ListTodo size={17} />
-    </span>
+    <Link to={to} className="dz-list-row flex min-h-14 items-center gap-3 py-2.5">
+      <span aria-hidden="true" className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-md bg-white/[0.045] text-muted-foreground">{leading}</span>
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-sm font-medium text-white/90">{title}</span>
+        <span className="mt-0.5 block truncate text-xs text-muted-foreground">{context}</span>
+      </span>
+      <span className={`max-w-[36%] truncate text-right text-xs font-medium ${tone}`} title={status}>{status}</span>
+    </Link>
   );
 }
+
+const taskLink = task => task.project_id ? `/projetos/${task.project_id}?tab=checklist&task=${encodeURIComponent(task.id)}` : "/minhas-tarefas";
 
 function ActionRow({ task, project }) {
-  const overdue = isOverdue(task.due_date, task.completed);
+  const overdue = isOverdue(task.due_date);
   const status = overdue ? "Atrasada" : task.task_status === "em_progresso" ? "Em andamento" : "Pendente";
   return (
-    <Link to={task.project_id ? `/projetos/${task.project_id}?tab=checklist&task=${encodeURIComponent(task.id)}` : "/minhas-tarefas"} className="dz-list-row flex items-center gap-3 py-2.5">
-      <ActionIcon />
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium text-white/88">{task.text}</p>
-        <p className="mt-1 truncate text-xs text-muted-foreground">{project?.name || "Projeto"} - {project?.main_artist_name || "DZ6"}</p>
-      </div>
-      <span className={`shrink-0 text-xs font-medium ${overdue ? "text-red-300" : task.task_status === "em_progresso" ? "text-amber-300" : "text-muted-foreground"}`}>{task.due_date ? dueLabel(task.due_date) : status}</span>
-    </Link>
+    <OverviewRow to={taskLink(task)} title={task.text} context={project?.name || "Projeto"}
+      leading={<ListTodo size={16} />} status={task.due_date ? dueLabel(task.due_date) : status}
+      tone={overdue ? "text-red-300" : isDueSoon(task.due_date) ? "text-amber-200" : undefined} />
   );
 }
 
 function ProjectRow({ project }) {
   const tone = STATUS_TONE[project.status] || STATUS_TONE.rascunho;
   return (
-    <Link to={`/projetos/${project.id}`} className="dz-list-row flex items-center gap-3 py-2.5">
-      <MiniCover project={project} />
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium text-white/88">{project.name}</p>
-        <p className="mt-1 truncate text-xs text-muted-foreground">{project.main_artist_name || "Sem artista"}</p>
-      </div>
-      <span className={`hidden items-center gap-2 text-xs font-medium sm:inline-flex ${tone.text}`}><span className={`h-1.5 w-1.5 rounded-full ${tone.dot}`} />{STATUS[project.status] || project.status}</span>
-    </Link>
+    <OverviewRow to={`/projetos/${project.id}`} title={project.name} context={project.main_artist_name || "Sem artista"}
+      leading={<MiniCover project={project} />} status={STATUS[project.status] || project.status} tone={tone.text} />
   );
 }
 
@@ -129,7 +123,7 @@ export default function Home() {
           byProject,
           active: activeProjects.length,
           inProd: projects.filter((project) => project.status === "producao").length,
-          overdue: items.filter((item) => isOverdue(item.due_date, item.completed)).length,
+          overdue: pendingItems.filter(item => isOverdue(item.due_date)).length,
           pendingItems,
         });
       })
@@ -149,10 +143,12 @@ export default function Home() {
   ) : [];
   const upcoming = data.pendingItems.filter(item => isOverdue(item.due_date) || isDueSoon(item.due_date))
     .sort((a, b) => new Date(a.due_date).getTime() - new Date(b.due_date).getTime());
+  const urgent = upcoming[0];
+  const urgentOverdue = urgent && isOverdue(urgent.due_date);
   const metrics = [
     { label: "Projetos ativos", value: data.active, icon: FolderKanban },
     { label: "Em produção", value: data.inProd, icon: Disc3 },
-    { label: "Tarefas críticas", value: data.overdue, icon: ListTodo },
+    { label: "Tarefas atrasadas", value: data.overdue, icon: ListTodo },
   ];
 
   return (
@@ -161,6 +157,17 @@ export default function Home() {
         <div><p className="dz-kicker">Workspace</p><h1 className="dz-page-title">Visão geral</h1><p className="dz-page-subtitle">Projetos, entregas e o próximo passo da gravadora.</p></div>
         <Link to="/projetos" className="dz-ghost-button">Ver catálogo <ArrowRight size={15} /></Link>
       </header>
+      {urgent && (
+        <section aria-labelledby="home-priority" data-tone={urgentOverdue ? "danger" : "warn"} className="dz-card dz-project-next-action flex flex-wrap items-center gap-3 p-4">
+          <span aria-hidden="true" className={`grid h-10 w-10 shrink-0 place-items-center rounded-lg ${urgentOverdue ? "bg-red-500/10 text-red-300" : "bg-amber-500/10 text-amber-200"}`}><Clock3 size={18} /></span>
+          <div className="min-w-0 flex-1 basis-48">
+            <h2 id="home-priority" className="text-xs font-medium text-muted-foreground">{urgentOverdue ? "Prazo atrasado em destaque" : "Próximo prazo"}</h2>
+            <p className="mt-0.5 break-words text-sm font-semibold">{urgent.text}</p>
+            <p className="mt-1 break-words text-xs text-muted-foreground">{data.projectMap[urgent.project_id]?.name || "Projeto"} · {dueLabel(urgent.due_date)}</p>
+          </div>
+          <Link to={taskLink(urgent)} className="dz-ghost-button">Abrir tarefa <ArrowRight size={14} /></Link>
+        </section>
+      )}
       {data.featured ? <FeaturedProject project={data.featured} progress={data.byProject[data.featured?.id]} /> : <section className="dz-empty"><Disc3 size={24} className="text-muted-foreground" /><h2 className="text-lg font-semibold">Seu catálogo começa aqui</h2><p className="text-sm text-muted-foreground">Crie um projeto para organizar faixas, arquivos e entregas.</p><Link to="/projetos" className="dz-primary-button">Ver projetos<ArrowRight size={15} /></Link></section>}
       <MetricStrip metrics={metrics} />
 
@@ -182,11 +189,8 @@ export default function Home() {
           ) : !reviews.length ? (
             <p className="py-6 text-sm text-muted-foreground">Nenhum arquivo aguardando sua aprovação.</p>
           ) : reviews.map(({ entity, artifact, projectId }) => (
-            <Link key={`${entity}-${artifact.id}`} to={`/projetos/${projectId}?tab=${entity === "TrackVersion" ? "faixas" : "operacao"}&review=${entity}&record=${encodeURIComponent(artifact.id)}`} className="dz-list-row flex items-center gap-3 py-2.5">
-              <ActionIcon />
-              <span className="min-w-0 flex-1"><span className="block truncate text-sm font-medium">{artifact.name}</span><span className="block truncate text-xs text-muted-foreground">{data.projectMap[projectId]?.name || "Projeto"}</span></span>
-              <ArrowRight size={14} className="shrink-0 text-muted-foreground" />
-            </Link>
+            <OverviewRow key={`${entity}-${artifact.id}`} to={`/projetos/${projectId}?tab=${entity === "TrackVersion" ? "faixas" : "operacao"}&review=${entity}&record=${encodeURIComponent(artifact.id)}`}
+              title={artifact.name} context={data.projectMap[projectId]?.name || "Projeto"} leading={<FileCheck size={16} />} status="Em revisão" tone="text-amber-200" />
           ))}
         </Panel>
 

@@ -37,10 +37,14 @@ export default function TrackList({ project, tracks, onChanged, progressPct = 0,
             <p className="mt-1 text-xs text-muted-foreground">{list.length} {list.length === 1 ? "faixa" : "faixas"} neste projeto</p>
           </div>
         </div>
-        <button onClick={() => setOpen(true)} className="dz-ghost-button h-9"><Plus size={15} />Adicionar faixa</button>
+        {list.length > 0 && <button type="button" onClick={() => setOpen(true)} className="dz-ghost-button h-9"><Plus size={15} />Adicionar faixa</button>}
       </div>
       {list.length === 0 ? (
-        <div className="dz-empty min-h-36">Nenhuma faixa ainda. Adicione a primeira.</div>
+        <div className="dz-empty min-h-36 border border-dashed border-white/10">
+          <Music2 size={20} aria-hidden="true" />
+          <p>Nenhuma faixa neste projeto.</p>
+          <button type="button" onClick={() => setOpen(true)} className="dz-ghost-button h-9"><Plus size={15} />Adicionar faixa</button>
+        </div>
       ) : (
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId="tracks">

@@ -8,7 +8,7 @@ import { toast } from "@/components/ui/use-toast";
 import { Check, Pause, Play, Plus, MoreHorizontal, GripVertical, Download, Trash2 } from "lucide-react";
 import DeleteConfirmation from "@/components/DeleteConfirmation";
 import dz6ProfileLogo from "@/assets/dz6-profile.png";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 
 export default function TrackRow({ track, project, queue, index, provided, progressPct = 0, onChanged, defaultReviewerId }) {
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -114,13 +114,14 @@ export default function TrackRow({ track, project, queue, index, provided, progr
       <div className="dz-track-menu relative justify-self-end">
         <DropdownMenu open={menu} onOpenChange={setMenu}>
           <DropdownMenuTrigger asChild>
-            <button type="button" disabled={switching} aria-label={`Opções da faixa ${track.name}`} className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-white/5 hover:text-white"><MoreHorizontal size={16} /></button>
+            <button type="button" disabled={switching} aria-label={`Opções da faixa ${track.name}`} className="dz-icon-button"><MoreHorizontal size={16} /></button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" sideOffset={6} collisionPadding={12} className="max-h-[var(--radix-dropdown-menu-content-available-height)] w-52 max-w-[calc(100vw-1.5rem)] overflow-y-auto rounded-lg border-white/[0.12] p-1.5 shadow-elev">
             {!isCollection && versions.map((v) => <DropdownMenuItem key={v.id} onSelect={() => switchVersion(v)} disabled={switching} accentColor={currentVersion?.id === v.id ? "#34d399" : undefined} data-current={currentVersion?.id === v.id ? "true" : undefined} className="rounded-md px-3 py-2 text-xs text-white/80">{currentVersion?.id === v.id && <Check size={14} aria-hidden="true" />}<span className="min-w-0 truncate">{v.name}</span></DropdownMenuItem>)}
             <DropdownMenuItem onSelect={() => { setPendingFile(null); setManagerOpen(true); }} className="rounded-md px-3 py-2 text-xs text-white/80">Gerenciar versões</DropdownMenuItem>
             {track.audio_url && <DropdownMenuItem onSelect={downloadTrack} className="rounded-md px-3 py-2 text-xs text-white/80"><Download size={14} />Baixar áudio</DropdownMenuItem>}
             <DropdownMenuItem onSelect={() => fileRef.current?.click()} className="rounded-md px-3 py-2 text-xs text-white/80"><Plus size={14} />Nova versão</DropdownMenuItem>
+            <DropdownMenuSeparator />
             <DropdownMenuItem onSelect={() => setDeleteOpen(true)} className="rounded-md px-3 py-2 text-xs text-red-300"><Trash2 size={14} />Excluir faixa</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

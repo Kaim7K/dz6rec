@@ -6,6 +6,7 @@ import Field from "@/components/ui/form-field";
 import { Textarea } from "@/components/ui/textarea";
 import FileField from "@/components/ui/file-field";
 import AudioStorageField from "./AudioStorageField";
+import UploadError from "./UploadError";
 import { apiClient } from "@/api/appClient";
 import { uploadFile, logActivity } from "@/lib/music";
 import { Loader2 } from "lucide-react";
@@ -19,9 +20,13 @@ export default function AddTrackDialog({ open, onClose, onCreated, project, trac
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+  const [uploadError, setUploadError] = useState("");
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
   const submit = async (e) => {
-    e.preventDefault(); setLoading(true); setUploadProgress(0); setError("");
+    e.preventDefault();
+    if (loading) return;
+    setLoading(true); setUploadProgress(0); setError(""); setUploadError("");
+    let sendingAudio = Boolean(audio);
     try {
       const trackName = form.name.trim() || project.name || "Faixa sem nome";
       let audio_url = "";
@@ -29,6 +34,7 @@ export default function AddTrackDialog({ open, onClose, onCreated, project, trac
         setUploading(true);
         const onProgress = value => setUploadProgress(Math.max(0, Math.min(100, value || 0)));
         audio_url = storage === "drive" ? (await apiClient.drive.uploadAudio(audio, onProgress)).file_url : await uploadFile(audio, { onProgress });
+        sendingAudio = false;
         setUploading(false);
       }
       const data = { ...form, name: trackName, project_id: project.id, audio_url, bpm: form.bpm ? Number(form.bpm) : undefined, track_number: Number(form.track_number ?? nextTrackNumber) };
@@ -41,9 +47,8 @@ export default function AddTrackDialog({ open, onClose, onCreated, project, trac
       onCreated(); onClose();
     } catch (err) {
       setUploadProgress(0);
-      setError(err.message?.includes("client token") || err.message?.includes("CORS") || err.message?.includes("Failed to fetch")
-        ? "Nao foi possivel conectar ao Vercel Blob. Confira o token BLOB_READ_WRITE_TOKEN no projeto e tente novamente."
-        : err.message || "Nao foi possivel enviar o arquivo");
+      if (sendingAudio) setUploadError(err.message || "Não foi possível enviar o áudio. O arquivo continua selecionado.");
+      else setError(err.message || "Não foi possível salvar a faixa.");
     } finally {
       setLoading(false);
       setUploading(false);
@@ -56,7 +61,7 @@ export default function AddTrackDialog({ open, onClose, onCreated, project, trac
           <DialogTitle>Adicionar faixa</DialogTitle>
           <DialogDescription>Informe o essencial. Detalhes técnicos podem ser preenchidos depois.</DialogDescription>
         </DialogHeader>
-        {error && <div className="rounded-md border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</div>}
+        {error && <div role="alert" className="rounded-md border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</div>}
         <form onSubmit={submit} className="space-y-4">
           <Field label="Nome"><Input value={form.name} onChange={(e) => set("name", e.target.value)} placeholder={project?.name || "Ex. Noite Clara"} /></Field>
           <div className="dz-form-columns">
@@ -68,7 +73,7 @@ export default function AddTrackDialog({ open, onClose, onCreated, project, trac
             <Field label="Versão"><Input value={form.version_label} onChange={(e) => set("version_label", e.target.value)} placeholder="Demo 01, Mix 01..." /></Field>
           </div>
           <Field label="Arquivo de áudio">
-            <FileField value={audio} onChange={(file) => { setAudio(file); setUploadProgress(0); setError(""); }} accept="audio/*" hint="MP3, WAV, FLAC..." />
+            <FileField value={audio} disabled={loading} onChange={(file) => { setAudio(file); setUploadProgress(0); setUploadError(""); }} accept="audio/*" hint="MP3, WAV, FLAC..." />
             {(loading && audio) && (
               <div className="mt-2 space-y-1.5">
                 <div className="flex items-center justify-between text-2xs text-muted-foreground">
@@ -81,7 +86,8 @@ export default function AddTrackDialog({ open, onClose, onCreated, project, trac
               </div>
             )}
           </Field>
-          {audio && <AudioStorageField value={storage} onChange={setStorage} disabled={loading} />}
+          {audio && <AudioStorageField value={storage} onChange={value => { setStorage(value); setUploadError(""); }} disabled={loading} />}
+          <UploadError message={uploadError} />
           <p className="pt-1 text-2xs font-medium uppercase tracking-[0.16em] text-muted-foreground">Detalhes opcionais</p>
           <div className="dz-form-columns">
             <Field label="BPM"><Input type="number" value={form.bpm} onChange={(e) => set("bpm", e.target.value)} /></Field>
@@ -91,7 +97,7 @@ export default function AddTrackDialog({ open, onClose, onCreated, project, trac
             <Field label="ISRC"><Input value={form.isrc} onChange={(e) => set("isrc", e.target.value)} /></Field>
           </div>
           <Field label="Observações"><Textarea value={form.notes} onChange={(e) => set("notes", e.target.value)} rows={2} /></Field>
-          <DialogFooter><Button type="button" variant="ghost" onClick={onClose} disabled={loading} className="text-white/55">Cancelar</Button><Button type="submit" disabled={loading} className="bg-primary text-primary-foreground">{loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}{uploading ? "Enviando..." : loading ? "Salvando..." : "Adicionar faixa"}</Button></DialogFooter>
+          <DialogFooter><Button type="button" variant="ghost" onClick={onClose} disabled={loading}>Cancelar</Button>{!uploadError && <Button type="submit" disabled={loading}>{loading && <Loader2 className="h-4 w-4 animate-spin" />}{uploading ? "Enviando..." : loading ? "Salvando..." : "Adicionar faixa"}</Button>}</DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
