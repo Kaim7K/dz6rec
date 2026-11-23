@@ -8,6 +8,7 @@ import DeleteConfirmation from "@/components/DeleteConfirmation";
 import { Input } from "@/components/ui/input";
 import Field from "@/components/ui/form-field";
 import FileField from "@/components/ui/file-field";
+import AudioStorageField from "./AudioStorageField";
 import { toast } from "@/components/ui/use-toast";
 import ArtifactReviewDialog, { ReviewBadge } from "./ArtifactReviewDialog";
 import { Pause, Pencil, Play, Trash2 } from "lucide-react";
@@ -49,6 +50,7 @@ export default function TrackVersionsDialog({ track, project, queue, isCollectio
   const [error, setError] = useState("");
   const [name, setName] = useState("");
   const [file, setFile] = useState(initialFile || null);
+  const [storage, setStorage] = useState("blob");
   const [progress, setProgress] = useState(0);
   const [editing, setEditing] = useState(null);
   const [editName, setEditName] = useState("");
@@ -122,7 +124,7 @@ export default function TrackVersionsDialog({ track, project, queue, isCollectio
     setBusy("upload"); setError(""); setProgress(0);
     let created;
     try {
-      const audio_url = await uploadFile(file, { onProgress: setProgress });
+      const audio_url = storage === "drive" ? (await apiClient.drive.uploadAudio(file, setProgress)).file_url : await uploadFile(file, { onProgress: setProgress });
       if (track.audio_url && !versions.some(version => version.audio_url === track.audio_url)) await apiClient.entities.TrackVersion.create({ track_id: track.id, name: track.version_label || "Versão anterior", audio_url: track.audio_url });
       created = await apiClient.entities.TrackVersion.create({ track_id: track.id, name: name.trim() || `Mix ${versions.length + 1}`, audio_url, original_filename: file.name });
       setFile(null); setName("");
@@ -143,6 +145,7 @@ export default function TrackVersionsDialog({ track, project, queue, isCollectio
           <h3 className="text-sm font-semibold">Nova versão</h3>
           <Field label="Nome da nova versão"><Input value={name} disabled={!!busy} maxLength={120} onChange={event => setName(event.target.value)} placeholder={`Mix ${versions.length + 1}`} /></Field>
           <Field label="Arquivo da versão"><FileField value={file} onChange={setFile} disabled={loading || !!busy} accept="audio/*" hint={isCollection ? "O envio mantém a versão principal da faixa." : "O áudio atual permanece disponível no histórico."} /></Field>
+          {file && <AudioStorageField value={storage} onChange={setStorage} disabled={!!busy} />}
           <div className="flex flex-wrap items-center justify-between gap-3"><p role="status" className="text-xs text-muted-foreground">{busy === "upload" ? `Enviando… ${Math.round(progress || 0)}%` : "Nomeie a versão para facilitar as revisões."}</p><Button type="submit" className="w-full sm:w-auto" disabled={!file || loading || !!busy}>{busy === "upload" ? "Enviando..." : "Enviar versão"}</Button></div>
         </form>
         {playableVersions.length > 1 && <VersionComparison versions={playableVersions} mainPlayerPlaying={player.isPlaying} onPlay={() => { if (player.isPlaying) player.togglePlay(); }} />}

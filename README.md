@@ -57,6 +57,15 @@ O valor de `APP_URL` deve ser exatamente a origem do site, sem barra no final. P
 
 A API cria as tabelas `app_users` e `app_records` automaticamente no primeiro request. O primeiro cadastro feito no site vira `admin`/`superadmin`.
 
+## Áudio no Google Drive pessoal
+
+1. Ative a Google Drive API no projeto do cliente OAuth usado pela DZ6. Na tela de consentimento, conceda acesso aos usuários que vão testar a integração.
+2. Adicione `https://seu-dominio.vercel.app/api/drive/callback` aos URIs autorizados do cliente OAuth Web e mantenha `APP_URL` apontando para esse domínio.
+3. Configure `GOOGLE_DRIVE_TOKEN_KEY` no ambiente da aplicação com 32 bytes aleatórios em Base64. Gere a chave com `node -e "console.log(require('node:crypto').randomBytes(32).toString('base64'))"` e guarde-a junto dos demais segredos do projeto. Alterar a chave exige reconectar as contas.
+4. Em **Adicionar faixa** ou **Gerenciar versões**, escolha um arquivo de áudio e selecione **Salvar no meu Drive**. Conecte sua conta Google quando solicitado.
+
+O áudio fica privado no Drive de quem enviou. A DZ6 guarda a referência e usa a mesma política de acesso do catálogo interno para reprodução. A exclusão na DZ6 remove o vínculo do catálogo. Gerencie o arquivo original e a revogação do acesso pelo Google Drive e pela Conta Google.
+
 ## Scripts
 
 - `npm run dev`: servidor Vite

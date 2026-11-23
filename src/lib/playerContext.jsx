@@ -1,5 +1,7 @@
 ﻿import React, { createContext, useContext, useRef, useState, useEffect, useCallback } from "react";
 
+import { toast } from "@/components/ui/use-toast";
+
 const PlayerContext = createContext(null);
 export const usePlayer = () => useContext(PlayerContext);
 
@@ -83,6 +85,12 @@ export function PlayerProvider({ children }) {
       <audio
         ref={audioRef}
         onTimeUpdate={(e) => setProgress(e.currentTarget.currentTime)}
+        onError={(event) => {
+          if (event.currentTarget.getAttribute("src")?.startsWith("/api/drive/audio/")) {
+            setIsPlaying(false);
+            toast({ variant: "destructive", title: "Áudio indisponível no Drive", description: "Atualize a página. Se persistir, peça a quem enviou para reconectar o Drive ou reenviar o arquivo." });
+          }
+        }}
         onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
         onEnded={() => { if (repeat) { audioRef.current.currentTime = 0; audioRef.current.play(); } else next(); }}
       />

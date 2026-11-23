@@ -33,6 +33,7 @@ export default function ArtifactReviewDialog({ entity, artifact: initialArtifact
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [attempt, setAttempt] = useState(0);
+  const [failedAudio, setFailedAudio] = useState("");
   const audioRef = useRef(null);
   const url = artifactUrl(entity, artifact);
   const isAudio = (entity === "TrackVersion" || artifact.category === "audio") && !!url;
@@ -92,7 +93,8 @@ export default function ArtifactReviewDialog({ entity, artifact: initialArtifact
         <form onSubmit={submit} className="min-w-0 space-y-4">
         <div className="min-w-0 space-y-3">
           {entity === "ProjectFile" && artifact.category === "capa" && url && <div className="mx-auto aspect-square w-full max-w-64 overflow-hidden rounded-lg border border-white/10 bg-black"><img src={url} alt={`Capa: ${artifact.name}`} className="h-full w-full object-contain" /></div>}
-          {isAudio && <audio ref={audioRef} controls preload="metadata" src={url} aria-label={`Ouvir ${artifact.name}`} style={{ colorScheme: "dark" }} className="w-full max-w-full" />}
+          {isAudio && <audio ref={audioRef} controls preload="metadata" src={url} onError={() => setFailedAudio(url)} aria-label={`Ouvir ${artifact.name}`} style={{ colorScheme: "dark" }} className="w-full max-w-full" />}
+          {failedAudio && failedAudio === url && url.startsWith("/api/drive/audio/") && <p role="status" className="text-xs text-red-200">Áudio indisponível no Drive. Atualize a página ou peça a quem enviou para reconectar a conta.</p>}
           {isAudio && <ReviewWaveform key={url} url={url} audioRef={audioRef} />}
           {url && <a href={url} target="_blank" rel="noreferrer" className="inline-block text-xs text-red-200 hover:text-white">Abrir arquivo original</a>}
           <div className="rounded-md border border-white/[0.08] p-3 text-sm">

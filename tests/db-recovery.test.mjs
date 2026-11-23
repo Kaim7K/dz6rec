@@ -9,7 +9,7 @@ const {ensureDatabase}=await import('../api/_db.js');
 const {default:handler}=await import('../api/[...path].js');
 test('a transient bootstrap failure can retry, then shares successful initialization',async()=>{
   failNext=true;await assert.rejects(ensureDatabase(),/Simulated database outage/);const afterFailure=calls;
-  await Promise.all([ensureDatabase(),ensureDatabase(),ensureDatabase()]);assert.equal(calls-afterFailure,5);
+  await Promise.all([ensureDatabase(),ensureDatabase(),ensureDatabase()]);assert.equal(calls-afterFailure,7);
   const initialized=calls;await ensureDatabase();assert.equal(calls,initialized);
 });
 test('an asynchronous auth database failure is returned as JSON instead of escaping the route',async t=>{

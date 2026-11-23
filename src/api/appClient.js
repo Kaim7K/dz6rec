@@ -137,6 +137,15 @@ const entityNames = [
 ];
 
 export const apiClient = {
+  drive: {
+    status: () => isLocalMockEnabled() ? Promise.resolve({ enabled: false, connected: false }) : request("/api/drive/status"),
+    connect: () => request("/api/drive/connect", { method: "POST" }),
+    refreshMedia: () => isLocalMockEnabled() ? Promise.resolve() : request("/api/drive/session", { method: "POST" }),
+    uploadAudio: async (file, onProgress) => {
+      const { uploadAudioToDrive } = await import("./driveUpload");
+      return uploadAudioToDrive(file, request, onProgress);
+    },
+  },
   chat: {
     overview: () => request('/api/chat/overview'),
     presence: data => request('/api/chat/presence', { method: 'POST', body: JSON.stringify(data), keepalive: true }),
@@ -195,6 +204,7 @@ export const apiClient = {
         window.location.reload();
         return;
       }
+      fetch("/api/drive/session", { method: "DELETE", keepalive: true }).catch(() => {});
       if (redirectTo) window.location.href = typeof redirectTo === "string" ? redirectTo : "/login";
     },
     redirectToLogin: (returnTo = window.location.pathname) => {

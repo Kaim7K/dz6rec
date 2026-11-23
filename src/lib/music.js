@@ -152,7 +152,7 @@ export function nextProjectAction(project, items = [], files = [], reviews = [])
 
 // Cargos padrão (semeados dinamicamente; novos cargos podem ser adicionados em Configurações)
 export const CARGOS = [
-  "Artista/Intérprete", "Produtor Musical", "Beatmaker", "Engenheiro de Áudio", "Designer",
+  "Artista", "Artista/Intérprete", "Produtor Musical", "Beatmaker", "Engenheiro de Áudio", "Designer",
   "Diretor Artístico", "Social Media", "Estrategista de Marketing", "Diretor de Marketing", "COO", "CEO",
 ];
 

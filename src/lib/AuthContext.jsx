@@ -37,6 +37,17 @@ export const AuthProvider = ({ children }) => {
     checkAppState();
   }, [checkAppState]);
 
+  useEffect(() => {
+    if (user?.status !== "ativo" || apiClient.localMock.enabled()) return;
+    const refresh = () => apiClient.drive.refreshMedia().catch(() => {});
+    const timer = window.setInterval(refresh, 8 * 60 * 1000);
+    window.addEventListener("focus", refresh);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener("focus", refresh);
+    };
+  }, [user?.id, user?.status]);
+
   const logout = useCallback((shouldRedirect = true) => {
     setUser(null);
     setIsAuthenticated(false);

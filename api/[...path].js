@@ -6,6 +6,7 @@ import { handleUpload as handleBlobUpload } from "@vercel/blob/client";
 import formidable from "formidable";
 import { ensureDatabase, getSql } from "./_db.js";
 import { handleReview } from "./_reviews.js";
+import { handleDrive, refreshDriveMedia } from "./_drive.js";
 import { protectedReviewPatch } from "../src/lib/reviews.js";
 import {
   currentUser,
@@ -201,6 +202,7 @@ async function handleAuth(req, res, action, subAction, sql) {
     if (req.method !== "GET") return methodNotAllowed(res);
     const user = await currentUser(req, sql);
     if (!user) return send(res, 401, { error: "Authentication required" });
+    refreshDriveMedia(res, user);
     return send(res, 200, publicUser(user));
   }
 
@@ -530,6 +532,7 @@ export default async function handler(req, res) {
     const parts = pathParts(req);
     if (parts[0] === "auth") return await handleAuth(req, res, parts[1], parts[2], sql);
     if (parts[0] === "upload") return await handleUpload(req, res, sql);
+    if (parts[0] === "drive") return await handleDrive(req, res, sql, parts[1], parts[2]);
     const user = await currentUser(req, sql);
     if (!user) return send(res, 401, { error: "Authentication required" });
     if (user.status !== "ativo") return send(res, 403, { error: "Seu acesso ainda nao foi aprovado" });

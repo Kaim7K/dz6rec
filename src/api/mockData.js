@@ -1,6 +1,7 @@
 import { prepareReview, protectedReviewPatch } from "../lib/reviews.js";
 
 const STORE_KEY = "dz6_mock_store_v1";
+const ARTIST_CARGO_MIGRATION = "dz6_mock_cargo_artista";
 const PROFILE_KEY = "dz6_mock_profile_id";
 
 export function isLocalMockEnabled() {
@@ -20,6 +21,7 @@ const cargos = [
   { id: "cargo-marketing", name: "Estrategista de Marketing", color: "#f97316", created_date: now },
   { id: "cargo-social", name: "Social Media", color: "#737373", created_date: now },
   { id: "cargo-artista", name: "Artista/Intérprete", color: "#b91c1c", created_date: now },
+  { id: "cargo-artista-padrao", name: "Artista", color: "#b91c1c", created_date: now },
 ];
 
 const users = [
@@ -116,11 +118,18 @@ function clone(value) {
 
 export function getMockStore() {
   const raw = localStorage.getItem(STORE_KEY);
-  if (!raw) {
-    localStorage.setItem(STORE_KEY, JSON.stringify(seed));
-    return clone(seed);
+  const store = raw ? JSON.parse(raw) : clone(seed);
+  if (!localStorage.getItem(ARTIST_CARGO_MIGRATION)) {
+    store.Cargo ||= [];
+    if (!store.Cargo.some(cargo => cargo.name?.trim().toLowerCase() === "artista")) {
+      store.Cargo.push(clone(cargos.find(cargo => cargo.id === "cargo-artista-padrao")));
+    }
+    saveMockStore(store);
+    localStorage.setItem(ARTIST_CARGO_MIGRATION, "1");
+  } else if (!raw) {
+    saveMockStore(store);
   }
-  return JSON.parse(raw);
+  return store;
 }
 
 function saveMockStore(store) {

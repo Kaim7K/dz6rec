@@ -29,6 +29,20 @@ export async function ensureDatabase() {
     await sql`CREATE INDEX IF NOT EXISTS app_records_entity_idx ON app_records(entity)`;
     await sql`CREATE INDEX IF NOT EXISTS app_records_entity_created_idx ON app_records(entity, created_date DESC, id DESC)`;
     await sql`CREATE INDEX IF NOT EXISTS app_records_data_gin_idx ON app_records USING gin(data)`;
+    await sql`CREATE TABLE IF NOT EXISTS app_migrations (id text PRIMARY KEY)`;
+    await sql`
+      WITH migration AS (
+        INSERT INTO app_migrations (id) VALUES ('cargo-artista')
+        ON CONFLICT DO NOTHING RETURNING id
+      )
+      INSERT INTO app_records (id, entity, data)
+      SELECT 'cargo-artista-padrao', 'Cargo', '{"name":"Artista","color":"#b91c1c"}'::jsonb
+      FROM migration
+      WHERE NOT EXISTS (
+        SELECT 1 FROM app_records WHERE entity = 'Cargo' AND lower(btrim(data->>'name')) = 'artista'
+      )
+      ON CONFLICT DO NOTHING
+    `;
     await sql`
       CREATE TABLE IF NOT EXISTS app_users (
         id text PRIMARY KEY,

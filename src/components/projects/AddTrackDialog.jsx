@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import Field from "@/components/ui/form-field";
 import { Textarea } from "@/components/ui/textarea";
 import FileField from "@/components/ui/file-field";
+import AudioStorageField from "./AudioStorageField";
 import { apiClient } from "@/api/appClient";
 import { uploadFile, logActivity } from "@/lib/music";
 import { Loader2 } from "lucide-react";
@@ -13,6 +14,7 @@ import { Loader2 } from "lucide-react";
 export default function AddTrackDialog({ open, onClose, onCreated, project, trackCount, nextTrackNumber }) {
   const [form, setForm] = useState({ name: "", main_artist_name: project?.main_artist_name || "", featuring: "", version_label: "Demo 01", track_number: null, bpm: "", key: "", isrc: "", notes: "" });
   const [audio, setAudio] = useState(null);
+  const [storage, setStorage] = useState("blob");
   const [loading, setLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploading, setUploading] = useState(false);
@@ -25,7 +27,8 @@ export default function AddTrackDialog({ open, onClose, onCreated, project, trac
       let audio_url = "";
       if (audio) {
         setUploading(true);
-        audio_url = await uploadFile(audio, { onProgress: (value) => setUploadProgress(Math.max(0, Math.min(100, value || 0))) });
+        const onProgress = value => setUploadProgress(Math.max(0, Math.min(100, value || 0)));
+        audio_url = storage === "drive" ? (await apiClient.drive.uploadAudio(audio, onProgress)).file_url : await uploadFile(audio, { onProgress });
         setUploading(false);
       }
       const data = { ...form, name: trackName, project_id: project.id, audio_url, bpm: form.bpm ? Number(form.bpm) : undefined, track_number: Number(form.track_number ?? nextTrackNumber) };
@@ -78,6 +81,7 @@ export default function AddTrackDialog({ open, onClose, onCreated, project, trac
               </div>
             )}
           </Field>
+          {audio && <AudioStorageField value={storage} onChange={setStorage} disabled={loading} />}
           <p className="pt-1 text-2xs font-medium uppercase tracking-[0.16em] text-muted-foreground">Detalhes opcionais</p>
           <div className="dz-form-columns">
             <Field label="BPM"><Input type="number" value={form.bpm} onChange={(e) => set("bpm", e.target.value)} /></Field>
